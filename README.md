@@ -7,7 +7,7 @@ Homebrdige plugin for Open Z-Wave devices. The main goal of this project is to m
 
 ## Supported Z-Wave Command Classes
 
-(Work In Progress, the list shows the devices I currently have)
+__Work In Progress__ (the list shows command classes for the devices I currently have)
 
 - [x] SWITCH_BINARY (37)
 - [x] SWITCH_MULTILEVEL (38)
