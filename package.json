@@ -1,0 +1,41 @@
+{
+  "name": "homebridge-platform-zwave",
+  "version": "1.0.0",
+  "description": "Homebridge Z-Wave Platform plugin",
+  "main": "index.js",
+  "scripts": {
+    "dev": "./node_modules/.bin/homebridge -D -U ./.dev -P ./",
+    "test": "nyc ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/velocityzen/homebridge-platform-zwave.git"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "z-wave"
+  ],
+  "author": {
+    "name": "Alexey Novikov",
+    "email": "v@2dubs.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/velocityzen/homebridge-platform-zwave/issues"
+  },
+  "homepage": "https://github.com/velocityzen/homebridge-platform-zwave#readme",
+  "dependencies": {
+    "camelcase": "^5.3.1",
+    "openzwave-shared": "^1.4.8",
+    "range-map": "^1.0.4",
+    "try-require": "^1.2.1"
+  },
+  "engines": {
+    "homebridge": ">=0.4.49"
+  },
+  "devDependencies": {
+    "ava": "^2.1.0",
+    "nyc": "^14.1.1",
+    "homebridge": "^0.4.49"
+  }
+}
