@@ -1,6 +1,6 @@
 module.exports = [
 
-  'switchMultilevel',
+  'switchMultiLevel',
   'switchBinary'
 
 ].reduce((m, name) => {
