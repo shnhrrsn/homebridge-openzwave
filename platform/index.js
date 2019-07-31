@@ -174,7 +174,7 @@ class Platform {
     }
 
     for (const pId in parameters) {
-      this.controller.setConfigParam(node.id, parseInt(pId, 10), parameters[pId]);
+      this.controller.setConfigParam(node.id, pId, parameters[pId]);
     }
   }
 

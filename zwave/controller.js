@@ -136,11 +136,11 @@ class Controller {
   }
 
   requestConfigParam(nodeId, paramId) {
-    this.driver.requestConfigParam(nodeId, paramId)
+    this.driver.requestConfigParam(nodeId, Number(paramId))
   }
 
   setConfigParam(nodeId, paramId, paramValue, size) {
-    this.driver.setConfigParam(nodeId, paramId, paramValue, size)
+    this.driver.setConfigParam(nodeId, Number(paramId), paramValue, size)
   }
   //----
 
