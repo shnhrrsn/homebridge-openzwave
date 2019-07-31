@@ -60,7 +60,12 @@ function bind({ Service, Characteristic, bridge, accessory, node, values }) {
     .on('set', (value, cb) => bridge.setValue(valueId, value, cb))
     .on('get', cb => bridge.getValue(valueId, cb));
 
+  // if device has switchBinary class as well sync them
+  const serviceSwitch = accessory.getService(Service.Switch);
+  const switchOn = serviceSwitch && serviceSwitch.getCharacteristic(Characteristic.On);
+
   bridge.onValueChanged(valueId, value => {
+    switchOn && switchOn.updateValue(value !== 0);
     on.updateValue(value !== 0);
     brightness.updateValue(value);
   });
