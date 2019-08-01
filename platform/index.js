@@ -250,8 +250,8 @@ class Platform {
     this.accessories.delete(id);
   }
 
-  getAccessoryId({ manufacturerid, producttype, productid }) {
-    return this.api.hap.uuid.generate(`${manufacturerid}-${producttype}-${productid}`);
+  getAccessoryId({ id, manufacturerid, producttype, productid }) {
+    return this.api.hap.uuid.generate(`${manufacturerid}-${producttype}-${productid}-${id}`);
   }
 
   identify() {
