@@ -65,11 +65,11 @@ If you want to customize exposed accessories, add `accessories` to your config. 
 ```
 
 - __NodeId__ – "3" in the example above. NodeId of the node (device) the config is applied to.
-  – name – string, name of the device in the Home app
-  - ignoreClasses – the array of the command classes Ids to ignore
-  - values – map of `valueId: value` to set the initial value
-  - parameters – map of `parameterId: value` to set the initial value
-  - valuesMaps – map of `valueId: valueMaps` to map a value from Z-Wave to HomeKit.
+– name – string, name of the device in the Home app
+- ignoreClasses – the array of the command classes Ids to ignore
+- values – map of `valueId: value` to set the initial value
+- parameters – map of `parameterId: value` to set the initial value
+- valuesMaps – map of `valueId: valueMaps` to map a value from Z-Wave to HomeKit.
 
 You can also set the node config to `false` to ignore the node (device) entirely.
 
