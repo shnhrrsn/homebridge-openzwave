@@ -11,7 +11,7 @@ module.exports = class Bridge extends EventEmitter {
   }
 
   getValue(valueId, cb) {
-    this.platform.getNodeValue(valueId, (err, value) =>
+    this.platform.getNodeValue(valueId, (err, value = {}) =>
       cb(err, value.value)
     );
   }

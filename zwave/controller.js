@@ -148,11 +148,19 @@ class Controller {
   getLatestNodeValue(valueId) {
     const nodeId = Number(valueId.split('-')[0]);
     const node = this.nodes.get(nodeId);
-    if (node) {
-      return node.values.get(valueId);
+    if (!node) {
+      const err = new Error(error.NODE_NOT_FOUND);
+      err.nodeId = nodeId;
+      throw err;
     }
 
-    return undefined;
+    const value = node.values.get(valueId);
+    if (!value) {
+      const err = new Error(error.VALUE_NOT_FOUND);
+      err.valueId = valueId;
+    }
+
+    return value;
   }
 
   onFailed(...args) {
@@ -294,7 +302,7 @@ class Controller {
   removeNodeValue(nodeId, valueId) {
     const node = this.nodes.get(nodeId);
     const callbacks = node.callbacks.get(valueId);
-    callbacks && sendError(callbacks, 'NOT_FOUND');
+    callbacks && sendError(callbacks, 'VALUE_NOT_FOUND');
     node.callbacks.delete(valueId);
 
     const removedValue = node.values.get(valueId);
