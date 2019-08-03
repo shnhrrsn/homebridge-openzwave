@@ -21,7 +21,7 @@ __Work In Progress__ (the list shows command classes for the devices I currently
 ## Installation
 
 1. [Homebridge](https://github.com/nfarina/homebridge)
-2. `npm i -g homebridge-platform-zwave
+2. `npm i -g homebridge-platform-zwave`
 3. Add platform to your config file
 
 ## Config
