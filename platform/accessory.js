@@ -39,7 +39,7 @@ function createAccessory({ log, api, bridge, id, node, config = {} }) {
   const { Service, Characteristic } = hap;
 
   const manufacturer = getManufacturer(node);
-  const product = `${id} / ${node.product} (${node.productid})`;
+  const product = `${node.id} / ${node.product} - ${node.productid}`;
   const accessory = new Accessory(config.name || product, id);
 
   accessory
