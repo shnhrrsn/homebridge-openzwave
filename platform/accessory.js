@@ -39,13 +39,13 @@ function createAccessory({ log, api, bridge, id, node, config = {} }) {
   const { Service, Characteristic } = hap;
 
   const manufacturer = getManufacturer(node);
-  const product = `${node.product} (${node.productid})`;
+  const product = `${id} / ${node.product} (${node.productid})`;
   const accessory = new Accessory(config.name || product, id);
 
   accessory
     .getService(Service.AccessoryInformation)
     .setCharacteristic(Characteristic.Manufacturer, manufacturer)
-    .setCharacteristic(Characteristic.Model, node.productid)
+    .setCharacteristic(Characteristic.Model, `${node.product} - ${node.productid}`)
     .setCharacteristic(Characteristic.HardwareRevision, node.id);
 
   log.info(`New accessory: ${id}, ${manufacturer}, ${product}`);
