@@ -173,9 +173,25 @@ class Platform {
       return
     }
 
-    for (const pId in parameters) {
-      this.controller.setConfigParam(node.id, pId, parameters[pId]);
+    const controller = this.controller;
+    const nodeId = node.id;
+
+    const setConfigParam = (nodeId, pId, pValue) => {
+      try {
+        const parameter = controller.getNodeValue(`${nodeId}-112-1-${pId}`);
+        if (parameter.value !== pValue) {
+          controller.setConfigParam(nodeId, pId, pValue);
+          this.log.info(`Changed node ${nodeId} config parameter ${pId} from ${parameter.value} to ${pValue}`);
+        }
+      } catch (e) {
+        this.log.error(`Can not set the node ${nodeId} parameter ${pId}`, e);
+      }
     }
+
+    Object.entries(parameters).forEach(([ pId, pValue ]) => {
+      controller.requestConfigParam(nodeId, pId);
+      setTimeout(() => setConfigParam(nodeId, pId, pValue), 1000);
+    });
   }
 
   setNodeValuesMaps(node, valuesMaps) {
