@@ -61,9 +61,10 @@ class Controller {
       const value = this.getLatestNodeValue(valueId);
       if (cb) {
         cb(null, value);
-      } else {
-        return value
+        return;
       }
+
+      return value
     } catch (e) {
       if (cb) {
         cb(e);
@@ -83,7 +84,8 @@ class Controller {
 
       const oldValue = this.getLatestNodeValue(valueId);
       if (oldValue !== undefined && oldValue.value === value) {
-        return cb();
+        cb();
+        return;
       }
 
       const args = valueId.split('-').map(Number).concat(value);
@@ -101,6 +103,7 @@ class Controller {
       console.log('set node value error', e);
       if (cb) {
         cb(e);
+        return;
       }
 
       throw e;
@@ -158,6 +161,7 @@ class Controller {
     if (!value) {
       const err = new Error(error.VALUE_NOT_FOUND);
       err.valueId = valueId;
+      throw err;
     }
 
     return value;
