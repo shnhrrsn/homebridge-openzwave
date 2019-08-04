@@ -14,6 +14,7 @@ class Platform {
     this.log = log;
     this.api = api;
 
+    this.readyNodes = new Set(); // to avoid adding one node twice
     this.accessories = new Map();
     this.accessoryConfigs = config.accessories;
 
@@ -205,10 +206,11 @@ class Platform {
   }
 
   initNode(node) {
-    if (this.accessoryConfigs[node.id] === false) {
+    if (this.readyNodes.has(node.id) || this.accessoryConfigs[node.id] === false) {
       return
     }
 
+    this.readyNodes.add(node.id);
     const deviceConfig = getNodeConfig(node);
     const config = {
       ...deviceConfig,
@@ -255,6 +257,7 @@ class Platform {
   }
 
   removeAccessory(node) {
+    this.readyNodes.delete(node.id);
     const id = this.getAccessoryId(node);
     const accessory = this.accessories.get(id);
 
