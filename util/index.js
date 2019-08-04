@@ -34,7 +34,7 @@ function getOrAddService(accessory, service) {
 }
 
 function getNodeConfig(node) {
-  const pathToConfig = `../devices/${getManufacturer(node)}/${node.productid}`;
+  const pathToConfig = `../devices/${node.manufacturerid}/${node.productid}`;
   return tryRequire(pathToConfig, require) || {};
 }
 
