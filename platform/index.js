@@ -14,7 +14,7 @@ class Platform {
     this.log = log;
     this.api = api;
 
-    this.readyNodes = new Set(); // to avoid adding one node twice
+    this.readyNodes = new Set(); // to avoid adding the same node twice
     this.accessories = new Map();
     this.accessoryConfigs = config.accessories;
 
