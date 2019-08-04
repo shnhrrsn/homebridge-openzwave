@@ -1,6 +1,6 @@
 {
   "name": "homebridge-platform-zwave",
-  "version": "1.0.0-beta-4",
+  "version": "1.0.0-beta-5",
   "description": "Homebridge Z-Wave Platform plugin",
   "main": "index.js",
   "scripts": {
