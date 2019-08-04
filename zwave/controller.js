@@ -58,7 +58,7 @@ class Controller {
 
   getNodeValue(valueId, cb) {
     try {
-      const value = this.getLatestNodeValue(valueId);
+      const value = this.getCachedNodeValue(valueId);
       if (cb) {
         cb(null, value);
         return;
@@ -82,7 +82,7 @@ class Controller {
         value = valueMaps.in(value);
       }
 
-      const oldValue = this.getLatestNodeValue(valueId);
+      const oldValue = this.getCachedNodeValue(valueId);
       if (oldValue !== undefined && oldValue.value === value) {
         cb();
         return;
@@ -148,7 +148,7 @@ class Controller {
   //----
 
   // private
-  getLatestNodeValue(valueId) {
+  getCachedNodeValue(valueId) {
     const nodeId = Number(valueId.split('-')[0]);
     const node = this.nodes.get(nodeId);
     if (!node) {
