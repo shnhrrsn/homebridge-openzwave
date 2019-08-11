@@ -3,7 +3,7 @@ const { createAccessory, configureAccessory } = require('./accessory');
 const Bridge = require('./bridge');
 
 const Controller = require('../zwave/controller');
-const notification = require('../zwave/notification');
+const Notification = require('../zwave/notification');
 
 const { name, version } = require('../package.json');
 
@@ -16,7 +16,7 @@ class Platform {
 
     this.readyNodes = new Set(); // to avoid adding the same node twice
     this.accessories = new Map();
-    this.accessoryConfigs = config.accessories;
+    this.accessoryConfigs = config.accessories || {};
 
     this.bridge = new Bridge(this);
     this.createController(config.zwave);
@@ -37,11 +37,7 @@ class Platform {
       onNodePooling: (...args) => this.onNodePooling(...args),
       onSceneEvent: (...args) => this.onSceneEvent(...args),
       onNodeEvent: (...args) => this.onNodeEvent(...args),
-      // onValueAdded: (...args) => this.onNodeValueAdded(...args),
       onValueChanged: (...args) => this.onNodeValueChanged(...args),
-      // onValueRefreshed: (...args) => this.onNodeValueRefreshed(...args),
-      // onValueRemoved: (...args) => this.onNodeValueRemoved(...args),
-      onControllerCommand: (...args) => this.onControllerCommand(...args),
       onNotification: (...args) => this.onNotification(...args)
     });
   }
@@ -83,27 +79,19 @@ class Platform {
   onNodeReady(node) {
     this.log.debug('node ready', node.id);
     this.initNode(node);
+
+    if (node.id === this.controller.getControllerNodeId()) {
+      this.initControllerNode(node);
+    }
   }
 
   onNodePooling(node) {
     this.log.debug('node pooling', node.id);
   }
 
-  onNodeValueAdded(nodeId, commandClass, value) {
-    this.log.debug('node value added', nodeId, commandClass, value);
-  }
-
   onNodeValueChanged(nodeId, commandClass, value) {
     this.bridge.emit(`value.${value.value_id}.changed`, value.value);
     this.log.debug('node value changed', nodeId, commandClass, value.value);
-  }
-
-  onNodeValueRefreshed(nodeId, commandClass, value) {
-    this.log.debug('node value refreshed', nodeId, commandClass, value);
-  }
-
-  onNodeValueRemoved(nodeId, commandClass, valueInstance, valueIndex) {
-    this.log.debug('node value removed', nodeId, commandClass, valueInstance, valueIndex);
   }
 
   onSceneEvent(...args) {
@@ -114,33 +102,29 @@ class Platform {
     this.log.debug('Node event', ...args);
   }
 
-  onControllerCommand(...args) {
-    this.log.debug('controller command', ...args);
-  }
-
   onNotification(node, notificationCode) {
     const nodeId = node ? node.id : '';
 
     switch (notificationCode) {
-      case notification.MESSAGE_COMPLETE:
+      case Notification.MESSAGE_COMPLETE:
         this.log.debug('node message complete', nodeId);
         break;
-      case notification.TIMEOUT:
+      case Notification.TIMEOUT:
         this.log.debug('node timeout', nodeId);
         break;
-      case notification.NOP:
+      case Notification.NOP:
         this.log.debug('node nop', nodeId);
         break;
-      case notification.NODE_AWAKE:
+      case Notification.NODE_AWAKE:
         this.log.debug('node awake', nodeId);
         break;
-      case notification.NODE_SLEEP:
+      case Notification.NODE_SLEEP:
         this.log.debug('node sleep', nodeId);
         break;
-      case notification.NODE_DEAD:
+      case Notification.NODE_DEAD:
         this.log.debug('node dead', nodeId);
         break;
-      case notification.NODE_ALIVE:
+      case Notification.NODE_ALIVE:
         this.log.debug('node alive', nodeId);
         break;
 
@@ -253,7 +237,7 @@ class Platform {
     });
 
     this.accessories.set(id, accessory);
-    this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [ accessory ])
+    this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [ accessory ]);
   }
 
   removeAccessory(node) {
@@ -276,6 +260,55 @@ class Platform {
   identify() {
     this.log.info(`${name} ${version}`);
     this.log.info(`Node ${process.version}, Homebridge ${this.api.serverVersion}`);
+  }
+
+  initControllerNode(node) {
+    const id = this.getAccessoryId(node);
+    const accessory = this.accessories.get(id);
+
+    this.createControllerButton(accessory, 'Add Node', 'addNode', [ false ]);
+    this.createControllerButton(accessory, 'Add Secure Node', 'addNode', [ true ]);
+    this.createControllerButton(accessory, 'Remove Node', 'removeNode');
+  }
+
+  createControllerButton(accessory, title, command, args = []) {
+    const { Service, Characteristic } = this.api.hap;
+
+    let button = accessory.getService(title);
+    if (!button) {
+      button = new Service.Switch(title, title.toLowerCase());
+      accessory.addService(button);
+    }
+
+    let state = false;
+    const on = button.getCharacteristic(Characteristic.On)
+      .on('get', cb => cb(null, state))
+      .on('set', (value, cb) => {
+        if (value && !state) {
+          state = true;
+          return this.controller[command](...args, {
+            onWaiting: () => {
+              state = true;
+              cb();
+            },
+
+            onEnd: err => {
+              state = false;
+
+              if (err) {
+                return cb(err);
+              }
+
+              on.updateValue(false)
+            }
+          });
+        }
+
+        if (!value && state) {
+          this.controller.cancelControllerCommand();
+          return cb();
+        }
+      });
   }
 }
 

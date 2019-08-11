@@ -29,8 +29,8 @@ function getValueByIndex(values, index) {
   return values.find(v => v.index === index);
 }
 
-function getOrAddService(accessory, service) {
-  return accessory.getService(service) || accessory.addService(service);
+function getOrAddService(accessory, service, name) {
+  return accessory.getService(service) || accessory.addService(service, name);
 }
 
 function getNodeConfig(node) {

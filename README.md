@@ -26,7 +26,7 @@ __Work In Progress__ (the list shows command classes for the devices I currently
 
 ## Config
 
-Add the minimal platform configuration. All the supported command classes from all devices paired with your gateway appear in the Home app.
+Add the minimal platform configuration. This plugin creates `Add Node`, `Add Secure Node`, and `Remove Node` buttons for your controller. All the supported command classes from all devices paired with your gateway appear in the Home app.
 
 ```json
 {

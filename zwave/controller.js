@@ -1,9 +1,29 @@
 const camelcase = require('camelcase')
 const OpenZWave = require('openzwave-shared');
 
-const driverEvents = require('./driverEvents');
+const State = require('./state');
+const Events = require('./events');
 const error = require('./error');
 const notification = require('./notification');
+
+const DEFAULT_COMMAND_TIMEOUT = 60000; // 60 seconds
+
+const AUTO_SUBSCRIBE_EVENTS = [
+  'FAILED',
+  'READY',
+  'SCAN_COMPLETE',
+  'NODE_ADDED',
+  'NODE_AVAILABLE',
+  'NODE_REMOVED',
+  'NODE_READY',
+  'NODE_POOLING',
+  'SCENE_EVENT',
+  'NODE_EVENT',
+  'VALUE_ADDED',
+  'VALUE_CHANGED',
+  'VALUE_REMOVED',
+  'NOTIFICATION'
+]
 
 function sendEachError(callbacks, errorName) {
   const err = new Error(error[errorName]);
@@ -41,9 +61,9 @@ class Controller {
       // NetworkKey: this.config.networkKey
     })
 
-    for (const e in driverEvents) {
-      this.driver.on(driverEvents[e], (...args) => this[camelcase(`on_${e}`)](...args))
-    }
+    AUTO_SUBSCRIBE_EVENTS.forEach(e => this.driver
+      .on(Events[e], (...args) => this[camelcase(`on_${e}`)](...args))
+    )
 
     this.driver.connect(this.config.devicePath);
   }
@@ -110,6 +130,46 @@ class Controller {
     }
   }
 
+  addNode(isSecure, cbs) {
+    this.beginControllerCommand('addNode', [ isSecure ], cbs);
+  }
+
+  removeNode(cbs) {
+    this.beginControllerCommand('removeNode', [], cbs);
+  }
+
+  removeFailedNode(nodeId, cbs) {
+    this.beginControllerCommand('removeFailedNode', [ nodeId ], cbs);
+  }
+
+  hasNodeFailed(nodeId, cbs) {
+    this.beginControllerCommand('hasNodeFailed', [ nodeId ], cbs);
+  }
+
+  refreshNodeInfo(nodeId, cbs) {
+    this.beginControllerCommand('refreshNodeInfo', [ nodeId ], cbs);
+  }
+
+  requestNodeNeighborUpdate(nodeId, cbs) {
+    this.beginControllerCommand('requestNodeNeighborUpdate', [ nodeId ], cbs);
+  }
+
+  assignReturnRoute(nodeId, cbs) {
+    this.beginControllerCommand('assignReturnRoute', [ nodeId ], cbs);
+  }
+
+  deleteAllReturnRoutes(nodeId, cbs) {
+    this.beginControllerCommand('deleteAllReturnRoutes', [ nodeId ], cbs);
+  }
+
+  sendNodeInformation(nodeId, cbs) {
+    this.beginControllerCommand('sendNodeInformation', [ nodeId ], cbs);
+  }
+
+  requestNetworkUpdate(nodeId, cbs) {
+    this.beginControllerCommand('requestNetworkUpdate', [ nodeId ], cbs);
+  }
+
   getDriverStatistics() {
     return this.driver.getDriverStatistics();
   }
@@ -123,11 +183,11 @@ class Controller {
   }
 
   healNetwork() {
-    this.driver.healNetwork();
+    return this.driver.healNetwork();
   }
 
   healNetworkNode(nodeId, doReturnRoutes) {
-    this.driver.healNetworkNode(nodeId, doReturnRoutes);
+    return this.driver.healNetworkNode(nodeId, doReturnRoutes);
   }
 
   isNodeReady(nodeId) {
@@ -135,33 +195,84 @@ class Controller {
   }
 
   requestAllConfigParams(nodeId) {
-    this.driver.requestAllConfigParams(nodeId);
+    return this.driver.requestAllConfigParams(nodeId);
   }
 
   requestConfigParam(nodeId, paramId) {
-    this.driver.requestConfigParam(nodeId, Number(paramId))
+    return this.driver.requestConfigParam(nodeId, Number(paramId))
   }
 
   setConfigParam(nodeId, paramId, paramValue, size) {
-    this.driver.setConfigParam(nodeId, Number(paramId), paramValue, size)
+    return this.driver.setConfigParam(nodeId, Number(paramId), paramValue, size)
   }
   //----
 
   // private
+  endControllerCommand(handler, cb, ...args) {
+    clearTimeout(this.cancelTimeout);
+    this.driver.off(Events.CONTROLLER_COMMAND, this.controllerCommandHandler);
+    this.controllerCommandHandler = undefined;
+    cb(...args);
+  }
+
+  beginControllerCommand(name, args, { onWaiting, onChange, onEnd }) {
+    if (this.controllerCommandHandler) {
+      return onEnd(error.Error(error.CONTROLLER_COMMAND_IN_PROGRESS));
+    }
+
+    this.controllerCommandHandler = (nodeId, value, state, msg) => {
+      onChange && onChange(value, state, msg);
+
+      switch (value) {
+        case State.NODE_OK:
+          this.endControllerCommand(this.controllerCommandHandler, onEnd, null, true);
+          break;
+
+        case State.NODE_FAILED:
+          this.endControllerCommand(this.controllerCommandHandler, onEnd, null, false);
+          break;
+
+        case State.COMPLETED:
+          this.endControllerCommand(this.controllerCommandHandler, onEnd, null, state);
+          break;
+
+        case State.WAITING:
+          onWaiting && onWaiting();
+          break;
+
+        case State.CANCEL:
+          this.endControllerCommand(this.controllerCommandHandler, onEnd);
+          break;
+
+        case State.ERROR:
+        case State.FAILED:
+          this.endControllerCommand(this.controllerCommandHandler, onEnd, error.Error(error.CONTROLLER_COMMAND_FAILED, { state }));
+          break;
+      }
+    }
+
+    onEnd && this.driver.on(Events.CONTROLLER_COMMAND, this.controllerCommandHandler);
+    this.driver[name](...args);
+
+    this.cancelTimeout = setTimeout(() => this.cancelControllerCommand(),
+      this.config.commandTimeout || DEFAULT_COMMAND_TIMEOUT
+    );
+  }
+
+  cancelControllerCommand() {
+    this.driver.cancelControllerCommand();
+  }
+
   getCachedNodeValue(valueId) {
     const nodeId = Number(valueId.split('-')[0]);
     const node = this.nodes.get(nodeId);
     if (!node) {
-      const err = new Error(error.NODE_NOT_FOUND);
-      err.nodeId = nodeId;
-      throw err;
+      throw error.Error(error.NODE_NOT_FOUND, { nodeId });
     }
 
     const value = node.values.get(valueId);
     if (!value) {
-      const err = new Error(error.VALUE_NOT_FOUND);
-      err.valueId = valueId;
-      throw err;
+      throw error.Error(error.VALUE_NOT_FOUND, { valueId });
     }
 
     return value;
@@ -256,10 +367,6 @@ class Controller {
     const valueId = `${nodeId}-${commandClass}-${instance}-${index}`;
     const removedValue = this.removeNodeValue(nodeId, valueId);
     this.platform.onValueRemoved && this.platform.onValueRemoved(nodeId, removedValue);
-  }
-
-  onControllerCommand(...args) {
-    this.platform.onControllerCommand && this.platform.onControllerCommand(...args);
   }
 
   onNotification(nodeId, notificationCode) {

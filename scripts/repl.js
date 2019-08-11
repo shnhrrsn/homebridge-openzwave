@@ -1,5 +1,6 @@
 const repl = require('repl');
 const Controller = require('../zwave/controller');
+const notification = require('../zwave/notification');
 
 const devicePath = process.argv[2]
 let controller
@@ -26,8 +27,12 @@ function onScanComplete() {
   })
 }
 
-function onControllerCommand(n, rv, st, msg) {
-  console.log('Controller commmand feedback: %s node==%d, retval=%d, state=%d', msg, n, rv, st);
+function onNodeAdded(nodeId) {
+  console.log('Node added', nodeId);
+}
+
+function onNodeRemoved(nodeId) {
+  console.log('Node removed', nodeId);
 }
 
 function onNodeEvent(node, data) {
@@ -38,16 +43,44 @@ function onValueChanged(nodeId, commandClass, value) {
   console.log('Node value canged', value);
 }
 
-function onValueRefreshed(nodeId, commandClass, value) {
-  console.log('Node value refreshed', value);
+function onNotification(node, notificationCode) {
+  const nodeId = node ? node.id : '';
+
+  switch (notificationCode) {
+    case notification.MESSAGE_COMPLETE:
+      console.log('node message complete', nodeId);
+      break;
+    case notification.TIMEOUT:
+      console.log('node timeout', nodeId);
+      break;
+    case notification.NOP:
+      console.log('node nop', nodeId);
+      break;
+    case notification.NODE_AWAKE:
+      console.log('node awake', nodeId);
+      break;
+    case notification.NODE_SLEEP:
+      console.log('node sleep', nodeId);
+      break;
+    case notification.NODE_DEAD:
+      console.log('node dead', nodeId);
+      break;
+    case notification.NODE_ALIVE:
+      console.log('node alive', nodeId);
+      break;
+
+    default:
+      console.log(`notofication code ${notificationCode} for node ${nodeId}`);
+  }
 }
 
 controller = new Controller({ devicePath }, {
+  onNodeAdded,
+  onNodeRemoved,
   onNodeEvent,
   onValueChanged,
-  onValueRefreshed,
   onScanComplete,
-  onControllerCommand
+  onNotification
 });
 
 console.log('Connecting to', devicePath, '\n');
