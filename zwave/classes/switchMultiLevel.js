@@ -41,18 +41,18 @@ function bind({ Service, Characteristic, bridge, accessory, node, values }) {
           return cb(err);
         }
 
-        if (value && level === 0) {
+        if (value && level < 1) {
           return bridge.setValue(valueId, 100, cb);
         }
 
-        if (!value && level !== 0) {
+        if (!value && level >= 1) {
           return bridge.setValue(valueId, 0, cb);
         }
 
         cb();
       }))
       .on('get', cb => bridge.getValue(valueId, (err, value) =>
-        cb(err, value !== 0)
+        cb(err, value >= 1)
       ));
   }
 
@@ -65,9 +65,10 @@ function bind({ Service, Characteristic, bridge, accessory, node, values }) {
   const switchOn = serviceSwitch && serviceSwitch.getCharacteristic(Characteristic.On);
 
   bridge.onValueChanged(valueId, value => {
-    switchOn && switchOn.updateValue(value !== 0);
-    on.updateValue(value !== 0);
+    const onState = value >= 1
     brightness.updateValue(value);
+    on.updateValue(onState);
+    switchOn && switchOn.updateValue(onState);
   });
 }
 
