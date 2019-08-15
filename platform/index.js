@@ -207,7 +207,7 @@ class Platform {
 
     const id = this.getAccessoryId(node);
     const accessory = this.accessories.get(id);
-    this.log.info(`Node ${id} => accessory ${id} ${config.name ? `(${config.name})` : ''}`);
+    this.log.info(`Node ${node.id} => accessory ${id} ${config.name ? `(${config.name})` : ''}`);
     if (accessory) {
       this.updateAccessory(node, config, accessory);
       return;
