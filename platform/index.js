@@ -207,13 +207,13 @@ class Platform {
 
     const id = this.getAccessoryId(node);
     const accessory = this.accessories.get(id);
+    this.log.info(`Node ${id} => accessory ${id} ${config.name ? `(${config.name})` : ''}`);
     if (accessory) {
       this.updateAccessory(node, config, accessory);
       return;
     }
 
     this.createAccessory(node, config, id);
-    this.log.info(`Node ${id} => accessory ${id} ${config.name ? `(${config.name})` : ''}`);
   }
 
   updateAccessory(node, config, accessory) {
