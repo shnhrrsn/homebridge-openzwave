@@ -213,6 +213,7 @@ class Platform {
     }
 
     this.createAccessory(node, config, id);
+    this.log.info(`Node ${id} => accessory ${id} ${config.name ? `(${config.name})` : ''}`);
   }
 
   updateAccessory(node, config, accessory) {
