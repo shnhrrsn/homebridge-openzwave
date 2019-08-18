@@ -130,43 +130,43 @@ class Controller {
     }
   }
 
-  addNode(isSecure, cbs) {
+  addNode(isSecure, cbs = {}) {
     this.beginControllerCommand('addNode', [ isSecure ], cbs);
   }
 
-  removeNode(cbs) {
+  removeNode(cbs = {}) {
     this.beginControllerCommand('removeNode', [], cbs);
   }
 
-  removeFailedNode(nodeId, cbs) {
+  removeFailedNode(nodeId, cbs = {}) {
     this.beginControllerCommand('removeFailedNode', [ nodeId ], cbs);
   }
 
-  hasNodeFailed(nodeId, cbs) {
+  hasNodeFailed(nodeId, cbs = {}) {
     this.beginControllerCommand('hasNodeFailed', [ nodeId ], cbs);
   }
 
-  refreshNodeInfo(nodeId, cbs) {
+  refreshNodeInfo(nodeId, cbs = {}) {
     this.beginControllerCommand('refreshNodeInfo', [ nodeId ], cbs);
   }
 
-  requestNodeNeighborUpdate(nodeId, cbs) {
+  requestNodeNeighborUpdate(nodeId, cbs = {}) {
     this.beginControllerCommand('requestNodeNeighborUpdate', [ nodeId ], cbs);
   }
 
-  assignReturnRoute(nodeId, cbs) {
+  assignReturnRoute(nodeId, cbs = {}) {
     this.beginControllerCommand('assignReturnRoute', [ nodeId ], cbs);
   }
 
-  deleteAllReturnRoutes(nodeId, cbs) {
+  deleteAllReturnRoutes(nodeId, cbs = {}) {
     this.beginControllerCommand('deleteAllReturnRoutes', [ nodeId ], cbs);
   }
 
-  sendNodeInformation(nodeId, cbs) {
+  sendNodeInformation(nodeId, cbs = {}) {
     this.beginControllerCommand('sendNodeInformation', [ nodeId ], cbs);
   }
 
-  requestNetworkUpdate(nodeId, cbs) {
+  requestNetworkUpdate(nodeId, cbs = {}) {
     this.beginControllerCommand('requestNetworkUpdate', [ nodeId ], cbs);
   }
 
