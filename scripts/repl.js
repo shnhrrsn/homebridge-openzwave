@@ -84,10 +84,10 @@ controller = new Controller({ devicePath }, {
   onNotification
 });
 
+controller.connect();
 controller.driver.on(Events.CONTROLLER_COMMAND, (nodeId, value, state, msg) =>
   console.log(`controller command ${msg} node ${nodeId}, value ${value}, state ${state}`)
 )
 
 console.log('Connecting to', devicePath, '\n');
-controller.connect();
 
