@@ -212,12 +212,12 @@ class Controller {
     clearTimeout(this.cancelTimeout);
     this.driver.off(Events.CONTROLLER_COMMAND, this.controllerCommandHandler);
     this.controllerCommandHandler = undefined;
-    cb(...args);
+    cb && cb(...args);
   }
 
   beginControllerCommand(name, args, { onWaiting, onChange, onEnd }) {
     if (this.controllerCommandHandler) {
-      return onEnd(error.Error(error.CONTROLLER_COMMAND_IN_PROGRESS));
+      return onEnd && onEnd(error.Error(error.CONTROLLER_COMMAND_IN_PROGRESS));
     }
 
     this.controllerCommandHandler = (nodeId, value, state, msg) => {
@@ -251,7 +251,7 @@ class Controller {
       }
     }
 
-    onEnd && this.driver.on(Events.CONTROLLER_COMMAND, this.controllerCommandHandler);
+    this.driver.on(Events.CONTROLLER_COMMAND, this.controllerCommandHandler);
     this.driver[name](...args);
 
     this.cancelTimeout = setTimeout(() => this.cancelControllerCommand(),
