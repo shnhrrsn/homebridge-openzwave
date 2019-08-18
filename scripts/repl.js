@@ -1,6 +1,7 @@
 const repl = require('repl');
 const Controller = require('../zwave/controller');
 const notification = require('../zwave/notification');
+const Events = require('../zwave/Events');
 
 const devicePath = process.argv[2]
 let controller
@@ -82,6 +83,10 @@ controller = new Controller({ devicePath }, {
   onScanComplete,
   onNotification
 });
+
+controller.driver.on(Events.CONTROLLER_COMMAND, (nodeId, value, state, msg) =>
+  console.log(`controller command ${msg} node ${nodeId}, value ${value}, state ${state}`)
+)
 
 console.log('Connecting to', devicePath, '\n');
 controller.connect();
