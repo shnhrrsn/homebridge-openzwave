@@ -274,8 +274,8 @@ class Platform {
     this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, accessories);
   }
 
-  getAccessoryId({ id, manufacturerid, producttype, productid }) {
-    return this.api.hap.uuid.generate(`${manufacturerid}-${producttype}-${productid}-${id}`);
+  getAccessoryId({ id }) {
+    return this.api.hap.uuid.generate(`${id}`);
   }
 
   identify() {
