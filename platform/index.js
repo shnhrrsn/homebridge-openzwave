@@ -43,6 +43,7 @@ class Platform {
   }
 
   init() {
+    this.cleanupAccessoriesIds = new Set(this.accessories.keys());
     this.controller.connect();
   }
 
@@ -61,9 +62,12 @@ class Platform {
 
   onScanComplete() {
     this.log.info('Z-Wave network scan complete');
+    this.cleanupAccessories();
   }
 
   onNodeAdded(node) {
+    const accessoryId = this.getAccessoryId(node);
+    this.cleanupAccessoriesIds.delete(accessoryId);
     this.log.debug('node added', node.id);
   }
 
@@ -250,8 +254,24 @@ class Platform {
       return
     }
 
-    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [ accessory ])
+    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [ accessory ]);
     this.accessories.delete(id);
+  }
+
+  cleanupAccessories() {
+    const accessories = [];
+    this.cleanupAccessoriesIds.forEach(id => {
+      accessories.push(this.accessories.get(id));
+      this.accessories.delete(id);
+    });
+
+    delete this.cleanupAccessoriesIds;
+
+    if (!accessories.length) {
+      return
+    }
+
+    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, accessories);
   }
 
   getAccessoryId({ id, manufacturerid, producttype, productid }) {
