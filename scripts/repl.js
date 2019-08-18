@@ -1,7 +1,7 @@
 const repl = require('repl');
 const Controller = require('../zwave/controller');
 const notification = require('../zwave/notification');
-const Events = require('../zwave/Events');
+const Events = require('../zwave/events');
 
 const devicePath = process.argv[2]
 let controller
