@@ -28,12 +28,12 @@ function onScanComplete() {
   })
 }
 
-function onNodeAdded(nodeId) {
-  console.log('Node added', nodeId);
+function onNodeAdded(node) {
+  console.log('Node added', node);
 }
 
-function onNodeRemoved(nodeId) {
-  console.log('Node removed', nodeId);
+function onNodeRemoved(node) {
+  console.log('Node removed', node);
 }
 
 function onNodeEvent(node, data) {
