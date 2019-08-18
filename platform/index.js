@@ -271,6 +271,7 @@ class Platform {
       return
     }
 
+    this.log.info('Deleting ${accessories.length} accessories');
     this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, accessories);
   }
 
