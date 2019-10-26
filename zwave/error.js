@@ -9,7 +9,7 @@ module.exports = {
   Error: (error, data) => {
     const err = new Error(error);
     if (data) {
-      Object.assign(error, data);
+      Object.assign(err, data);
     }
 
     return err;
