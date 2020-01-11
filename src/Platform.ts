@@ -37,7 +37,6 @@ export default class Platform implements Homebridge.Platform {
 		this.zwave.on('driver failed', this.onDriverFailed.bind(this))
 		this.zwave.on('scan complete', this.onScanComplete.bind(this))
 		this.zwave.on('notification', this.onNotification.bind(this))
-		this.zwave.on('controller command', this.onControllerCommand.bind(this))
 
 		this.zwave.connect(this.config.zwave.devicePath)
 	}
@@ -70,9 +69,5 @@ export default class Platform implements Homebridge.Platform {
 		}
 
 		this.log.debug('onNotification', { nodeId, notification, help })
-	}
-
-	onControllerCommand(nodeId: number, state: ControllerState, notif: number, message: string, command: number) {
-		this.log.debug('onControllerCommand', { nodeId, state, message, command })
 	}
 }

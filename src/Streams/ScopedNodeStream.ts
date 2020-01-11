@@ -1,6 +1,12 @@
 import { Observable } from 'rxjs'
 import { filter } from 'rxjs/operators'
-import { INodeStream, INodeInfoParams, INodeIdParams, INotificationParams } from './INodeStream'
+import {
+	INodeStream,
+	INodeInfoParams,
+	INodeIdParams,
+	INotificationParams,
+	IControllerCommandParams,
+} from './INodeStream'
 import { IValueParams, IValueRemovedParams } from './IValueStream'
 
 export default class ScopedNodeStream implements INodeStream {
@@ -14,6 +20,7 @@ export default class ScopedNodeStream implements INodeStream {
 	readonly valueRefreshed: Observable<IValueParams>
 	readonly valueRemoved: Observable<IValueRemovedParams>
 	readonly notification: Observable<INotificationParams>
+	readonly controllerCommand: Observable<IControllerCommandParams>
 
 	constructor(nodeId: number, nodeStream: INodeStream) {
 		this.nodeAvailable = nodeStream.nodeAvailable.pipe(filter(params => params.nodeId === nodeId))
@@ -26,6 +33,7 @@ export default class ScopedNodeStream implements INodeStream {
 		this.valueRefreshed = nodeStream.valueRefreshed.pipe(filter(params => params.nodeId === nodeId))
 		this.valueRemoved = nodeStream.valueRemoved.pipe(filter(params => params.nodeId === nodeId))
 		this.notification = nodeStream.notification.pipe(filter(params => params.nodeId === nodeId))
+		this.controllerCommand = nodeStream.controllerCommand.pipe(filter(params => params.nodeId === nodeId))
 	}
 
 	dispose() {

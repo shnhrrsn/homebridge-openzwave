@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs'
-import { NodeInfo, Notification } from 'openzwave-shared'
+import { NodeInfo, Notification, ControllerState } from 'openzwave-shared'
 import { IValueStream } from './IValueStream'
 
 export interface INodeIdParams {
@@ -15,6 +15,14 @@ export interface INotificationParams {
 	nodeId: number
 	notification: Notification
 	help: string
+}
+
+export interface IControllerCommandParams {
+	nodeId: number
+	state: ControllerState
+	notif: number
+	message: string
+	command: number
 }
 
 export interface INodeStream extends IValueStream {
@@ -35,4 +43,7 @@ export interface INodeStream extends IValueStream {
 
 	// An error has occurred that we need to report.
 	readonly notification: Observable<INotificationParams>
+
+	// When Controller Commands are executed, Notifications of Success/Failure etc are communicated via this
+	readonly controllerCommand: Observable<IControllerCommandParams>
 }
