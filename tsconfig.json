@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "esModuleInterop": true,
+        "strict": true,
+        "outDir": "lib",
+        "target": "esnext",
+    },
+    "include": [
+        "src/**/*.ts"
+    ]
+}

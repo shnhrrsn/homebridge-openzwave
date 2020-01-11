@@ -1,0 +1,90 @@
+import Ozw from '../Zwave/Zwave'
+import ScopedNodeStream from '../Streams/ScopedNodeStream'
+
+import { IAccessoryConfig } from '../IConfig'
+import { CommandClass } from '../Zwave/CommandClass'
+import { IDriverRegistry } from './Registries/IDriverRegistry'
+import { Homebridge } from '../../types/homebridge'
+import { NodeInfo, Value } from 'openzwave-shared'
+
+export type AccessoryCommands = Map<CommandClass, Map<number, Value>>
+
+export class Accessory {
+	nodeId: number
+	platformAccessory: Homebridge.PlatformAccessory
+	api: Homebridge.Api
+	log: Homebridge.Logger
+	zwave: Ozw
+	commands: AccessoryCommands
+	nodeStream: ScopedNodeStream
+	driverRegistry: IDriverRegistry
+	config: IAccessoryConfig
+
+	constructor(
+		log: Homebridge.Logger,
+		api: Homebridge.Api,
+		zwave: Ozw,
+		nodeId: number,
+		platformAccessory: Homebridge.PlatformAccessory,
+		driverRegistry: IDriverRegistry,
+		commands: AccessoryCommands,
+		config?: IAccessoryConfig,
+	) {
+		this.log = log
+		this.api = api
+		this.zwave = zwave
+		this.nodeId = nodeId
+		this.platformAccessory = platformAccessory
+		this.driverRegistry = driverRegistry
+		this.nodeStream = new ScopedNodeStream(nodeId, this.zwave)
+		this.commands = new Map(commands)
+		this.config = config ?? {}
+	}
+
+	configure(nodeInfo: NodeInfo) {
+		const { Service } = this.api.hap
+		const infoService = this.getService(Service.AccessoryInformation, false)
+
+		if (infoService) {
+			this.configureInfoService(infoService, nodeInfo)
+		}
+
+		for (const [commandClass, values] of this.commands.entries()) {
+			const driver = this.driverRegistry.get(commandClass)
+
+			if (!driver) {
+				continue
+			}
+
+			driver({
+				values,
+				log: this.log,
+				hap: this.api.hap,
+				accessory: this,
+				valueStream: this.nodeStream,
+				hints: new Set(this.config.hints ?? []),
+				zwave: this.zwave,
+			})
+		}
+	}
+
+	getService(serviceType: HAPNodeJS.PredefinedService, createAutomatically = true): HAPNodeJS.Service | undefined {
+		const service = this.platformAccessory.getService(serviceType)
+
+		if (service) {
+			return service
+		}
+
+		if (!createAutomatically) {
+			return undefined
+		}
+
+		return this.platformAccessory.addService(serviceType)
+	}
+
+	private configureInfoService(infoService: HAPNodeJS.Service, nodeInfo: NodeInfo) {
+		const { Characteristic } = this.api.hap
+		infoService.setCharacteristic(<any>Characteristic.Manufacturer, nodeInfo.manufacturer)
+		infoService.setCharacteristic(<any>Characteristic.Model, nodeInfo.product)
+	}
+}

@@ -1,41 +1,48 @@
 {
-  "name": "homebridge-platform-zwave",
-  "version": "1.1.0",
-  "description": "Homebridge Z-Wave Platform plugin",
-  "main": "index.js",
+  "name": "homebridge-openzwave",
+  "version": "1.0.0-dev.0",
+  "description": "OpenZWave Platform for Homebridge",
+  "author": "Shaun Harrison (@shnhrrsn)",
+  "license": "MIT",
+  "main": "lib/registerPlatform.ts",
   "scripts": {
-    "dev": "./node_modules/.bin/homebridge -D -U ./.dev -P ./",
-    "test": "nyc ava"
+    "code:typecheck": "tsc --noEmit",
+    "code:format": "prettier --write src/**/*.ts types/**/*.ts",
+    "build": "tsc --noEmit && rm -fr lib && babel src --out-dir lib --extensions .ts --source-maps inline",
+    "prepare": "npm build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/velocityzen/homebridge-platform-zwave.git"
+    "url": "https://github.com/shnhrrsn/homebridge-openzwave.git"
   },
   "keywords": [
     "homebridge-plugin",
-    "z-wave"
+    "homebridge-platform",
+    "z-wave",
+    "zwave",
+    "openzwave"
   ],
-  "author": {
-    "name": "Alexey Novikov",
-    "email": "v@2dubs.com"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/velocityzen/homebridge-platform-zwave/issues"
-  },
-  "homepage": "https://github.com/velocityzen/homebridge-platform-zwave#readme",
   "dependencies": {
-    "camelcase": "^5.3.1",
-    "openzwave-shared": "^1.5.6",
-    "range-map": "^1.0.4",
+    "openzwave-shared": "^1.5.10",
+    "rxjs": "^6.5.4",
+    "semver": "^7.1.1",
     "try-require": "^1.2.1"
   },
   "engines": {
     "homebridge": ">=0.4.50"
   },
   "devDependencies": {
-    "ava": "^2.4.0",
+    "@babel/cli": "^7.7.7",
+    "@babel/core": "^7.7.7",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.7.4",
+    "@babel/plugin-proposal-optional-chaining": "^7.7.5",
+    "@babel/plugin-transform-modules-commonjs": "^7.7.5",
+    "@babel/preset-typescript": "^7.7.7",
+    "@babel/register": "^7.7.7",
+    "@types/node": "^13.1.6",
     "homebridge": "^0.4.50",
-    "nyc": "^14.1.1"
+    "prettier": "1.19.1",
+    "typescript": "^3.7.4"
   }
 }
