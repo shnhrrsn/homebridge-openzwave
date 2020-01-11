@@ -8,6 +8,7 @@ import { Homebridge } from '../../types/homebridge'
 import { NodeInfo } from 'openzwave-shared'
 import { INodeInfoParams, INodeIdParams } from '../Streams/INodeStream'
 import { platformName, pluginName } from '../settings'
+import { CommandClass } from '../Zwave/CommandClass'
 
 export default class AccessoryManager {
 	log: Homebridge.Logger
@@ -63,10 +64,6 @@ export default class AccessoryManager {
 	onNodeReady({ nodeId, nodeInfo }: INodeInfoParams) {
 		this.log.debug('onNodeReady', this.getInitialNodeName(nodeId, nodeInfo))
 
-		if (nodeId === this.zwave.getControllerNodeId()) {
-			return
-		}
-
 		const accessory = this.makeAccessory(nodeId, nodeInfo)
 		accessory.configure(nodeInfo)
 
@@ -108,7 +105,7 @@ export default class AccessoryManager {
 			nodeId,
 			platformAccessory,
 			StandardDriverRegistry,
-			this.nodeIdToCommandsMap.get(nodeId) || new Map(),
+			this.getNodeCommands(nodeId),
 			config,
 		)
 
@@ -119,12 +116,27 @@ export default class AccessoryManager {
 		return accessory
 	}
 
+	private getNodeCommands(nodeId: number): AccessoryCommands {
+		if (nodeId === this.zwave.getControllerNodeId()) {
+			const commands: AccessoryCommands = new Map()
+			commands.set(CommandClass.PLATFORM_RESERVED, new Map())
+			return commands
+		}
+
+		return this.nodeIdToCommandsMap.get(nodeId) ?? new Map()
+	}
+
 	private getInitialNodeName(nodeId: number, nodeInfo?: NodeInfo) {
 		const configName = this.config?.accessories?.[nodeId]?.name
 
 		if (configName) {
 			return configName
 		}
+
+		if (nodeId === this.zwave.getControllerNodeId()) {
+			return nodeInfo?.product ?? platformName
+		}
+
 		if (!nodeInfo) {
 			return `Node ${nodeId}`
 		}

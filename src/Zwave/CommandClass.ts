@@ -1,4 +1,5 @@
 export enum CommandClass {
+	PLATFORM_RESERVED = -999,
 	ALARM = 113,
 	ANTITHEFT = 93,
 	APPLICATION_STATUS = 34,
