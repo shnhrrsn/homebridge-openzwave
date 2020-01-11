@@ -68,18 +68,25 @@ export class Accessory {
 		}
 	}
 
-	getService(serviceType: HAPNodeJS.PredefinedService, createAutomatically = true): HAPNodeJS.Service | undefined {
+	getService(
+		serviceType: HAPNodeJS.PredefinedService | string,
+		createAutomatically = true,
+	): HAPNodeJS.Service | undefined {
 		const service = this.platformAccessory.getService(serviceType)
 
 		if (service) {
 			return service
 		}
 
-		if (!createAutomatically) {
+		if (!createAutomatically || typeof serviceType === 'string') {
 			return undefined
 		}
 
-		return this.platformAccessory.addService(serviceType)
+		return this.addService(serviceType)
+	}
+
+	addService(service: HAPNodeJS.PredefinedService | HAPNodeJS.Service): HAPNodeJS.Service {
+		return this.platformAccessory.addService(service)
 	}
 
 	private configureInfoService(infoService: HAPNodeJS.Service, nodeInfo: NodeInfo) {
