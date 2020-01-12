@@ -16,6 +16,7 @@ export type CoordinateValuesParams = {
 	initialValue: Value
 	valueStream: IValueStream
 	zwave: Ozw
+	readonly?: boolean
 	transformer?: IValueTransformer
 }
 
@@ -27,6 +28,7 @@ export default class ValueCoordinator {
 	valueStream: IValueStream
 	zwave: Ozw
 	transformer: IValueTransformer
+	readonly: boolean
 	scopedStream?: ScopedValueStream
 	valueUpdateObserver?: Subscription
 
@@ -36,6 +38,7 @@ export default class ValueCoordinator {
 		initialValue,
 		valueStream,
 		zwave,
+		readonly,
 		transformer,
 	}: CoordinateValuesParams) {
 		this.log = log
@@ -43,6 +46,7 @@ export default class ValueCoordinator {
 		this.initialValue = initialValue
 		this.valueStream = valueStream
 		this.zwave = zwave
+		this.readonly = readonly ?? false
 		this.transformer = transformer ?? valueIdentityTransformer
 	}
 
@@ -67,9 +71,11 @@ export default class ValueCoordinator {
 		})
 
 		// Handle explicit HomeKit value setting
-		this.characteristic.on('set', (newValue: ValueType, callback: Function) => {
-			this.sendHomeKitValueToZwave(newValue, callback)
-		})
+		if (this.readonly !== true) {
+			this.characteristic.on('set', (newValue: ValueType, callback: Function) => {
+				this.sendHomeKitValueToZwave(newValue, callback)
+			})
+		}
 
 		// Handle explicit HomeKit value requests
 		this.characteristic.on('get', (callback?: Function) => {
