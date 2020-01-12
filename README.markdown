@@ -1,7 +1,8 @@
 # homebridge-openzwave
 
-[![NPM Version](https://img.shields.io/npm/v/homebridge-openzwave.svg?style=flat-square)](https://www.npmjs.com/package/homebridge-openzwave)
-[![NPM Downloads](https://img.shields.io/npm/dt/homebridge-openzwave.svg?style=flat-square)](https://www.npmjs.com/package/homebridge-openzwave)
+[![Latest Version](https://img.shields.io/npm/v/homebridge-openzwave.svg)](https://www.npmjs.com/package/homebridge-openzwave)
+[![Total Downloads](https://img.shields.io/npm/dt/homebridge-openzwave.svg)](https://www.npmjs.com/package/homebridge-openzwave)
+[![License](https://img.shields.io/npm/l/homebridge-openzwave.svg)](https://www.npmjs.com/package/homebridge-openzwave)
 
 OpenZWave platform for Homebridge. The main goal of this project is to map Z-Wave protocol command classes to HomeKit Accessories, Services, and Characteristics. Theoretically, it should make it support any Open Z-Wave device.
 
@@ -9,16 +10,15 @@ This project was initially forked from [velocityzen/homebridge-platform-zwave](h
 
 ## Supported Z-Wave Command Classes
 
-**Work In Progress** (the list shows command classes for the devices I currently have)
+- SWITCH_BINARY (37)
+- SWITCH_MULTILEVEL (38)
+- BATTERY (128)
 
-- [x] SWITCH_BINARY (37)
-- [x] SWITCH_MULTILEVEL (38)
-- [ ] CENTRAL_SCENE (91)
+## Requirements
 
-## Prerequisites
-
-1. Z-Wave gateway. For example [Aeotec Z-Stick Gen5](https://aeotec.com/z-wave-usb-stick)
-2. Installed https://github.com/OpenZWave/open-zwave
+- Z-Wave Gateway
+  - [Aeotec Z-Stick Gen5](https://aeotec.com/z-wave-usb-stick)
+- [OpenZwave](https://github.com/OpenZWave/open-zwave)
 
 ## Installation
 
@@ -26,59 +26,77 @@ This project was initially forked from [velocityzen/homebridge-platform-zwave](h
 2. `npm i -g homebridge-openzwave`
 3. Add platform to your config file
 
-## Config
+## Configuration
 
-Add the minimal platform configuration. This plugin creates `Add Node`, `Add Secure Node`, and `Remove Node` buttons for your controller. All the supported command classes from all devices paired with your gateway appear in the Home app.
+In order to use this plugin, you’ll need to add the following JSON object to your Homebridge config file:
 
 ```json
 {
   "platform": "zWavePlatform",
   "name": "Z-Wave Platform",
   "zwave": {
-    "devicePath": "/dev/cu.usbmodem144101"
-  },
-  "uuidPrefix": "zWavePlatform/"
+    "devicePath": "/dev/ttyACM0"
+  }
 }
 ```
 
-- **zwave**
-  - **devicePath**: path to the gateway. For the list use `ls /dev/cu.*` and/or `ls /dev/tty.*`.
-- **uuidPrefix**: Optional prefix to change generated UUID’s for use in Homekit. Defaults to "zWavePlatform/".
+| Config Key         | Description                                                                                                                                             | Required |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `platform`         | Homebridge Platform name.<br>This value should always be zWavePlatform.                                                                                 | Y        |
+| `name`             | The name of this platform within Homebridge.<br>This is mainly used for logs and can be any value you want.                                             | N        |
+| `zwave`            | This contains the settings that will be passed to OpenZWave.                                                                                            | Y        |
+| `zwave.devicePath` | The device path to your gateway.<br>See [Finding Your Device](#finding-your-device) for more information.]                                              | Y        |
+| `uuidPrefix`       | Override the default prefixed used when generating UUIDs for each node.<br>_NOTE: Most setups will not need to change this value._                      | N        |
+| `accessories`      | Customize how your Z-Wave accessories behave in HomeKit, or exclude them entirely.<br>See the [Accessories](#accessories) section for more information. | N        |
+
+### Finding Your Device
+
+To locate your Z-Wave controller, try looking running `ls /dev/tty.*` or `ls /dev/cu.*` in terminal.
+
+Depending on your OS, you may also be able to run `ls -lah /dev/serial/by-id` to find additional insights.
+
+If you’re unable to figure out which device is your Z-Wave gateway, try unplugging it and running the commands above, after that, plug it back in and look for the additional device that wasn’t there before.
 
 ### Accessories
 
-If you want to customize exposed accessories, add `accessories` to your config. Ex.:
+The accessories config object allows you to customize how your devices appear and behave within HomeKit.
 
-```
+```json
 {
   "platform": "zWavePlatform",
   "name": "Z-Wave Platform",
   "zwave": {
-    "devicePath": "/dev/cu.usbmodem144101"
+    "devicePath": "/dev/ttyACM0"
   },
   "accessories": {
     "3": {
-      "name": "My Switch",
-      "ignoreClasses": [ 38 ],
-      "values": {
-        "112-1-35": 37
-      },
-      "hints": [ "fan" ]
+      "name": "My Fan Control",
+      "ignoreClasses": [128],
+      "hints": ["fan"]
     }
   }
 }
 ```
 
-- **NodeId** – "3" in the example above. NodeId of the node (device) the config is applied to.
-- name – string, name of the device in the Home app.
-- ignoreClasses – the array of the command classes Ids to ignore.
-- values – map of `valueId: value` to set the initial value.
-- parameters – map of `parameterId: value` to set the initial value.
-- valuesMaps – map of `valueId: valueMaps` to map a value from Z-Wave to HomeKit.
-- hints – set of strings to help better understand the device. Currently only `fan` is supported.
+| Config Key      | Description                                                                                                                           |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`          | The default name this accessory should have in HomeKit.                                                                               |
+| `ignoreClasses` | An array of [Z-Wave command classes](src/Zwave/CommandClass.ts) you’d prefer this plugin not represent in HomeKit.                    |
+| `hints`         | An array of strings to better help the plugin understand what type of device this is.<br>Currently the only supported value is `fan`. |
 
-You can also set the node config to `false` to ignore the node (device) entirely.
+#### Excluding Accessories from HomeKit
 
-## Notes
+If you have Z-Wave nodes you’d wish to exclude from HomeKit, you can hide them by setting the accessory to false:
 
-All the devices and command classes will be tested and added to this plugin as soon as I can get the device in my hands or with your help. Donations and PRs are welcome!
+```json
+{
+  "platform": "zWavePlatform",
+  "name": "Z-Wave Platform",
+  "zwave": {
+    "devicePath": "/dev/ttyACM0"
+  },
+  "accessories": {
+    "3": false
+  }
+}
+```
