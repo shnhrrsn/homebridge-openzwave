@@ -184,6 +184,6 @@ export default class AccessoryManager {
 			return `Node ${nodeId}`
 		}
 
-		return `${nodeId} / ${nodeInfo.product} - ${nodeInfo.productid}`
+		return `${nodeId} - ${nodeInfo.product} (${nodeInfo.productid})`
 	}
 }
