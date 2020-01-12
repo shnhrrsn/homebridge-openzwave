@@ -117,6 +117,7 @@ export default class AccessoryManager {
 
 	onNodeRemoved({ nodeId }: INodeIdParams) {
 		this.log.debug('onNodeRemoved', this.getInitialNodeName(nodeId))
+		this.removeAccessory(this.nodeIdToAccessoryId(nodeId))
 	}
 
 	nodeIdToAccessoryId(nodeId: number): string {
