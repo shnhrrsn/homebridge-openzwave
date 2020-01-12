@@ -3,7 +3,7 @@ export type IConfig = {
 		devicePath?: string
 	}
 	accessories?: {
-		[x in string]: IAccessoryConfig
+		[x in string]: IAccessoryConfig | false
 	}
 	uuidPrefix?: string
 }

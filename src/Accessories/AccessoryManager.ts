@@ -3,7 +3,7 @@ import Platform from '../Platform'
 import StandardDriverRegistry from './Registries/StandardDriverRegistry'
 
 import { Accessory, AccessoryCommands } from './Accessory'
-import { IConfig } from '../IConfig'
+import { IConfig, IAccessoryConfig } from '../IConfig'
 import { Homebridge } from '../../types/homebridge'
 import { NodeInfo } from 'openzwave-shared'
 import { INodeInfoParams, INodeIdParams } from '../Streams/INodeStream'
@@ -62,9 +62,17 @@ export default class AccessoryManager {
 	}
 
 	onNodeReady({ nodeId, nodeInfo }: INodeInfoParams) {
-		this.log.debug('onNodeReady', this.getInitialNodeName(nodeId, nodeInfo))
+		const nodeName = this.getInitialNodeName(nodeId, nodeInfo)
+		this.log.debug('onNodeReady', nodeName)
 
-		const accessory = this.makeAccessory(nodeId, nodeInfo)
+		const config = this.config?.accessories?.[String(nodeId)]
+
+		if (config === false) {
+			this.log.info(`Ignoring ${nodeName}`)
+			return
+		}
+
+		const accessory = this.makeAccessory(nodeId, nodeInfo, config)
 		accessory.configure(nodeInfo)
 
 		if (!this.registry.has(accessory.platformAccessory.UUID)) {
@@ -88,7 +96,11 @@ export default class AccessoryManager {
 		return this.api.hap.uuid.generate(uuidPrefix + String(nodeId))
 	}
 
-	private makeAccessory(nodeId: number, nodeInfo: NodeInfo): Accessory {
+	private makeAccessory(
+		nodeId: number,
+		nodeInfo: NodeInfo,
+		config: IAccessoryConfig | undefined,
+	): Accessory {
 		const accessoryId = this.nodeIdToAccessoryId(nodeId)
 		let accessory = this.registry.get(accessoryId)
 
@@ -96,7 +108,6 @@ export default class AccessoryManager {
 			return accessory
 		}
 
-		const config = this.config?.accessories?.[String(nodeId)]
 		const platformAccessory =
 			this.restorableAccessories.get(accessoryId) ||
 			new this.api.platformAccessory(this.getInitialNodeName(nodeId, nodeInfo), accessoryId)
@@ -130,10 +141,10 @@ export default class AccessoryManager {
 	}
 
 	private getInitialNodeName(nodeId: number, nodeInfo?: NodeInfo) {
-		const configName = this.config?.accessories?.[nodeId]?.name
+		const config = this.config?.accessories?.[nodeId]
 
-		if (configName) {
-			return configName
+		if (config && config.name) {
+			return config.name
 		}
 
 		if (nodeId === this.zwave.getControllerNodeId()) {
