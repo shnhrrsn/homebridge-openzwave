@@ -1,6 +1,6 @@
 import batteryDriver from '../Drivers/batteryDriver'
-import switchBinaryDriver from '../Drivers/SwitchBinaryDriver'
-import switchMultiLevelDriver from '../Drivers/SwitchMultiLevelDriver'
+import switchBinaryDriver from '../Drivers/switchBinaryDriver'
+import switchMultiLevelDriver from '../Drivers/switchMultiLevelDriver'
 import platformDriver from '../Drivers/platformDriver'
 
 import { CommandClass } from '../../Zwave/CommandClass'
