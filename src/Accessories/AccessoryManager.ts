@@ -84,7 +84,8 @@ export default class AccessoryManager {
 	}
 
 	nodeIdToAccessoryId(nodeId: number): string {
-		return this.api.hap.uuid.generate(`${platformName}/${nodeId}`)
+		const uuidPrefix = this.config?.uuidPrefix ?? `${platformName}/`
+		return this.api.hap.uuid.generate(uuidPrefix + String(nodeId))
 	}
 
 	private makeAccessory(nodeId: number, nodeInfo: NodeInfo): Accessory {

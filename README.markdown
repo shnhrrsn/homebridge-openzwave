@@ -36,12 +36,14 @@ Add the minimal platform configuration. This plugin creates `Add Node`, `Add Sec
   "name": "Z-Wave Platform",
   "zwave": {
     "devicePath": "/dev/cu.usbmodem144101"
-  }
+  },
+  "uuidPrefix": "zWavePlatform/"
 }
 ```
 
 - **zwave**
-  - **devicePath** — path to the gateway. For the list use `ls /dev/cu.*` and/or `ls /dev/tty.*`
+  - **devicePath**: path to the gateway. For the list use `ls /dev/cu.*` and/or `ls /dev/tty.*`.
+- **uuidPrefix**: Optional prefix to change generated UUID’s for use in Homekit. Defaults to "zWavePlatform/".
 
 ### Accessories
 

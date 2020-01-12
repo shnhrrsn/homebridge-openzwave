@@ -5,6 +5,7 @@ export type IConfig = {
 	accessories?: {
 		[x in string]: IAccessoryConfig
 	}
+	uuidPrefix?: string
 }
 
 export type IAccessoryConfig = {
