@@ -20,6 +20,12 @@ export namespace Homebridge {
 			accessories: PlatformAccessory[],
 		): void
 
+		unregisterPlatformAccessories(
+			pluginName: string,
+			platformName: string,
+			accessories: PlatformAccessory[],
+		): void
+
 		on(event: 'didFinishLaunching', listener: () => void): this
 	}
 

@@ -61,6 +61,7 @@ export default class Platform implements Homebridge.Platform {
 
 	onScanComplete() {
 		this.log.debug('onScanComplete')
+		this.accessoryManager.purge()
 	}
 
 	onNotification(nodeId: number, notification: Notification, help: string) {

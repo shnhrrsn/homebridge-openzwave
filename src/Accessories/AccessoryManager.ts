@@ -53,8 +53,36 @@ export default class AccessoryManager {
 		})
 	}
 
+	purge() {
+		if (!this.config) {
+			return
+		}
+
+		for (const [nodeId, config] of Object.entries(this.config)) {
+			if (config !== false) {
+				continue
+			}
+
+			this.removeAccessory(this.nodeIdToAccessoryId(Number(nodeId)))
+		}
+	}
+
 	restoreAccessory(accessory: Homebridge.PlatformAccessory) {
 		this.restorableAccessories.set(accessory.UUID, accessory)
+	}
+
+	removeAccessory(accessoryId: string) {
+		const accessory =
+			this.restorableAccessories.get(accessoryId) ??
+			this.registry.get(accessoryId)?.platformAccessory
+
+		if (!accessory) {
+			return
+		}
+
+		this.api.unregisterPlatformAccessories(pluginName, platformName, [accessory])
+		this.restorableAccessories.delete(accessoryId)
+		this.registry.delete(accessoryId)
 	}
 
 	onNodeAvailable({ nodeId, nodeInfo }: INodeInfoParams) {
