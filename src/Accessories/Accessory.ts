@@ -49,7 +49,13 @@ export class Accessory {
 			this.configureInfoService(infoService, nodeInfo)
 		}
 
+		const ignoredClasses = new Set(this.config.ignoreClasses ?? [])
+
 		for (const [commandClass, values] of this.commands.entries()) {
+			if (ignoredClasses.has(commandClass)) {
+				continue
+			}
+
 			const driver = this.driverRegistry.get(commandClass)
 
 			if (!driver) {
