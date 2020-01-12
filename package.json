@@ -7,7 +7,7 @@
   "main": "lib/registerPlatform.ts",
   "scripts": {
     "code:typecheck": "tsc --noEmit",
-    "code:format": "prettier --write src/**/*.ts types/**/*.ts",
+    "code:format": "prettier --write src/**/*.ts types/**/*.ts *.json *.yaml .babelrc *.markdown",
     "build": "tsc --noEmit && rm -fr lib && babel src --out-dir lib --extensions .ts --source-maps inline",
     "prepare": "npm build"
   },
