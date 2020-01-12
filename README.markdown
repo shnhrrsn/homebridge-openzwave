@@ -32,8 +32,8 @@ In order to use this plugin, you’ll need to add the following JSON object to y
 
 ```json
 {
-  "platform": "zWavePlatform",
-  "name": "Z-Wave Platform",
+  "platform": "openzwave",
+  "name": "OpenZWave",
   "zwave": {
     "devicePath": "/dev/ttyACM0"
   }
@@ -42,7 +42,7 @@ In order to use this plugin, you’ll need to add the following JSON object to y
 
 | Config Key         | Description                                                                                                                                             | Required |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| `platform`         | Homebridge Platform name.<br>This value should always be zWavePlatform.                                                                                 | Y        |
+| `platform`         | Homebridge Platform name.<br>This value should always be openzwave.                                                                                     | Y        |
 | `name`             | The name of this platform within Homebridge.<br>This is mainly used for logs and can be any value you want.                                             | N        |
 | `zwave`            | This contains the settings that will be passed to OpenZWave.                                                                                            | Y        |
 | `zwave.devicePath` | The device path to your gateway.<br>See [Finding Your Device](#finding-your-device) for more information.]                                              | Y        |
@@ -63,7 +63,7 @@ The accessories config object allows you to customize how your devices appear an
 
 ```json
 {
-  "platform": "zWavePlatform",
+  "platform": "openzwave",
   "name": "Z-Wave Platform",
   "zwave": {
     "devicePath": "/dev/ttyACM0"
@@ -90,7 +90,7 @@ If you have Z-Wave nodes you’d wish to exclude from HomeKit, you can hide them
 
 ```json
 {
-  "platform": "zWavePlatform",
+  "platform": "openzwave",
   "name": "Z-Wave Platform",
   "zwave": {
     "devicePath": "/dev/ttyACM0"

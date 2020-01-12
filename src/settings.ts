@@ -1,3 +1,3 @@
-export const pluginName = 'homebridge-platform-zwave'
-export const platformName = 'zWavePlatform'
+export const pluginName = 'homebridge-openzwave'
+export const platformName = 'openzwave'
 export const bridgeNodeId = 1
