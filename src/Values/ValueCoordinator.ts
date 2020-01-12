@@ -48,6 +48,10 @@ export default class ValueCoordinator {
 		this.zwave = zwave
 		this.readonly = readonly ?? false
 		this.transformer = transformer ?? valueIdentityTransformer
+
+		if (!this.transformer.homekitToZwave && !this.readonly) {
+			throw new Error('homekitToZwave is required for readwrite values')
+		}
 	}
 
 	start() {
@@ -117,13 +121,19 @@ export default class ValueCoordinator {
 	}
 
 	private sendHomeKitValueToZwave(homekitValue: ValueType, callback: Function) {
+		if (this.readonly === true) {
+			return
+		}
+
 		this.log.debug('set', homekitValue)
 
 		if (this.transformer.isHomekitValid && !this.transformer.isHomekitValid!(homekitValue)) {
 			return
 		}
 
-		this.zwave.setValue(this.valueId, this.transformer.homekitToZwave(homekitValue))
+		// NOTE: Constructor ensures homekitToZwave is available
+		this.zwave.setValue(this.valueId, this.transformer.homekitToZwave!(homekitValue))
+
 		setTimeout(callback, 1000) // TODO
 		setTimeout(this.refreshZwaveValue.bind(this), 5000)
 	}
