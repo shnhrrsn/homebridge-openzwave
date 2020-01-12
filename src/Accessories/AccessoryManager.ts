@@ -68,7 +68,9 @@ export default class AccessoryManager {
 		accessory.configure(nodeInfo)
 
 		if (!this.registry.has(accessory.platformAccessory.UUID)) {
-			this.api.registerPlatformAccessories(pluginName, platformName, [accessory.platformAccessory])
+			this.api.registerPlatformAccessories(pluginName, platformName, [
+				accessory.platformAccessory,
+			])
 			this.registry.set(accessory.platformAccessory.UUID, accessory)
 		}
 	}

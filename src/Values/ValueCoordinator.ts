@@ -30,7 +30,14 @@ export default class ValueCoordinator {
 	scopedStream?: ScopedValueStream
 	valueUpdateObserver?: Subscription
 
-	constructor({ log, characteristic, initialValue, valueStream, zwave, transformer }: CoordinateValuesParams) {
+	constructor({
+		log,
+		characteristic,
+		initialValue,
+		valueStream,
+		zwave,
+		transformer,
+	}: CoordinateValuesParams) {
 		this.log = log
 		this.characteristic = characteristic
 		this.initialValue = initialValue
@@ -46,7 +53,9 @@ export default class ValueCoordinator {
 		let valueUpdate = scopedStream.valueUpdate
 
 		if (this.transformer.isZwaveValid) {
-			valueUpdate = valueUpdate.pipe(filter(({ value }) => this.transformer.isZwaveValid!(value.value)))
+			valueUpdate = valueUpdate.pipe(
+				filter(({ value }) => this.transformer.isZwaveValid!(value.value)),
+			)
 		}
 
 		// Notify HomeKit of the initial value

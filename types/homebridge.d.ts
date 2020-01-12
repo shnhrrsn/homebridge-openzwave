@@ -14,7 +14,11 @@ export namespace Homebridge {
 			dynamic: boolean,
 		): void
 
-		registerPlatformAccessories(pluginName: string, platformName: string, accessories: PlatformAccessory[]): void
+		registerPlatformAccessories(
+			pluginName: string,
+			platformName: string,
+			accessories: PlatformAccessory[],
+		): void
 
 		on(event: 'didFinishLaunching', listener: () => void): this
 	}

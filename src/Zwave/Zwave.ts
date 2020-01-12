@@ -55,9 +55,12 @@ export default class Zwave extends OpenZwave implements INodeStream {
 			this.valueRefreshed.next({ nodeId, comClass, value })
 		})
 
-		this.on('value removed', (nodeId: number, comClass: number, instance: number, index: number) => {
-			this.valueRemoved.next({ nodeId, comClass, instance, index })
-		})
+		this.on(
+			'value removed',
+			(nodeId: number, comClass: number, instance: number, index: number) => {
+				this.valueRemoved.next({ nodeId, comClass, instance, index })
+			},
+		)
 
 		this.on('notification', (nodeId: number, notification: Notification, help: string) => {
 			this.notification.next({ nodeId, notification, help })
@@ -65,7 +68,13 @@ export default class Zwave extends OpenZwave implements INodeStream {
 
 		this.on(
 			'controller command',
-			(nodeId: number, state: ControllerState, notif: number, message: string, command: number) => {
+			(
+				nodeId: number,
+				state: ControllerState,
+				notif: number,
+				message: string,
+				command: number,
+			) => {
 				this.controllerCommand.next({ nodeId, state, notif, message, command })
 			},
 		)

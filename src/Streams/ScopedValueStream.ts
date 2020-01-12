@@ -11,9 +11,15 @@ export class ScopedValueStream implements IValueStream {
 	private _valueUpdate?: Observable<IValueParams>
 
 	constructor(valueId: ValueId, valueStream: IValueStream) {
-		this.valueAdded = valueStream.valueAdded.pipe(filter(params => matchesValueId(params.value, valueId)))
-		this.valueChanged = valueStream.valueChanged.pipe(filter(params => matchesValueId(params.value, valueId)))
-		this.valueRefreshed = valueStream.valueRefreshed.pipe(filter(params => matchesValueId(params.value, valueId)))
+		this.valueAdded = valueStream.valueAdded.pipe(
+			filter(params => matchesValueId(params.value, valueId)),
+		)
+		this.valueChanged = valueStream.valueChanged.pipe(
+			filter(params => matchesValueId(params.value, valueId)),
+		)
+		this.valueRefreshed = valueStream.valueRefreshed.pipe(
+			filter(params => matchesValueId(params.value, valueId)),
+		)
 		this.valueRemoved = valueStream.valueRemoved.pipe(
 			filter(params => {
 				return (
@@ -39,5 +45,9 @@ export class ScopedValueStream implements IValueStream {
 }
 
 function matchesValueId(value: Value, valueId: ValueId): boolean {
-	return valueId.class_id === value.class_id && valueId.instance === value.instance && valueId.index === value.index
+	return (
+		valueId.class_id === value.class_id &&
+		valueId.instance === value.instance &&
+		valueId.index === value.index
+	)
 }

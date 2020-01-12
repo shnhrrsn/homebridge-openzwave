@@ -23,17 +23,23 @@ export default class ScopedNodeStream implements INodeStream {
 	readonly controllerCommand: Observable<IControllerCommandParams>
 
 	constructor(nodeId: number, nodeStream: INodeStream) {
-		this.nodeAvailable = nodeStream.nodeAvailable.pipe(filter(params => params.nodeId === nodeId))
+		this.nodeAvailable = nodeStream.nodeAvailable.pipe(
+			filter(params => params.nodeId === nodeId),
+		)
 		this.nodeAdded = nodeStream.nodeAdded.pipe(filter(params => params.nodeId === nodeId))
 		this.nodeReady = nodeStream.nodeReady.pipe(filter(params => params.nodeId === nodeId))
 		this.nodeRemoved = nodeStream.nodeRemoved.pipe(filter(params => params.nodeId === nodeId))
 		this.nodeReset = nodeStream.nodeReset.pipe(filter(params => params.nodeId === nodeId))
 		this.valueAdded = nodeStream.valueAdded.pipe(filter(params => params.nodeId === nodeId))
 		this.valueChanged = nodeStream.valueChanged.pipe(filter(params => params.nodeId === nodeId))
-		this.valueRefreshed = nodeStream.valueRefreshed.pipe(filter(params => params.nodeId === nodeId))
+		this.valueRefreshed = nodeStream.valueRefreshed.pipe(
+			filter(params => params.nodeId === nodeId),
+		)
 		this.valueRemoved = nodeStream.valueRemoved.pipe(filter(params => params.nodeId === nodeId))
 		this.notification = nodeStream.notification.pipe(filter(params => params.nodeId === nodeId))
-		this.controllerCommand = nodeStream.controllerCommand.pipe(filter(params => params.nodeId === nodeId))
+		this.controllerCommand = nodeStream.controllerCommand.pipe(
+			filter(params => params.nodeId === nodeId),
+		)
 	}
 
 	dispose() {

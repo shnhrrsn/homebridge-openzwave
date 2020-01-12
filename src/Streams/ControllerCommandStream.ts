@@ -26,7 +26,9 @@ export default class ControllerCommandStream {
 
 	constructor(nodeStream: INodeStream) {
 		this.change = nodeStream.controllerCommand
-		this.waiting = nodeStream.controllerCommand.pipe(filter(({ state }) => state === ControllerState.Waiting))
+		this.waiting = nodeStream.controllerCommand.pipe(
+			filter(({ state }) => state === ControllerState.Waiting),
+		)
 		this.end = nodeStream.controllerCommand.pipe(filter(({ state }) => endStates.has(state)))
 	}
 

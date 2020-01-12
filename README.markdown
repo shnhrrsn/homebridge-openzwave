@@ -9,7 +9,7 @@ This project was initially forked from [velocityzen/homebridge-platform-zwave](h
 
 ## Supported Z-Wave Command Classes
 
-__Work In Progress__ (the list shows command classes for the devices I currently have)
+**Work In Progress** (the list shows command classes for the devices I currently have)
 
 - [x] SWITCH_BINARY (37)
 - [x] SWITCH_MULTILEVEL (38)
@@ -40,8 +40,8 @@ Add the minimal platform configuration. This plugin creates `Add Node`, `Add Sec
 }
 ```
 
-* __zwave__
-  * __devicePath__ — path to the gateway. For the list use `ls /dev/cu.*` and/or `ls /dev/tty.*`
+- **zwave**
+  - **devicePath** — path to the gateway. For the list use `ls /dev/cu.*` and/or `ls /dev/tty.*`
 
 ### Accessories
 
@@ -67,13 +67,13 @@ If you want to customize exposed accessories, add `accessories` to your config. 
 }
 ```
 
-- __NodeId__ – "3" in the example above. NodeId of the node (device) the config is applied to.
+- **NodeId** – "3" in the example above. NodeId of the node (device) the config is applied to.
 - name – string, name of the device in the Home app.
 - ignoreClasses – the array of the command classes Ids to ignore.
 - values – map of `valueId: value` to set the initial value.
 - parameters – map of `parameterId: value` to set the initial value.
 - valuesMaps – map of `valueId: valueMaps` to map a value from Z-Wave to HomeKit.
-- hints – set of strings to help better understand the device.  Currently only `fan` is supported.
+- hints – set of strings to help better understand the device. Currently only `fan` is supported.
 
 You can also set the node config to `false` to ignore the node (device) entirely.
 
