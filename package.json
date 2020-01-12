@@ -4,7 +4,7 @@
   "description": "OpenZWave Platform for Homebridge",
   "author": "Shaun Harrison (@shnhrrsn)",
   "license": "MIT",
-  "main": "lib/registerPlatform.ts",
+  "main": "lib/registerPlatform.js",
   "scripts": {
     "code:typecheck": "tsc --noEmit",
     "code:format": "prettier --write src/**/*.ts types/**/*.ts *.json *.yaml .babelrc *.markdown",
