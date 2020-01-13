@@ -163,7 +163,7 @@ export default class AccessoryManager {
 	private getNodeCommands(nodeId: number): AccessoryCommands {
 		if (nodeId === this.zwave.getControllerNodeId()) {
 			const commands: AccessoryCommands = new Map()
-			commands.set(CommandClass.PLATFORM_RESERVED, new Map())
+			commands.set(CommandClass.VIRTUAL_PLATFORM, new Map())
 			return commands
 		}
 

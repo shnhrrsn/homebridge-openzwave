@@ -9,7 +9,7 @@ import { IDriverRegistry } from './IDriverRegistry'
 const StandardDriverRegistry: IDriverRegistry = new Map()
 export default StandardDriverRegistry
 
-StandardDriverRegistry.set(CommandClass.PLATFORM_RESERVED, platformDriver)
+StandardDriverRegistry.set(CommandClass.VIRTUAL_PLATFORM, platformDriver)
 
 StandardDriverRegistry.set(CommandClass.BATTERY, batteryDriver)
 StandardDriverRegistry.set(CommandClass.SWITCH_BINARY, switchBinaryDriver)

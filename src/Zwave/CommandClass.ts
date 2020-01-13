@@ -1,5 +1,5 @@
 export enum CommandClass {
-	PLATFORM_RESERVED = -999,
+	// Official Zwave Commands
 	ALARM = 113,
 	ANTITHEFT = 93,
 	APPLICATION_STATUS = 34,
@@ -101,4 +101,7 @@ export enum CommandClass {
 	ZIP_SERVER = 36,
 	ZIP_SERVICES = 35,
 	ZWAVEPLUS_INFO = 94,
+
+	// Virtual Platform Commands
+	VIRTUAL_PLATFORM = 999_000,
 }
