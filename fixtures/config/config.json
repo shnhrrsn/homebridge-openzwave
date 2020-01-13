@@ -1,0 +1,23 @@
+{
+  "bridge": {
+    "name": "Homebridge",
+    "username": "CC:22:3D:E3:CE:30",
+    "port": 51826,
+    "pin": "031-45-154"
+  },
+  "platforms": [
+    {
+      "platform": "openzwave",
+      "name": "zwave",
+      "zwave": {
+        "devicePath": "./ttyVACM0"
+      },
+      "accessories": {
+        "18": {
+          "name": "Fan",
+          "hints": ["fan"]
+        }
+      }
+    }
+  ]
+}

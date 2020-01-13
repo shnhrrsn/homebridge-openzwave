@@ -1,0 +1,12 @@
+{
+  "name": "homebridge-openzwave",
+  "main": "../../src/registerPlatform.ts",
+  "private": true,
+  "keywords": [
+    "homebridge-plugin",
+    "homebridge-platform"
+  ],
+  "engines": {
+    "homebridge": ">=0.4.50"
+  }
+}
