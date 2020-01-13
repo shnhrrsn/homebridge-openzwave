@@ -1,3 +1,5 @@
+import { IAccessoryConfig } from './IAccessoryConfig'
+
 export type IConfig = {
 	zwave?: {
 		devicePath?: string
@@ -7,14 +9,3 @@ export type IConfig = {
 	}
 	uuidPrefix?: string
 }
-
-export type IAccessoryConfig = {
-	name?: string
-	ignoreClasses?: number[]
-	values?: {
-		[x in string]: number
-	}
-	hints?: AccessoryHintType[]
-}
-
-export type AccessoryHintType = 'fan' | 'light'

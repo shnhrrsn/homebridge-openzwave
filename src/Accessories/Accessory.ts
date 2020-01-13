@@ -1,7 +1,7 @@
 import Ozw from '../Zwave/Zwave'
 import ScopedNodeStream from '../Streams/ScopedNodeStream'
 
-import { IAccessoryConfig } from '../IConfig'
+import { IAccessoryConfig } from '../IAccessoryConfig'
 import { CommandClass } from '../Zwave/CommandClass'
 import { IDriverRegistry } from './Registries/IDriverRegistry'
 import { Homebridge } from '../../types/homebridge'
