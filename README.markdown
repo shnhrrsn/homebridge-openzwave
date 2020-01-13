@@ -129,6 +129,7 @@ A `.env` file is supported in the root of the project directory.
 
 - `yarn testharness` will launch Homebridge through Babel/TypeScript pointed towards `src`
 - `yarn util ls` displays a list of devices currently in your Z-Wave network
+- `yarn util inspect :nodeid` query a specific node to display debug information including node info and command classes
 
 ### Remote Development
 

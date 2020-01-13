@@ -46,6 +46,7 @@
     "@babel/preset-typescript": "^7.7.7",
     "@babel/register": "^7.7.7",
     "@types/node": "^13.1.6",
+    "ascii-table": "^0.0.9",
     "dotenv": "^8.2.0",
     "homebridge": "^0.4.50",
     "prettier": "1.19.1",
