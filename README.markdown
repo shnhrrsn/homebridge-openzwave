@@ -46,16 +46,14 @@ In order to use this plugin, you’ll need to add the following JSON object to y
 | `name`             | The name of this platform within Homebridge.<br>This is mainly used for logs and can be any value you want.                                             | N        |
 | `zwave`            | This contains the settings that will be passed to OpenZWave.                                                                                            | Y        |
 | `zwave.devicePath` | The device path to your gateway.<br>See [Finding Your Device](#finding-your-device) for more information.]                                              | Y        |
-| `uuidPrefix`       | Override the default prefixed used when generating UUIDs for each node.<br>_NOTE: Most setups will not need to change this value._                      | N        |
+| `uuidPrefix`       | Override the default prefix used when generating UUIDs for each node.<br>_NOTE: Most setups will not need to change this value._                        | N        |
 | `accessories`      | Customize how your Z-Wave accessories behave in HomeKit, or exclude them entirely.<br>See the [Accessories](#accessories) section for more information. | N        |
 
 ### Finding Your Device
 
-To locate your Z-Wave controller, try looking running `ls /dev/tty.*` or `ls /dev/cu.*` in terminal.
+To locate your Z-Wave controller, try running `ls /dev/tty.*` or `ls /dev/cu.*` in terminal. Depending on your OS, you may also be able to run `ls -lah /dev/serial/by-id` to find additional context for which device in your Z-Wave gateway.
 
-Depending on your OS, you may also be able to run `ls -lah /dev/serial/by-id` to find additional insights.
-
-If you’re unable to figure out which device is your Z-Wave gateway, try unplugging it and running the commands above, after that, plug it back in and look for the additional device that wasn’t there before.
+If you’re unable to figure out the correct device, try unplugging it and running the commands above, after that, plug it back in and look for the additional device that wasn’t there before.
 
 ### Accessories
 
