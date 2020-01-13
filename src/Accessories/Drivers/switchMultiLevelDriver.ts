@@ -1,7 +1,8 @@
 import registerCharacteristic from './Support/registerCharacteristic'
 
 import { IDriverParams } from './Driver'
-import { ValueType } from '../../Values/ValueType'
+import MultiLevelBinaryTransformer from '../../Values/Transformers/MultiLevelBinaryTransformer'
+import MultiLevelTransformer from '../../Values/Transformers/MultiLevelTransformer'
 
 export default function switchMultiLevelDriver(params: IDriverParams) {
 	const value = params.values.get(0)
@@ -25,14 +26,7 @@ export default function switchMultiLevelDriver(params: IDriverParams) {
 		value,
 		characteristic: isFan ? Characteristic.Active : Characteristic.On,
 		options: {
-			transformer: {
-				homekitToZwave(homekitValue: ValueType): ValueType {
-					return homekitValue ? 0xff : 0
-				},
-				zwaveToHomeKit(zwaveValue: ValueType): ValueType {
-					return zwaveValue > 0 ? true : false
-				},
-			},
+			transformer: MultiLevelBinaryTransformer,
 		},
 	})
 
@@ -43,17 +37,7 @@ export default function switchMultiLevelDriver(params: IDriverParams) {
 		value: value,
 		characteristic: isFan ? Characteristic.RotationSpeed : Characteristic.Brightness,
 		options: {
-			transformer: {
-				homekitToZwave(homekitValue: ValueType): ValueType {
-					return homekitValue
-				},
-				zwaveToHomeKit(zwaveValue: ValueType): ValueType {
-					return Math.min(99, Math.max(0, Number(zwaveValue)))
-				},
-				isZwaveValid(zwaveValue: ValueType) {
-					return zwaveValue != 0xff
-				},
-			},
+			transformer: MultiLevelTransformer,
 		},
 	})
 }
