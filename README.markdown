@@ -72,7 +72,8 @@ The accessories config object allows you to customize how your devices appear an
     "3": {
       "name": "My Fan Control",
       "classes": {
-        "ignored": [128]
+        "ignored": [128],
+        "rewrite": [{ "from": 38, "to": 999001 }]
       },
       "hints": ["fan"]
     }
@@ -80,12 +81,15 @@ The accessories config object allows you to customize how your devices appear an
 }
 ```
 
-| Config Key        | Description                                                                                                                           |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`            | The default name this accessory should have in HomeKit.                                                                               |
-| `classes`         |                                                                                                                                       |
-| `classes.ignored` | An array of [Z-Wave command classes](src/Zwave/CommandClass.ts) you’d prefer this plugin not represent in HomeKit.                    |
-| `hints`           | An array of strings to better help the plugin understand what type of device this is.<br>Currently the only supported value is `fan`. |
+| Config Key                | Description                                                                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                    | The default name this accessory should have in HomeKit.                                                                               |
+| `commands`                |                                                                                                                                       |
+| `commands.ignored`        | An array of [Z-Wave command classes](src/Zwave/CommandClass.ts) you’d prefer this plugin not represent in HomeKit.                    |
+| `commands.rewrite`        | An array of commands to rewrite to change their intended effect                                                                       |
+| `commands.rewrite[].from` | The the [Z-Wave command class](src/Zwave/CommandClass.ts) to replace                                                                  |
+| `commands.rewrite[].to`   | The the [Z-Wave command class](src/Zwave/CommandClass.ts) to change to                                                                |
+| `hints`                   | An array of strings to better help the plugin understand what type of device this is.<br>Currently the only supported value is `fan`. |
 
 #### Excluding Accessories from HomeKit
 

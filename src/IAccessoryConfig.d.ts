@@ -7,5 +7,11 @@ export interface IAccessoryConfig {
 	hints?: AccessoryHintType[]
 	commands?: {
 		ignored?: CommandClass[]
+		rewrite?: IAccessoryCommandRewriteConfig[]
 	}
+}
+
+export interface IAccessoryCommandRewriteConfig {
+	from: CommandClass
+	to: CommandClass
 }

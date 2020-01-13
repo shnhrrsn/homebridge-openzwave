@@ -56,7 +56,8 @@ export class Accessory {
 				continue
 			}
 
-			const driver = this.driverRegistry.get(commandClass)
+			const rewrite = this.config.commands?.rewrite?.find(({ from }) => from === commandClass)
+			const driver = this.driverRegistry.get(rewrite?.to ?? commandClass)
 
 			if (!driver) {
 				continue
