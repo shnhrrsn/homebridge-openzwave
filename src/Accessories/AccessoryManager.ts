@@ -89,7 +89,11 @@ export default class AccessoryManager {
 	}
 
 	onNodeAvailable({ nodeId, nodeInfo }: INodeInfoParams) {
-		this.log.debug('onNodeAvailable', this.getInitialNodeName(nodeId, nodeInfo))
+		this.log.debug(
+			'onNodeAvailable',
+			this.getInitialNodeName(nodeId, nodeInfo),
+			`${nodeInfo.manufacturerid}/${nodeInfo.productid}`,
+		)
 	}
 
 	onNodeReady({ nodeId, nodeInfo }: INodeInfoParams) {
