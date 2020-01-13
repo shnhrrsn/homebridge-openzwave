@@ -1,5 +1,6 @@
 import Ozw from '../Zwave/Zwave'
 import ScopedNodeStream from '../Streams/ScopedNodeStream'
+import MappedValues from '../Values/MappedValues'
 
 import { IAccessoryConfig } from '../IAccessoryConfig'
 import { CommandClass } from '../Zwave/CommandClass'
@@ -63,8 +64,10 @@ export class Accessory {
 				continue
 			}
 
+			const indexes = rewrite?.indexes
+
 			driver({
-				values,
+				values: indexes ? new MappedValues(indexes, values) : values,
 				log: this.log,
 				hap: this.api.hap,
 				accessory: this,

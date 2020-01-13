@@ -11,7 +11,12 @@ export interface IAccessoryConfig {
 	}
 }
 
+export type IAccessoryCommandIndexesRewriteConfig = {
+	[x in number]: number
+}
+
 export interface IAccessoryCommandRewriteConfig {
 	from: CommandClass
 	to: CommandClass
+	indexes?: IAccessoryCommandIndexesRewriteConfig
 }
