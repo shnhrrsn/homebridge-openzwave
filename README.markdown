@@ -130,3 +130,25 @@ A `.env` file is supported in the root of the project directory.
 - `yarn testharness` will launch Homebridge through Babel/TypeScript pointed towards `src`
 - `yarn util ls` displays a list of devices currently in your Z-Wave network
 
+### Remote Development
+
+If your Z-Wave Controller is plugged into a different machine, you can access it remotely via `socat`.
+
+> NOTE: Be sure to shutdown Homebridge on the machine before you run `socat` as the gateway only supports a single connection to it.
+
+To get started, run this on the machine that your Z-Wave Controller is plugged into:
+
+```bash
+docker run --rm -ti  --privileged -p 32375:32375 -v /dev:/host/dev \
+alpine/socat -d -d tcp-l:32375,reuseaddr,fork file:/host/dev/ttyACM0,raw,nonblock,echo=0
+```
+
+> NOTE: Remember to update your `/dev` path to match the path from [Finding Your Device](#finding-your-device).
+
+Next you’ll just need to configure your local machine to access it:
+
+```bash
+socat -d -d pty,link=./ttyVACM0,echo=0,raw,waitslave tcp:$IP_OF_REMOTE_MACHINE:32375
+```
+
+And you should be good to go, just setup your `.env` file to include `DEVICE_PATH=./ttyVACM0`.
