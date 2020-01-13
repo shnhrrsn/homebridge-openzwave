@@ -83,12 +83,8 @@ export default class ValueCoordinator {
 
 		// Handle explicit HomeKit value requests
 		this.characteristic.on('get', (callback?: Function) => {
-			// TODO: Maybe switch to a behavior subject here?
-			// Should investigate performance and see if it’s worth it
-
-			// Since there’s no way to request a value from OZW with
-			// a callback, we just listen to next value emitted on the
-			// value update stream and pass that back to HomeKit
+			// valueUpdate is a ReplaySubject, so we can respond
+			// with the last cached value instantly
 			valueUpdate.pipe(first()).subscribe(({ value }) => {
 				this.sendZwaveValueToHomeKit(value, callback)
 
@@ -96,7 +92,9 @@ export default class ValueCoordinator {
 				callback = undefined
 			})
 
-			// Request a new value from ZWave so valueUpdate emits
+			// However, we still want to grab the fresh value from
+			// the device, so we’ll request a refresh and that will
+			// be sent to HomeKit once it’s resolved
 			this.refreshZwaveValue()
 		})
 	}
