@@ -3,13 +3,8 @@ import registerCharacteristic from './Support/registerCharacteristic'
 import { IDriverParams } from './Driver'
 import MultiLevelBinaryTransformer from '../../Values/Transformers/MultiLevelBinaryTransformer'
 import MultiLevelTransformer from '../../Values/Transformers/MultiLevelTransformer'
-import fanMultiLevelDriver from './fanMultiLevelDriver'
 
-export default function switchMultiLevelDriver(params: IDriverParams) {
-	if (params.hints.has('fan')) {
-		return fanMultiLevelDriver(params)
-	}
-
+export default function fanMultiLevelDriver(params: IDriverParams) {
 	const value = params.values.get(0)
 
 	if (!value) {
@@ -17,7 +12,7 @@ export default function switchMultiLevelDriver(params: IDriverParams) {
 	}
 
 	const { Service, Characteristic } = params.hap
-	const service = params.accessory.getService(Service.Lightbulb)
+	const service = params.accessory.getService(Service.Fanv2)
 
 	if (!service) {
 		return
@@ -28,18 +23,18 @@ export default function switchMultiLevelDriver(params: IDriverParams) {
 		service,
 		params,
 		value,
-		characteristic: Characteristic.On,
+		characteristic: Characteristic.Active,
 		options: {
 			transformer: MultiLevelBinaryTransformer,
 		},
 	})
 
-	// Brightness
+	// Speed
 	registerCharacteristic({
 		service,
 		params,
 		value: value,
-		characteristic: Characteristic.Brightness,
+		characteristic: Characteristic.RotationSpeed,
 		options: {
 			transformer: MultiLevelTransformer,
 		},
