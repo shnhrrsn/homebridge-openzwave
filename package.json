@@ -27,8 +27,7 @@
   "dependencies": {
     "openzwave-shared": "^1.5.10",
     "rxjs": "^6.5.4",
-    "semver": "^7.1.1",
-    "try-require": "^1.2.1"
+    "semver": "^7.1.1"
   },
   "engines": {
     "homebridge": ">=0.4.50"
