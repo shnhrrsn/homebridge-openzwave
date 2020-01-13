@@ -5,5 +5,7 @@ export type AccessoryHintType = 'fan' | 'light'
 export interface IAccessoryConfig {
 	name?: string
 	hints?: AccessoryHintType[]
-	ignoredClasses?: CommandClass[]
+	commands?: {
+		ignored?: CommandClass[]
+	}
 }

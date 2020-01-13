@@ -49,10 +49,10 @@ export class Accessory {
 			this.configureInfoService(infoService, nodeInfo)
 		}
 
-		const ignoredClasses = new Set(this.config.ignoreClasses ?? [])
+		const ignoredCommands = new Set(this.config.commands?.ignored ?? [])
 
 		for (const [commandClass, values] of this.commands.entries()) {
-			if (ignoredClasses.has(commandClass)) {
+			if (ignoredCommands.has(commandClass)) {
 				continue
 			}
 

@@ -71,18 +71,21 @@ The accessories config object allows you to customize how your devices appear an
   "accessories": {
     "3": {
       "name": "My Fan Control",
-      "ignoreClasses": [128],
+      "classes": {
+        "ignored": [128]
+      },
       "hints": ["fan"]
     }
   }
 }
 ```
 
-| Config Key      | Description                                                                                                                           |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`          | The default name this accessory should have in HomeKit.                                                                               |
-| `ignoreClasses` | An array of [Z-Wave command classes](src/Zwave/CommandClass.ts) you’d prefer this plugin not represent in HomeKit.                    |
-| `hints`         | An array of strings to better help the plugin understand what type of device this is.<br>Currently the only supported value is `fan`. |
+| Config Key        | Description                                                                                                                           |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`            | The default name this accessory should have in HomeKit.                                                                               |
+| `classes`         |                                                                                                                                       |
+| `classes.ignored` | An array of [Z-Wave command classes](src/Zwave/CommandClass.ts) you’d prefer this plugin not represent in HomeKit.                    |
+| `hints`           | An array of strings to better help the plugin understand what type of device this is.<br>Currently the only supported value is `fan`. |
 
 #### Excluding Accessories from HomeKit
 
