@@ -2,5 +2,6 @@
 .vscode/
 *.log
 *.tgz
+.env
 lib/
 node_modules/
