@@ -1,4 +1,4 @@
-require('./shared/common')
+require('./shared/bootstrap')
 const chalk = require('chalk')
 const path = require('path')
 
