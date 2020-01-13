@@ -8,6 +8,7 @@
   "scripts": {
     "code:typecheck": "tsc --noEmit",
     "code:format": "prettier --write src/**/*.ts types/**/*.ts *.json *.yaml .babelrc *.markdown",
+    "util": "node utils/util.js",
     "testharness": "node utils/testharness.js",
     "build": "tsc --noEmit && rm -fr lib && babel src --out-dir lib --extensions .ts --source-maps inline",
     "prepack": "npm run build"

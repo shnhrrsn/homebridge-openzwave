@@ -114,3 +114,19 @@ If you have Z-Wave nodes you’d wish to exclude from HomeKit, you can hide them
 `homebridge-openzwave` supports global/shared device handlers to override default Z-Wave behavior. This can be useful for devices that use generic commands for more specific purposes, such as a fan control that only implements SWITCH_MULTILEVEL.
 
 For more information on device handlers, see the [README](src/Devices/README.markdown).
+
+## Development
+
+### Environment
+
+All development tooling dynamically configures OpenZWave through a `DEVICE_PATH` environment var that should be set to the location of your Z-Wave Gateway.
+
+A `.env` file is supported in the root of the project directory.
+
+### Tools
+
+`homebridge-openzwave` has some tooling to help making development easier:
+
+- `yarn testharness` will launch Homebridge through Babel/TypeScript pointed towards `src`
+- `yarn util ls` displays a list of devices currently in your Z-Wave network
+
