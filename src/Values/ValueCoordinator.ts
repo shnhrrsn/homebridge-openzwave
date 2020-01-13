@@ -4,10 +4,10 @@ import { Subscription } from 'rxjs'
 import { ScopedValueStream } from '../Streams/ScopedValueStream'
 import { ValueId, Value, ValueType } from 'openzwave-shared'
 import { IValueStream } from '../Streams/IValueStream'
-import { IValueTransformer } from './IValueTransformer'
+import { IValueTransformer } from './Transformers/IValueTransformer'
 
 import Ozw from '../Zwave/Zwave'
-import valueIdentityTransformer from './valueNoopTransformer'
+import valueIdentityTransformer from './Transformers/NoopValueTransformer'
 import { Homebridge } from '../../types/homebridge'
 
 export type CoordinateValuesParams = {

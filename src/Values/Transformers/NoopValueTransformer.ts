@@ -1,9 +1,9 @@
 import { IValueTransformer } from './IValueTransformer'
-import { ValueType } from './ValueType'
+import { ValueType } from '../ValueType'
 
 // An implementation of ValueTransformer that simply
 // passes through values 1:1
-const valueNoopTransformer: IValueTransformer = {
+const NoopValueTransformer: IValueTransformer = {
 	homekitToZwave(homekitValue: ValueType): ValueType {
 		return homekitValue
 	},
@@ -12,4 +12,4 @@ const valueNoopTransformer: IValueTransformer = {
 	},
 }
 
-export default valueNoopTransformer
+export default NoopValueTransformer

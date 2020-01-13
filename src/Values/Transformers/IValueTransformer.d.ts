@@ -1,4 +1,4 @@
-import { ValueType } from './ValueType'
+import { ValueType } from '../ValueType'
 
 export interface IValueTransformer {
 	zwaveToHomeKit(zwaveValue: ValueType): ValueType
