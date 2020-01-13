@@ -5,7 +5,8 @@ export default async function loadDeviceConfig(
 	nodeInfo: NodeInfo,
 ): Promise<IAccessoryConfig | undefined> {
 	try {
-		return await import(`./${nodeInfo.manufacturerid}/${nodeInfo.productid}`)
+		const config = await import(`./${nodeInfo.manufacturerid}/${nodeInfo.productid}`)
+		return config?.default ?? config
 	} catch (error) {
 		if (error.code === 'MODULE_NOT_FOUND') {
 			return undefined
