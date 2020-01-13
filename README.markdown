@@ -108,3 +108,9 @@ If you have Z-Wave nodes you’d wish to exclude from HomeKit, you can hide them
   }
 }
 ```
+
+## Device Handlers
+
+`homebridge-openzwave` supports global/shared device handlers to override default Z-Wave behavior. This can be useful for devices that use generic commands for more specific purposes, such as a fan control that only implements SWITCH_MULTILEVEL.
+
+For more information on device handlers, see the [README](src/Devices/README.markdown).

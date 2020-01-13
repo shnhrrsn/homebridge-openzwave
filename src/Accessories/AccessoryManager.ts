@@ -1,6 +1,8 @@
 import Ozw from '../Zwave/Zwave'
 import Platform from '../Platform'
 import StandardDriverRegistry from './Registries/StandardDriverRegistry'
+import loadDeviceConfig from '../Devices/loadDeviceConfig'
+import mergeDeviceConfig from '../Devices/mergeDeviceConfig'
 
 import { Accessory, AccessoryCommands } from './Accessory'
 import { IConfig } from '../IConfig'
@@ -101,15 +103,22 @@ export default class AccessoryManager {
 			return
 		}
 
-		const accessory = this.makeAccessory(nodeId, nodeInfo, config)
-		accessory.configure(nodeInfo)
+		this.makeAccessory(nodeId, nodeInfo, config)
+			.then(accessory => {
+				accessory.configure(nodeInfo)
 
-		if (!this.registry.has(accessory.platformAccessory.UUID)) {
-			this.api.registerPlatformAccessories(pluginName, platformName, [
-				accessory.platformAccessory,
-			])
-			this.registry.set(accessory.platformAccessory.UUID, accessory)
-		}
+				if (this.registry.has(accessory.platformAccessory.UUID)) {
+					return
+				}
+
+				this.api.registerPlatformAccessories(pluginName, platformName, [
+					accessory.platformAccessory,
+				])
+				this.registry.set(accessory.platformAccessory.UUID, accessory)
+			})
+			.catch(error => {
+				this.log.error('Failed to make accessory', error)
+			})
 	}
 
 	onNodeAdded({ nodeId }: INodeIdParams) {
@@ -126,16 +135,26 @@ export default class AccessoryManager {
 		return this.api.hap.uuid.generate(uuidPrefix + String(nodeId))
 	}
 
-	private makeAccessory(
+	private async makeAccessory(
 		nodeId: number,
 		nodeInfo: NodeInfo,
 		config: IAccessoryConfig | undefined,
-	): Accessory {
+	): Promise<Accessory> {
 		const accessoryId = this.nodeIdToAccessoryId(nodeId)
 		let accessory = this.registry.get(accessoryId)
 
 		if (accessory) {
 			return accessory
+		}
+
+		const deviceConfig = await loadDeviceConfig(nodeInfo)
+
+		if (deviceConfig) {
+			if (!config) {
+				config = deviceConfig
+			} else {
+				config = mergeDeviceConfig(config, deviceConfig)
+			}
 		}
 
 		const platformAccessory =
