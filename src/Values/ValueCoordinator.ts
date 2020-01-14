@@ -7,7 +7,7 @@ import { IValueStream } from '../Streams/IValueStream'
 import { IValueTransformer } from './Transformers/IValueTransformer'
 
 import Ozw from '../Zwave/Zwave'
-import valueIdentityTransformer from './Transformers/NoopValueTransformer'
+import noopValueTransformer from './Transformers/noopValueTransformer'
 import { Homebridge } from '../../types/homebridge'
 
 export type CoordinateValuesParams = {
@@ -47,7 +47,7 @@ export default class ValueCoordinator {
 		this.valueStream = valueStream
 		this.zwave = zwave
 		this.readonly = readonly ?? false
-		this.transformer = transformer ?? valueIdentityTransformer
+		this.transformer = transformer ?? noopValueTransformer()
 
 		if (!this.transformer.homekitToZwave && !this.readonly) {
 			throw new Error('homekitToZwave is required for readwrite values')

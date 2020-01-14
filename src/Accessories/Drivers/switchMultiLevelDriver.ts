@@ -1,8 +1,8 @@
 import registerCharacteristic from './Support/registerCharacteristic'
 
 import { IDriverParams } from './Driver'
-import MultiLevelBinaryTransformer from '../../Values/Transformers/MultiLevelBinaryTransformer'
-import MultiLevelTransformer from '../../Values/Transformers/MultiLevelTransformer'
+import multiLevelBinaryTransformer from '../../Values/Transformers/multiLevelBinaryTransformer'
+import multiLevelTransformer from '../../Values/Transformers/multiLevelTransformer'
 import fanMultiLevelDriver from './fanMultiLevelDriver'
 
 export default function switchMultiLevelDriver(params: IDriverParams) {
@@ -30,7 +30,7 @@ export default function switchMultiLevelDriver(params: IDriverParams) {
 		value,
 		characteristic: Characteristic.On,
 		options: {
-			transformer: MultiLevelBinaryTransformer,
+			transformer: multiLevelBinaryTransformer(),
 		},
 	})
 
@@ -41,7 +41,7 @@ export default function switchMultiLevelDriver(params: IDriverParams) {
 		value: value,
 		characteristic: Characteristic.Brightness,
 		options: {
-			transformer: MultiLevelTransformer,
+			transformer: multiLevelTransformer(),
 		},
 	})
 }

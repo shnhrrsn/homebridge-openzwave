@@ -1,8 +1,8 @@
 import registerCharacteristic from './Support/registerCharacteristic'
 
 import { IDriverParams } from './Driver'
-import MultiLevelBinaryTransformer from '../../Values/Transformers/MultiLevelBinaryTransformer'
-import MultiLevelTransformer from '../../Values/Transformers/MultiLevelTransformer'
+import multiLevelBinaryTransformer from '../../Values/Transformers/multiLevelBinaryTransformer'
+import multiLevelTransformer from '../../Values/Transformers/multiLevelTransformer'
 
 export default function fanMultiLevelDriver(params: IDriverParams) {
 	const value = params.values.get(0)
@@ -25,7 +25,7 @@ export default function fanMultiLevelDriver(params: IDriverParams) {
 		value,
 		characteristic: Characteristic.Active,
 		options: {
-			transformer: MultiLevelBinaryTransformer,
+			transformer: multiLevelBinaryTransformer(),
 		},
 	})
 
@@ -36,7 +36,7 @@ export default function fanMultiLevelDriver(params: IDriverParams) {
 		value: value,
 		characteristic: Characteristic.RotationSpeed,
 		options: {
-			transformer: MultiLevelTransformer,
+			transformer: multiLevelTransformer(),
 		},
 	})
 }
