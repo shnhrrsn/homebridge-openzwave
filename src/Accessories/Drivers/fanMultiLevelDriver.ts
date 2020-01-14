@@ -25,7 +25,10 @@ export default function fanMultiLevelDriver(params: IDriverParams) {
 		value,
 		characteristic: Characteristic.Active,
 		options: {
-			transformer: multiLevelBinaryTransformer(),
+			transformer: multiLevelBinaryTransformer({
+				truthy: (Characteristic.Active as any)?.ACTIVE ?? true,
+				falsey: (Characteristic.Active as any)?.INACTIVE ?? false,
+			}),
 		},
 	})
 
