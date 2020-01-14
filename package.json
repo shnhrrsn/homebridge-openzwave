@@ -1,6 +1,6 @@
 {
   "name": "homebridge-openzwave",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "OpenZWave Platform for Homebridge",
   "author": "Shaun Harrison (@shnhrrsn)",
   "license": "MIT",
