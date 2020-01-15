@@ -1,5 +1,6 @@
+import OpenZwave, { NodeInfo, Notification, ControllerState } from 'openzwave-shared'
+
 import { Observable } from 'rxjs'
-import { NodeInfo, Notification, ControllerState } from 'openzwave-shared'
 import { IValueStream } from './IValueStream'
 
 export interface INodeIdParams {
@@ -46,4 +47,7 @@ export interface INodeStream extends IValueStream {
 
 	// When Controller Commands are executed, Notifications of Success/Failure etc are communicated via this
 	readonly controllerCommand: Observable<IControllerCommandParams>
+
+	// Access to the underlying zwave instance
+	readonly zwave: OpenZwave
 }

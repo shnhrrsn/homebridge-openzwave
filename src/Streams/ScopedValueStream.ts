@@ -1,3 +1,4 @@
+import OpenZwave from 'openzwave-shared'
 import { Observable, merge } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import { IValueStream, IValueParams, IValueRemovedParams } from './IValueStream'
@@ -9,8 +10,11 @@ export class ScopedValueStream implements IValueStream {
 	readonly valueRefreshed: Observable<IValueParams>
 	readonly valueRemoved: Observable<IValueRemovedParams>
 	private _valueUpdate?: Observable<IValueParams>
+	private valueStream: IValueStream
 
 	constructor(valueId: ValueId, valueStream: IValueStream) {
+		this.valueStream = valueStream
+
 		this.valueAdded = valueStream.valueAdded.pipe(
 			filter(params => matchesValueId(params.value, valueId)),
 		)
@@ -41,6 +45,10 @@ export class ScopedValueStream implements IValueStream {
 
 	dispose() {
 		// TODO
+	}
+
+	get zwave(): OpenZwave {
+		return this.valueStream.zwave
 	}
 }
 

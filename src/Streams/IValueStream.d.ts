@@ -1,5 +1,5 @@
+import OpenZwave, { Value, ValueId } from 'openzwave-shared'
 import { Observable } from 'rxjs'
-import { Value } from 'openzwave-shared'
 
 export interface IValueParams {
 	nodeId: number
@@ -26,4 +26,7 @@ export interface IValueStream {
 
 	// A node value has been removed from OpenZWave's list. This only occurs when a node is removed.
 	readonly valueRemoved: Observable<IValueRemovedParams>
+
+	// Access to the underlying zwave instance
+	readonly zwave: OpenZwave
 }

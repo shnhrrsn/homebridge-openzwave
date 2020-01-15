@@ -26,9 +26,8 @@ export default function registerCharacteristic({
 	new ValueCoordinator({
 		log: params.log,
 		characteristic: characteristicInstance,
-		initialValue: value,
+		valueId: value,
 		valueStream: params.valueStream,
-		zwave: params.zwave,
 		...options,
 	}).start()
 }

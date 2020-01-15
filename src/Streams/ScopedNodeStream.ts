@@ -1,3 +1,4 @@
+import OpenZwave from 'openzwave-shared'
 import { Observable } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import {
@@ -21,8 +22,11 @@ export default class ScopedNodeStream implements INodeStream {
 	readonly valueRemoved: Observable<IValueRemovedParams>
 	readonly notification: Observable<INotificationParams>
 	readonly controllerCommand: Observable<IControllerCommandParams>
+	private nodeStream: INodeStream
 
 	constructor(nodeId: number, nodeStream: INodeStream) {
+		this.nodeStream = nodeStream
+
 		this.nodeAvailable = nodeStream.nodeAvailable.pipe(
 			filter(params => params.nodeId === nodeId),
 		)
@@ -44,5 +48,9 @@ export default class ScopedNodeStream implements INodeStream {
 
 	dispose() {
 		// TODO
+	}
+
+	get zwave(): OpenZwave {
+		return this.nodeStream.zwave
 	}
 }

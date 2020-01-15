@@ -85,4 +85,8 @@ export default class Zwave extends OpenZwave implements INodeStream {
 			},
 		)
 	}
+
+	get zwave(): OpenZwave {
+		return this
+	}
 }

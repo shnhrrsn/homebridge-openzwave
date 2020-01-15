@@ -1,8 +1,9 @@
+import OpenZwave, { Value, ValueType, ValueId } from 'openzwave-shared'
+
 import { first, filter } from 'rxjs/operators'
 import { Subscription } from 'rxjs'
 
 import { ScopedValueStream } from '../Streams/ScopedValueStream'
-import { ValueId, Value, ValueType } from 'openzwave-shared'
 import { IValueStream } from '../Streams/IValueStream'
 import { IValueTransformer } from './Transformers/IValueTransformer'
 
@@ -13,39 +14,35 @@ import { Homebridge } from '../../types/homebridge'
 export type CoordinateValuesParams = {
 	log: Homebridge.Logger
 	characteristic: HAPNodeJS.Characteristic
-	initialValue: Value
+	valueId: ValueId
 	valueStream: IValueStream
-	zwave: Ozw
 	readonly?: boolean
 	transformer?: IValueTransformer
 }
 
 // Coordinates value streams from both Zwave and HomeKit for a single Characteristic
 export default class ValueCoordinator {
-	log: Homebridge.Logger
-	characteristic: HAPNodeJS.Characteristic
-	initialValue: Value<string | number | boolean>
-	valueStream: IValueStream
-	zwave: Ozw
-	transformer: IValueTransformer
-	readonly: boolean
-	scopedStream?: ScopedValueStream
-	valueUpdateObserver?: Subscription
+	readonly log: Homebridge.Logger
+	readonly characteristic: HAPNodeJS.Characteristic
+	readonly valueStream: IValueStream
+	readonly transformer: IValueTransformer
+	readonly readonly: boolean
+	readonly valueId: ValueId
+	private scopedStream?: ScopedValueStream
+	private valueUpdateObserver?: Subscription
 
 	constructor({
 		log,
 		characteristic,
-		initialValue,
+		valueId,
 		valueStream,
-		zwave,
 		readonly,
 		transformer,
 	}: CoordinateValuesParams) {
 		this.log = log
 		this.characteristic = characteristic
-		this.initialValue = initialValue
+		this.valueId = valueId
 		this.valueStream = valueStream
-		this.zwave = zwave
 		this.readonly = readonly ?? false
 		this.transformer = transformer ?? noopValueTransformer()
 
@@ -66,8 +63,20 @@ export default class ValueCoordinator {
 			)
 		}
 
-		// Notify HomeKit of the initial value
-		this.sendZwaveValueToHomeKit(this.initialValue)
+		// If we already have a value, send it to HomeKit
+		let hadInitialValue = false
+		valueUpdate
+			.pipe(first())
+			.subscribe(({ value }) => {
+				this.sendZwaveValueToHomeKit(value)
+				hadInitialValue = true
+			})
+			.unsubscribe()
+
+		// Otherwise, request a refresh
+		if (!hadInitialValue) {
+			this.refreshZwaveValue()
+		}
 
 		// Subscribe to all value updates and forward them to HomeKit
 		this.valueUpdateObserver = valueUpdate.subscribe(({ value }) => {
@@ -140,7 +149,7 @@ export default class ValueCoordinator {
 		this.zwave.refreshValue(this.valueId)
 	}
 
-	get valueId(): ValueId {
-		return this.initialValue
+	private get zwave(): OpenZwave {
+		return this.valueStream.zwave
 	}
 }
