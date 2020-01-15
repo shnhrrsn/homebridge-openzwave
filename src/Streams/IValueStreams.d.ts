@@ -14,7 +14,7 @@ export interface IValueRemovedParams {
 	index: number
 }
 
-export interface IValueStream {
+export interface IValueStreams {
 	// A new node value has been added to OpenZWave's list. These notifications occur after a node has been discovered, and details of its command classes have been received. Each command class may generate one or more values depending on the complexity of the item being represented.
 	readonly valueAdded: Observable<IValueParams>
 

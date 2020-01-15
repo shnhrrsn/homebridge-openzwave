@@ -27,7 +27,7 @@ export default function registerCharacteristic({
 		log: params.log,
 		characteristic: characteristicInstance,
 		valueId: value,
-		valueStream: params.valueStream,
+		valueStreams: params.valueStreams,
 		...options,
 	}).start()
 }

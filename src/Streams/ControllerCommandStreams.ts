@@ -1,13 +1,6 @@
 import { Observable } from 'rxjs'
 import { filter } from 'rxjs/operators'
-import {
-	INodeStream,
-	INodeInfoParams,
-	INodeIdParams,
-	INotificationParams,
-	IControllerCommandParams,
-} from './INodeStream'
-import { IValueParams, IValueRemovedParams } from './IValueStream'
+import { INodeStreams, IControllerCommandParams } from './INodeStreams'
 import { ControllerState } from 'openzwave-shared'
 
 const endStates = new Set([
@@ -19,17 +12,17 @@ const endStates = new Set([
 	ControllerState.Failed,
 ])
 
-export default class ControllerCommandStream {
+export default class ControllerCommandStreams {
 	readonly change: Observable<IControllerCommandParams>
 	readonly waiting: Observable<IControllerCommandParams>
 	readonly end: Observable<IControllerCommandParams>
 
-	constructor(nodeStream: INodeStream) {
-		this.change = nodeStream.controllerCommand
-		this.waiting = nodeStream.controllerCommand.pipe(
+	constructor(nodeStreams: INodeStreams) {
+		this.change = nodeStreams.controllerCommand
+		this.waiting = nodeStreams.controllerCommand.pipe(
 			filter(({ state }) => state === ControllerState.Waiting),
 		)
-		this.end = nodeStream.controllerCommand.pipe(filter(({ state }) => endStates.has(state)))
+		this.end = nodeStreams.controllerCommand.pipe(filter(({ state }) => endStates.has(state)))
 	}
 
 	dispose() {

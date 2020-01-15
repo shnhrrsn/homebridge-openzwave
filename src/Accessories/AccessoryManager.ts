@@ -9,7 +9,7 @@ import { IConfig } from '../IConfig'
 import { IAccessoryConfig } from '../IAccessoryConfig'
 import { Homebridge } from '../../types/homebridge'
 import { NodeInfo } from 'openzwave-shared'
-import { INodeInfoParams, INodeIdParams } from '../Streams/INodeStream'
+import { INodeInfoParams, INodeIdParams } from '../Streams/INodeStreams'
 import { platformName, pluginName } from '../settings'
 import { CommandClass } from '../Zwave/CommandClass'
 

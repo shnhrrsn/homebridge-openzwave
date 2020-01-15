@@ -1,30 +1,30 @@
 import OpenZwave from 'openzwave-shared'
 import { Observable, merge } from 'rxjs'
 import { filter } from 'rxjs/operators'
-import { IValueStream, IValueParams, IValueRemovedParams } from './IValueStream'
+import { IValueStreams, IValueParams, IValueRemovedParams } from './IValueStreams'
 import { ValueId, Value } from 'openzwave-shared'
 
-export class ScopedValueStream implements IValueStream {
+export class ScopedValueStreams implements IValueStreams {
 	readonly valueAdded: Observable<IValueParams>
 	readonly valueChanged: Observable<IValueParams>
 	readonly valueRefreshed: Observable<IValueParams>
 	readonly valueRemoved: Observable<IValueRemovedParams>
 	private _valueUpdate?: Observable<IValueParams>
-	private valueStream: IValueStream
+	private valueStreams: IValueStreams
 
-	constructor(valueId: ValueId, valueStream: IValueStream) {
-		this.valueStream = valueStream
+	constructor(valueId: ValueId, valueStreams: IValueStreams) {
+		this.valueStreams = valueStreams
 
-		this.valueAdded = valueStream.valueAdded.pipe(
+		this.valueAdded = valueStreams.valueAdded.pipe(
 			filter(params => matchesValueId(params.value, valueId)),
 		)
-		this.valueChanged = valueStream.valueChanged.pipe(
+		this.valueChanged = valueStreams.valueChanged.pipe(
 			filter(params => matchesValueId(params.value, valueId)),
 		)
-		this.valueRefreshed = valueStream.valueRefreshed.pipe(
+		this.valueRefreshed = valueStreams.valueRefreshed.pipe(
 			filter(params => matchesValueId(params.value, valueId)),
 		)
-		this.valueRemoved = valueStream.valueRemoved.pipe(
+		this.valueRemoved = valueStreams.valueRemoved.pipe(
 			filter(params => {
 				return (
 					valueId.class_id === params.comClass &&
@@ -48,7 +48,7 @@ export class ScopedValueStream implements IValueStream {
 	}
 
 	get zwave(): OpenZwave {
-		return this.valueStream.zwave
+		return this.valueStreams.zwave
 	}
 }
 

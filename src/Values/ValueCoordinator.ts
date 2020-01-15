@@ -3,11 +3,10 @@ import OpenZwave, { Value, ValueType, ValueId } from 'openzwave-shared'
 import { first, filter } from 'rxjs/operators'
 import { Subscription } from 'rxjs'
 
-import { ScopedValueStream } from '../Streams/ScopedValueStream'
-import { IValueStream } from '../Streams/IValueStream'
+import { ScopedValueStreams } from '../Streams/ScopedValueStreams'
+import { IValueStreams } from '../Streams/IValueStreams'
 import { IValueTransformer } from './Transformers/IValueTransformer'
 
-import Ozw from '../Zwave/Zwave'
 import noopValueTransformer from './Transformers/noopValueTransformer'
 import { Homebridge } from '../../types/homebridge'
 
@@ -15,7 +14,7 @@ export type CoordinateValuesParams = {
 	log: Homebridge.Logger
 	characteristic: HAPNodeJS.Characteristic
 	valueId: ValueId
-	valueStream: IValueStream
+	valueStreams: IValueStreams
 	readonly?: boolean
 	transformer?: IValueTransformer
 }
@@ -24,25 +23,25 @@ export type CoordinateValuesParams = {
 export default class ValueCoordinator {
 	readonly log: Homebridge.Logger
 	readonly characteristic: HAPNodeJS.Characteristic
-	readonly valueStream: IValueStream
+	readonly valueStreams: IValueStreams
 	readonly transformer: IValueTransformer
 	readonly readonly: boolean
 	readonly valueId: ValueId
-	private scopedStream?: ScopedValueStream
+	private scopedStreams?: ScopedValueStreams
 	private valueUpdateObserver?: Subscription
 
 	constructor({
 		log,
 		characteristic,
 		valueId,
-		valueStream,
+		valueStreams,
 		readonly,
 		transformer,
 	}: CoordinateValuesParams) {
 		this.log = log
 		this.characteristic = characteristic
 		this.valueId = valueId
-		this.valueStream = valueStream
+		this.valueStreams = valueStreams
 		this.readonly = readonly ?? false
 		this.transformer = transformer ?? noopValueTransformer()
 
@@ -52,10 +51,10 @@ export default class ValueCoordinator {
 	}
 
 	start() {
-		const scopedStream = new ScopedValueStream(this.valueId, this.valueStream)
-		this.scopedStream = scopedStream
+		const scopedStreams = new ScopedValueStreams(this.valueId, this.valueStreams)
+		this.scopedStreams = scopedStreams
 
-		let valueUpdate = scopedStream.valueUpdate
+		let valueUpdate = scopedStreams.valueUpdate
 
 		if (this.transformer.isZwaveValid) {
 			valueUpdate = valueUpdate.pipe(
@@ -112,8 +111,8 @@ export default class ValueCoordinator {
 		this.valueUpdateObserver?.unsubscribe()
 		this.valueUpdateObserver = undefined
 
-		this.scopedStream?.dispose()
-		this.scopedStream = undefined
+		this.scopedStreams?.dispose()
+		this.scopedStreams = undefined
 	}
 
 	private sendZwaveValueToHomeKit(value: Value, callback?: Function) {
@@ -150,6 +149,6 @@ export default class ValueCoordinator {
 	}
 
 	private get zwave(): OpenZwave {
-		return this.valueStream.zwave
+		return this.valueStreams.zwave
 	}
 }

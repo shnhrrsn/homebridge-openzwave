@@ -1,7 +1,7 @@
 import OpenZwave, { NodeInfo, Notification, ControllerState } from 'openzwave-shared'
 
 import { Observable } from 'rxjs'
-import { IValueStream } from './IValueStream'
+import { IValueStreams } from './IValueStreams'
 
 export interface INodeIdParams {
 	nodeId: number
@@ -26,7 +26,7 @@ export interface IControllerCommandParams {
 	command: number
 }
 
-export interface INodeStream extends IValueStream {
+export interface INodeStreams extends IValueStreams {
 	// A new node has been found
 	readonly nodeAvailable: Observable<INodeInfoParams>
 

@@ -1,15 +1,15 @@
 import OpenZwave, { NodeInfo, Value, Notification, ControllerState } from 'openzwave-shared'
 import { Subject, ReplaySubject } from 'rxjs'
 import {
-	INodeStream,
+	INodeStreams,
 	INotificationParams,
 	INodeIdParams,
 	INodeInfoParams,
 	IControllerCommandParams,
-} from '../Streams/INodeStream'
-import { IValueParams, IValueRemovedParams } from '../Streams/IValueStream'
+} from '../Streams/INodeStreams'
+import { IValueParams, IValueRemovedParams } from '../Streams/IValueStreams'
 
-export default class Zwave extends OpenZwave implements INodeStream {
+export default class Zwave extends OpenZwave implements INodeStreams {
 	readonly nodeRemoved = new Subject<INodeIdParams>()
 	readonly nodeAdded = new Subject<INodeIdParams>()
 	readonly nodeReset = new Subject<INodeIdParams>()
