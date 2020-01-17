@@ -9,6 +9,7 @@ export class BoundValueStream {
 	private valueSubject = new Subject<ValueType>()
 	private valueStreams: IValueStreams
 	private log: Homebridge.Logger
+	private isRefreshing = false
 	private valueChangedSubscriber: any
 	private valueRefreshedSubscriber: any
 	readonly valueId: ValueId
@@ -28,8 +29,21 @@ export class BoundValueStream {
 	}
 
 	refresh() {
-		// TODO: Throttle
+		if (this.isRefreshing) {
+			this.log.debug('Throttled refresh')
+			return
+		}
+
 		this.valueStreams.zwave.refreshValue(this.valueId)
+		this.isRefreshing = true
+		this.log.debug('Refreshing')
+
+		this.takeFreshValue(this.valueStreams.valueRefreshed, 5000)
+			.then(() => this.log.debug('Refreshed'))
+			.catch(error => this.log.debug('Failed to refresh', error.message))
+			.finally(() => {
+				this.isRefreshing = false
+			})
 	}
 
 	set(newValue: ValueType): Promise<void> {
@@ -39,32 +53,7 @@ export class BoundValueStream {
 			return Promise.reject(error)
 		}
 
-		return new Promise((resolve, reject) => {
-			let shouldSkip = true
-
-			// Skip initial value since this is a replay subject
-			let subscriber: Subscription | undefined = undefined
-			const timeout = setTimeout(() => {
-				if (!subscriber) {
-					return
-				}
-
-				subscriber?.unsubscribe()
-				reject(new Error('Timeout'))
-			}, 2000)
-
-			subscriber = this.valueStreams.valueChanged.source
-				.pipe(skipWhile(() => shouldSkip))
-				.pipe(first())
-				.subscribe(() => {
-					resolve()
-					clearTimeout(timeout)
-					subscriber?.unsubscribe()
-					subscriber = undefined
-				})
-
-			shouldSkip = false
-		})
+		return this.takeFreshValue(this.valueStreams.valueChanged).then(() => undefined)
 	}
 
 	private onValueRefreshed(params: IValueParams) {
@@ -77,6 +66,35 @@ export class BoundValueStream {
 
 	get valueObservable(): Observable<ValueType> {
 		return this.valueSubject
+	}
+
+	private takeFreshValue<T>(observable: Observable<T>, timeoutInterval = 2000): Promise<T> {
+		return new Promise((resolve, reject) => {
+			let shouldSkip = true
+
+			// Skip initial value since this is a replay subject
+			let subscriber: Subscription | undefined = undefined
+			const timeout = setTimeout(() => {
+				if (!subscriber) {
+					return
+				}
+
+				subscriber?.unsubscribe()
+				reject(new Error('Timeout'))
+			}, timeoutInterval)
+
+			subscriber = observable
+				.pipe(skipWhile(() => shouldSkip))
+				.pipe(first())
+				.subscribe(value => {
+					resolve(value)
+					clearTimeout(timeout)
+					subscriber?.unsubscribe()
+					subscriber = undefined
+				})
+
+			shouldSkip = false
+		})
 	}
 }
 
