@@ -102,8 +102,8 @@ export default class ValueCoordinator {
 	}
 
 	private sendZwaveValueToHomeKit(value: ValueType, callback?: Function) {
-		this.log.debug('valueUpdate', value)
 		const homekitValue = this.transformer.zwaveToHomeKit(value)
+		this.log.debug('sendZwaveValueToHomeKit', homekitValue)
 
 		if (callback) {
 			callback(null, homekitValue)
@@ -117,15 +117,16 @@ export default class ValueCoordinator {
 			return
 		}
 
-		this.log.debug('set', homekitValue)
-
 		if (this.transformer.isHomekitValid && !this.transformer.isHomekitValid!(homekitValue)) {
 			return
 		}
 
+		// NOTE: Constructor ensures homekitToZwave is available
+		const zwaveValue = this.transformer.homekitToZwave!(homekitValue)
+		this.log.debug('sendHomeKitValueToZwave', zwaveValue)
+
 		this.valueStream
-			// NOTE: Constructor ensures homekitToZwave is available
-			.set(this.transformer.homekitToZwave!(homekitValue))
+			.set(zwaveValue)
 			.then(() => callback())
 			.catch(callback)
 			.finally(() => {

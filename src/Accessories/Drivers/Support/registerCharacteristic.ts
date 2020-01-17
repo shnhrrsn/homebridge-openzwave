@@ -1,6 +1,7 @@
 import ValueCoordinator, { CoordinateValuesParams } from '../../../Values/ValueCoordinator'
 import { BoundValueStream } from '../../../Streams/BoundValueStream'
 import { Homebridge } from '../../../../types/homebridge'
+import makePrefixedLogger from '../../../Support/makePrefixedLogger'
 
 export type RegisterCharacteristicParams = {
 	service: HAPNodeJS.Service
@@ -24,7 +25,7 @@ export default function registerCharacteristic({
 	}
 
 	new ValueCoordinator({
-		log,
+		log: makePrefixedLogger(log, (characteristicInstance as any).displayName),
 		valueStream,
 		characteristic: characteristicInstance,
 		...options,

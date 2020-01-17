@@ -8,6 +8,7 @@ import { IDriverRegistry } from './Registries/IDriverRegistry'
 import { Homebridge } from '../../types/homebridge'
 import { NodeInfo, Value } from 'openzwave-shared'
 import { IValueStreams } from '../Streams/IValueStreams'
+import makePrefixedLogger from '../Support/makePrefixedLogger'
 
 export type AccessoryCommands = Map<CommandClass, Map<number, Value>>
 
@@ -52,6 +53,7 @@ export class Accessory {
 		}
 
 		const ignoredCommands = new Set(this.config.commands?.ignored ?? [])
+		const log = makePrefixedLogger(this.log, `node ${this.nodeId}`)
 
 		for (const [commandClass, values] of this.commands.entries()) {
 			if (ignoredCommands.has(commandClass)) {
@@ -68,8 +70,8 @@ export class Accessory {
 			const indexes = rewrite?.indexes
 
 			driver({
+				log,
 				values: indexes ? new MappedValues(indexes, values) : values,
-				log: this.log,
 				hap: this.api.hap,
 				accessory: this,
 				valueStreams: this.valueStreams,
