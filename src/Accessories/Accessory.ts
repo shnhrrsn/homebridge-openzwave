@@ -1,5 +1,5 @@
 import Zwave from '../Zwave/Zwave'
-import ScopedNodeStreams from '../Streams/ScopedNodeStreams'
+import NodeScopedValueStreams from '../Streams/NodeScopedValueStreams'
 import MappedValues from '../Values/MappedValues'
 
 import { IAccessoryConfig } from '../IAccessoryConfig'
@@ -7,6 +7,7 @@ import { CommandClass } from '../Zwave/CommandClass'
 import { IDriverRegistry } from './Registries/IDriverRegistry'
 import { Homebridge } from '../../types/homebridge'
 import { NodeInfo, Value } from 'openzwave-shared'
+import { IValueStreams } from '../Streams/IValueStreams'
 
 export type AccessoryCommands = Map<CommandClass, Map<number, Value>>
 
@@ -17,7 +18,7 @@ export class Accessory {
 	log: Homebridge.Logger
 	zwave: Zwave
 	commands: AccessoryCommands
-	nodeStreams: ScopedNodeStreams
+	valueStreams: IValueStreams
 	driverRegistry: IDriverRegistry
 	config: IAccessoryConfig
 
@@ -37,7 +38,7 @@ export class Accessory {
 		this.nodeId = nodeId
 		this.platformAccessory = platformAccessory
 		this.driverRegistry = driverRegistry
-		this.nodeStreams = new ScopedNodeStreams(nodeId, zwave)
+		this.valueStreams = new NodeScopedValueStreams(nodeId, zwave)
 		this.commands = new Map(commands)
 		this.config = config ?? {}
 	}
@@ -71,7 +72,7 @@ export class Accessory {
 				log: this.log,
 				hap: this.api.hap,
 				accessory: this,
-				valueStreams: this.nodeStreams,
+				valueStreams: this.valueStreams,
 				hints: new Set(this.config.hints ?? []),
 				zwave: this.zwave,
 			})
