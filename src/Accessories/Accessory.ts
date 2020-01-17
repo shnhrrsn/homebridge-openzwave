@@ -1,4 +1,4 @@
-import Ozw from '../Zwave/Zwave'
+import Zwave from '../Zwave/Zwave'
 import ScopedNodeStreams from '../Streams/ScopedNodeStreams'
 import MappedValues from '../Values/MappedValues'
 
@@ -15,7 +15,7 @@ export class Accessory {
 	platformAccessory: Homebridge.PlatformAccessory
 	api: Homebridge.Api
 	log: Homebridge.Logger
-	zwave: Ozw
+	zwave: Zwave
 	commands: AccessoryCommands
 	nodeStreams: ScopedNodeStreams
 	driverRegistry: IDriverRegistry
@@ -24,7 +24,7 @@ export class Accessory {
 	constructor(
 		log: Homebridge.Logger,
 		api: Homebridge.Api,
-		zwave: Ozw,
+		zwave: Zwave,
 		nodeId: number,
 		platformAccessory: Homebridge.PlatformAccessory,
 		driverRegistry: IDriverRegistry,
@@ -37,7 +37,7 @@ export class Accessory {
 		this.nodeId = nodeId
 		this.platformAccessory = platformAccessory
 		this.driverRegistry = driverRegistry
-		this.nodeStreams = new ScopedNodeStreams(nodeId, this.zwave)
+		this.nodeStreams = new ScopedNodeStreams(nodeId, zwave)
 		this.commands = new Map(commands)
 		this.config = config ?? {}
 	}

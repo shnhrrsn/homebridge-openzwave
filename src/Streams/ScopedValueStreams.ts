@@ -1,4 +1,4 @@
-import OpenZwave from 'openzwave-shared'
+import Zwave from '../Zwave/Zwave'
 import { Observable, merge } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import { IValueStreams, IValueParams, IValueRemovedParams } from './IValueStreams'
@@ -47,7 +47,7 @@ export class ScopedValueStreams implements IValueStreams {
 		// TODO
 	}
 
-	get zwave(): OpenZwave {
+	get zwave(): Zwave {
 		return this.valueStreams.zwave
 	}
 }

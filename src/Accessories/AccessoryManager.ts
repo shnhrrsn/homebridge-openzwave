@@ -1,4 +1,4 @@
-import Ozw from '../Zwave/Zwave'
+import Zwave from '../Zwave/Zwave'
 import Platform from '../Platform'
 import StandardDriverRegistry from './Registries/StandardDriverRegistry'
 import loadDeviceConfig from '../Devices/loadDeviceConfig'
@@ -17,7 +17,7 @@ export default class AccessoryManager {
 	log: Homebridge.Logger
 	config?: IConfig
 	api: Homebridge.Api
-	zwave: Ozw
+	zwave: Zwave
 	registry: Map<string, Accessory>
 	nodeIdToCommandsMap: Map<number, AccessoryCommands>
 	restorableAccessories: Map<string, Homebridge.PlatformAccessory>

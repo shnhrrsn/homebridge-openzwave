@@ -1,5 +1,5 @@
 import AccessoryManager from './Accessories/AccessoryManager'
-import Ozw from './Zwave/Zwave'
+import Zwave from './Zwave/Zwave'
 
 import { Homebridge } from '../types/homebridge'
 import { IConfig } from './IConfig'
@@ -9,14 +9,18 @@ export default class Platform implements Homebridge.Platform {
 	log: Homebridge.Logger
 	config?: IConfig
 	api: Homebridge.Api
-	zwave: Ozw
+	zwave: Zwave
 	accessoryManager: AccessoryManager
 
 	constructor(log: Homebridge.Logger, config: IConfig | undefined, api: Homebridge.Api) {
 		this.log = log
 		this.config = config
 		this.api = api
-		this.zwave = new Ozw({ ConsoleOutput: false, Logging: false, SaveConfiguration: false })
+		this.zwave = new Zwave({
+			ConsoleOutput: false,
+			Logging: false,
+			SaveConfiguration: false,
+		})
 		this.accessoryManager = new AccessoryManager(this)
 
 		if (!config) {
@@ -32,13 +36,13 @@ export default class Platform implements Homebridge.Platform {
 			return
 		}
 
-		this.zwave.on('connected', this.onConnected.bind(this))
-		this.zwave.on('driver ready', this.onDriverReady.bind(this))
-		this.zwave.on('driver failed', this.onDriverFailed.bind(this))
-		this.zwave.on('scan complete', this.onScanComplete.bind(this))
-		this.zwave.on('notification', this.onNotification.bind(this))
+		this.zwave.ozw.on('connected', this.onConnected.bind(this))
+		this.zwave.ozw.on('driver ready', this.onDriverReady.bind(this))
+		this.zwave.ozw.on('driver failed', this.onDriverFailed.bind(this))
+		this.zwave.ozw.on('scan complete', this.onScanComplete.bind(this))
+		this.zwave.ozw.on('notification', this.onNotification.bind(this))
 
-		this.zwave.connect(this.config.zwave.devicePath)
+		this.zwave.ozw.connect(this.config.zwave.devicePath)
 	}
 
 	configureAccessory(accessory: Homebridge.PlatformAccessory): void {

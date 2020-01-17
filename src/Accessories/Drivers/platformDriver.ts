@@ -10,15 +10,15 @@ export default function platformDriver(params: IDriverParams) {
 	const stream = new ControllerCommandStreams(params.zwave)
 
 	createPlatformSwitch(params, stream, 'Add Node', () => {
-		params.zwave.addNode()
+		params.zwave.ozw.addNode()
 	})
 
 	createPlatformSwitch(params, stream, 'Add Secure Node', () => {
-		params.zwave.addNode(true)
+		params.zwave.ozw.addNode(true)
 	})
 
 	createPlatformSwitch(params, stream, 'Remove Node', () => {
-		params.zwave.removeNode()
+		params.zwave.ozw.removeNode()
 	})
 }
 
@@ -53,7 +53,7 @@ function createPlatformSwitch(
 		}
 
 		if (!value) {
-			params.zwave.cancelControllerCommand()
+			params.zwave.ozw.cancelControllerCommand()
 			return callback?.()
 		}
 

@@ -2,7 +2,7 @@ import { Homebridge } from '../../../types/homebridge'
 import { Accessory } from '../Accessory'
 import { Value } from 'openzwave-shared'
 import { IValueStreams } from '../../Streams/IValueStreams'
-import Ozw from '../../Zwave/Zwave'
+import Zwave from '../../Zwave/Zwave'
 
 export interface IDriverParams {
 	hap: Homebridge.Hap
@@ -11,7 +11,7 @@ export interface IDriverParams {
 	valueStreams: IValueStreams
 	values: Map<number, Value>
 	hints: Set<string>
-	zwave: Ozw
+	zwave: Zwave
 }
 
 export type Driver = (params: IDriverParams) => void

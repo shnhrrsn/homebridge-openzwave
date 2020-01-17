@@ -1,4 +1,4 @@
-import OpenZwave from 'openzwave-shared'
+import Zwave from '../Zwave/Zwave'
 import { Observable } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import {
@@ -56,7 +56,7 @@ export default class ScopedNodeStreams implements INodeStreams {
 		// TODO
 	}
 
-	get zwave(): OpenZwave {
+	get zwave(): Zwave {
 		return this.nodeStreams.zwave
 	}
 }
