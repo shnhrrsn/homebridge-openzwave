@@ -24,7 +24,7 @@ export default function switchMultiLevelDriver(params: IDriverParams) {
 		return
 	}
 
-	const valueStream = new BoundValueStream(value, params.valueStreams)
+	const valueStream = new BoundValueStream(value, params.valueStreams, params.log)
 
 	// On/Off
 	registerCharacteristic({

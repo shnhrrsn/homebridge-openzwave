@@ -16,7 +16,7 @@ export default function switchBinaryDriver(params: IDriverParams) {
 		return
 	}
 
-	const valueStream = new BoundValueStream(value, params.valueStreams)
+	const valueStream = new BoundValueStream(value, params.valueStreams, params.log)
 
 	registerCharacteristic({
 		service,

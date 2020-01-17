@@ -3,17 +3,20 @@ import { IValueStreams, IValueParams } from './IValueStreams'
 import { ValueType } from '../Values/ValueType'
 import { filter, skipWhile, first } from 'rxjs/operators'
 import { Subject, Observable, Subscription } from 'rxjs'
+import { Homebridge } from '../../types/homebridge'
 
 export class BoundValueStream {
 	private valueSubject = new Subject<ValueType>()
 	private valueStreams: IValueStreams
-	readonly valueId: ValueId
+	private log: Homebridge.Logger
 	private valueChangedSubscriber: any
 	private valueRefreshedSubscriber: any
+	readonly valueId: ValueId
 
-	constructor(valueId: ValueId, valueStreams: IValueStreams) {
+	constructor(valueId: ValueId, valueStreams: IValueStreams, log: Homebridge.Logger) {
 		this.valueId = valueId
 		this.valueStreams = valueStreams
+		this.log = log
 
 		this.valueChangedSubscriber = this.valueStreams.valueChanged
 			.pipe(filter(params => matchesValueId(params.value, valueId)))
