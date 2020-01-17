@@ -1,10 +1,11 @@
-import { first, filter } from 'rxjs/operators'
-import { Subscription } from 'rxjs'
-import { IValueTransformer } from './Transformers/IValueTransformer'
-import noopValueTransformer from './Transformers/noopValueTransformer'
-import { Homebridge } from '../../types/homebridge'
 import { BoundValueStream } from '../Streams/BoundValueStream'
+import { first, filter } from 'rxjs/operators'
+import { Homebridge } from '../../types/homebridge'
+import { IValueTransformer } from './Transformers/IValueTransformer'
+import { Subscription } from 'rxjs'
 import { ValueType } from './ValueType'
+import exactlyOnce from '../Support/exactlyOnce'
+import noopValueTransformer from './Transformers/noopValueTransformer'
 
 export type CoordinateValuesParams = {
 	log: Homebridge.Logger
@@ -13,6 +14,8 @@ export type CoordinateValuesParams = {
 	readonly?: boolean
 	transformer?: IValueTransformer
 }
+
+type HomeKitCallback = (error?: Error, ...args: any) => void
 
 // Coordinates value streams from both Zwave and HomeKit for a single Characteristic
 export default class ValueCoordinator {
@@ -70,22 +73,19 @@ export default class ValueCoordinator {
 
 		// Handle explicit HomeKit value setting
 		if (this.readonly !== true) {
-			this.characteristic.on('set', (newValue: ValueType, callback: any) => {
-				this.sendHomeKitValueToZwave(newValue, callback)
+			this.characteristic.on('set', (newValue: ValueType, callback: HomeKitCallback) => {
+				this.sendHomeKitValueToZwave(newValue, exactlyOnce(callback, this.log))
 			})
 		}
 
 		// Handle explicit HomeKit value requests
-		this.characteristic.on('get', (callback?: Function) => {
+		this.characteristic.on('get', (callback: HomeKitCallback) => {
 			// valueUpdate is a ReplaySubject, so we can respond
 			// with the last cached value instantly
 			valueUpdate
 				.pipe(first())
 				.subscribe(value => {
-					this.sendZwaveValueToHomeKit(value, callback)
-
-					// Protect against the possibility this fires multiple times
-					callback = undefined
+					this.sendZwaveValueToHomeKit(value, exactlyOnce(callback, this.log))
 				})
 				.unsubscribe()
 
@@ -101,12 +101,12 @@ export default class ValueCoordinator {
 		this.valueUpdateObserver = undefined
 	}
 
-	private sendZwaveValueToHomeKit(value: ValueType, callback?: Function) {
+	private sendZwaveValueToHomeKit(value: ValueType, callback?: HomeKitCallback) {
 		const homekitValue = this.transformer.zwaveToHomeKit(value)
 		this.log.debug('sendZwaveValueToHomeKit', homekitValue)
 
 		if (callback) {
-			callback(null, homekitValue)
+			callback(undefined, homekitValue)
 		} else {
 			this.characteristic.updateValue(homekitValue)
 		}
