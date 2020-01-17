@@ -1,9 +1,6 @@
 import { first, filter } from 'rxjs/operators'
 import { Subscription } from 'rxjs'
-
-import { ScopedValueStreams } from '../Streams/ScopedValueStreams'
 import { IValueTransformer } from './Transformers/IValueTransformer'
-
 import noopValueTransformer from './Transformers/noopValueTransformer'
 import { Homebridge } from '../../types/homebridge'
 import { BoundValueStream } from '../Streams/BoundValueStream'
@@ -24,7 +21,6 @@ export default class ValueCoordinator {
 	readonly valueStream: BoundValueStream
 	readonly transformer: IValueTransformer
 	readonly readonly: boolean
-	private scopedStreams?: ScopedValueStreams
 	private valueUpdateObserver?: Subscription
 
 	constructor({
@@ -100,9 +96,6 @@ export default class ValueCoordinator {
 	stop() {
 		this.valueUpdateObserver?.unsubscribe()
 		this.valueUpdateObserver = undefined
-
-		this.scopedStreams?.dispose()
-		this.scopedStreams = undefined
 	}
 
 	private sendZwaveValueToHomeKit(value: ValueType, callback?: Function) {
