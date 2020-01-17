@@ -1,20 +1,18 @@
-import OpenZwave, { Value, ValueType, ValueId } from 'openzwave-shared'
-
 import { first, filter } from 'rxjs/operators'
 import { Subscription } from 'rxjs'
 
 import { ScopedValueStreams } from '../Streams/ScopedValueStreams'
-import { IValueStreams } from '../Streams/IValueStreams'
 import { IValueTransformer } from './Transformers/IValueTransformer'
 
 import noopValueTransformer from './Transformers/noopValueTransformer'
 import { Homebridge } from '../../types/homebridge'
+import { BoundValueStream } from '../Streams/BoundValueStream'
+import { ValueType } from './ValueType'
 
 export type CoordinateValuesParams = {
 	log: Homebridge.Logger
 	characteristic: HAPNodeJS.Characteristic
-	valueId: ValueId
-	valueStreams: IValueStreams
+	valueStream: BoundValueStream
 	readonly?: boolean
 	transformer?: IValueTransformer
 }
@@ -23,25 +21,22 @@ export type CoordinateValuesParams = {
 export default class ValueCoordinator {
 	readonly log: Homebridge.Logger
 	readonly characteristic: HAPNodeJS.Characteristic
-	readonly valueStreams: IValueStreams
+	readonly valueStream: BoundValueStream
 	readonly transformer: IValueTransformer
 	readonly readonly: boolean
-	readonly valueId: ValueId
 	private scopedStreams?: ScopedValueStreams
 	private valueUpdateObserver?: Subscription
 
 	constructor({
 		log,
 		characteristic,
-		valueId,
-		valueStreams,
+		valueStream,
 		readonly,
 		transformer,
 	}: CoordinateValuesParams) {
 		this.log = log
 		this.characteristic = characteristic
-		this.valueId = valueId
-		this.valueStreams = valueStreams
+		this.valueStream = valueStream
 		this.readonly = readonly ?? false
 		this.transformer = transformer ?? noopValueTransformer()
 
@@ -51,22 +46,17 @@ export default class ValueCoordinator {
 	}
 
 	start() {
-		const scopedStreams = new ScopedValueStreams(this.valueId, this.valueStreams)
-		this.scopedStreams = scopedStreams
-
-		let valueUpdate = scopedStreams.valueUpdate
+		let valueUpdate = this.valueStream.valueObservable
 
 		if (this.transformer.isZwaveValid) {
-			valueUpdate = valueUpdate.pipe(
-				filter(({ value }) => this.transformer.isZwaveValid!(value.value)),
-			)
+			valueUpdate = valueUpdate.pipe(filter(value => this.transformer.isZwaveValid!(value)))
 		}
 
 		// If we already have a value, send it to HomeKit
 		let hadInitialValue = false
 		valueUpdate
 			.pipe(first())
-			.subscribe(({ value }) => {
+			.subscribe(value => {
 				this.sendZwaveValueToHomeKit(value)
 				hadInitialValue = true
 			})
@@ -74,11 +64,11 @@ export default class ValueCoordinator {
 
 		// Otherwise, request a refresh
 		if (!hadInitialValue) {
-			this.refreshZwaveValue()
+			this.valueStream.refresh()
 		}
 
 		// Subscribe to all value updates and forward them to HomeKit
-		this.valueUpdateObserver = valueUpdate.subscribe(({ value }) => {
+		this.valueUpdateObserver = valueUpdate.subscribe(value => {
 			this.sendZwaveValueToHomeKit(value)
 		})
 
@@ -93,7 +83,7 @@ export default class ValueCoordinator {
 		this.characteristic.on('get', (callback?: Function) => {
 			// valueUpdate is a ReplaySubject, so we can respond
 			// with the last cached value instantly
-			valueUpdate.pipe(first()).subscribe(({ value }) => {
+			valueUpdate.pipe(first()).subscribe(value => {
 				this.sendZwaveValueToHomeKit(value, callback)
 
 				// Protect against the possibility this fires multiple times
@@ -115,9 +105,9 @@ export default class ValueCoordinator {
 		this.scopedStreams = undefined
 	}
 
-	private sendZwaveValueToHomeKit(value: Value, callback?: Function) {
-		this.log.debug('valueUpdate', value.value)
-		const homekitValue = this.transformer.zwaveToHomeKit(value.value)
+	private sendZwaveValueToHomeKit(value: ValueType, callback?: Function) {
+		this.log.debug('valueUpdate', value)
+		const homekitValue = this.transformer.zwaveToHomeKit(value)
 
 		if (callback) {
 			callback(null, homekitValue)
@@ -138,17 +128,13 @@ export default class ValueCoordinator {
 		}
 
 		// NOTE: Constructor ensures homekitToZwave is available
-		this.zwave.setValue(this.valueId, this.transformer.homekitToZwave!(homekitValue))
+		this.valueStream.set(this.transformer.homekitToZwave!(homekitValue))
 
 		setTimeout(callback, 1000) // TODO
 		setTimeout(this.refreshZwaveValue.bind(this), 5000)
 	}
 
 	private refreshZwaveValue() {
-		this.zwave.refreshValue(this.valueId)
-	}
-
-	private get zwave(): OpenZwave {
-		return this.valueStreams.zwave
+		this.valueStream.refresh()
 	}
 }

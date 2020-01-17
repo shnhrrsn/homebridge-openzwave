@@ -1,5 +1,6 @@
 import { IDriverParams } from './Driver'
 import registerCharacteristic from './Support/registerCharacteristic'
+import { BoundValueStream } from '../../Streams/BoundValueStream'
 
 export default function switchBinaryDriver(params: IDriverParams) {
 	const value = params.values.get(0)
@@ -15,10 +16,12 @@ export default function switchBinaryDriver(params: IDriverParams) {
 		return
 	}
 
+	const valueStream = new BoundValueStream(value, params.valueStreams)
+
 	registerCharacteristic({
 		service,
-		params,
-		value,
+		valueStream,
+		log: params.log,
 		characteristic: Characteristic.On,
 	})
 }

@@ -1,5 +1,6 @@
 import { IDriverParams } from './Driver'
 import registerCharacteristic from './Support/registerCharacteristic'
+import { BoundValueStream } from '../../Streams/BoundValueStream'
 
 export default function batteryDriver(params: IDriverParams) {
 	const value = params.values.get(0)
@@ -15,10 +16,12 @@ export default function batteryDriver(params: IDriverParams) {
 		return
 	}
 
+	const valueStream = new BoundValueStream(value, params.valueStreams)
+
 	registerCharacteristic({
 		service,
-		params,
-		value,
+		valueStream,
+		log: params.log,
 		characteristic: Characteristic.BatteryLevel,
 		options: {
 			transformer: {
@@ -31,8 +34,8 @@ export default function batteryDriver(params: IDriverParams) {
 
 	registerCharacteristic({
 		service,
-		params,
-		value,
+		valueStream,
+		log: params.log,
 		characteristic: Characteristic.StatusLowBattery,
 		options: {
 			transformer: {

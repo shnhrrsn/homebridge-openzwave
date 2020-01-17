@@ -1,20 +1,20 @@
 import ValueCoordinator, { CoordinateValuesParams } from '../../../Values/ValueCoordinator'
-import { IDriverParams } from '../Driver'
-import { Value } from 'openzwave-shared'
+import { BoundValueStream } from '../../../Streams/BoundValueStream'
+import { Homebridge } from '../../../../types/homebridge'
 
 export type RegisterCharacteristicParams = {
 	service: HAPNodeJS.Service
 	characteristic: Function
-	value: Value
-	params: IDriverParams
+	valueStream: BoundValueStream
+	log: Homebridge.Logger
 	options?: Partial<CoordinateValuesParams>
 }
 
 export default function registerCharacteristic({
 	service,
 	characteristic,
-	value,
-	params,
+	valueStream,
+	log,
 	options,
 }: RegisterCharacteristicParams) {
 	const characteristicInstance = service?.getCharacteristic(characteristic)
@@ -24,10 +24,9 @@ export default function registerCharacteristic({
 	}
 
 	new ValueCoordinator({
-		log: params.log,
+		log,
+		valueStream,
 		characteristic: characteristicInstance,
-		valueId: value,
-		valueStreams: params.valueStreams,
 		...options,
 	}).start()
 }

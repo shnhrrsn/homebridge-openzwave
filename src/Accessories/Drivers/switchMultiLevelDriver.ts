@@ -4,6 +4,7 @@ import { IDriverParams } from './Driver'
 import multiLevelBinaryTransformer from '../../Values/Transformers/multiLevelBinaryTransformer'
 import multiLevelTransformer from '../../Values/Transformers/multiLevelTransformer'
 import fanMultiLevelDriver from './fanMultiLevelDriver'
+import { BoundValueStream } from '../../Streams/BoundValueStream'
 
 export default function switchMultiLevelDriver(params: IDriverParams) {
 	if (params.hints.has('fan')) {
@@ -23,11 +24,13 @@ export default function switchMultiLevelDriver(params: IDriverParams) {
 		return
 	}
 
+	const valueStream = new BoundValueStream(value, params.valueStreams)
+
 	// On/Off
 	registerCharacteristic({
 		service,
-		params,
-		value,
+		valueStream,
+		log: params.log,
 		characteristic: Characteristic.On,
 		options: {
 			transformer: multiLevelBinaryTransformer(),
@@ -37,8 +40,8 @@ export default function switchMultiLevelDriver(params: IDriverParams) {
 	// Brightness
 	registerCharacteristic({
 		service,
-		params,
-		value: value,
+		valueStream,
+		log: params.log,
 		characteristic: Characteristic.Brightness,
 		options: {
 			transformer: multiLevelTransformer(),
