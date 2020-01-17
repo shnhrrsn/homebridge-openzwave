@@ -70,7 +70,7 @@ export default class ValueCoordinator {
 
 		// Handle explicit HomeKit value setting
 		if (this.readonly !== true) {
-			this.characteristic.on('set', (newValue: ValueType, callback: Function) => {
+			this.characteristic.on('set', (newValue: ValueType, callback: any) => {
 				this.sendHomeKitValueToZwave(newValue, callback)
 			})
 		}
@@ -79,12 +79,15 @@ export default class ValueCoordinator {
 		this.characteristic.on('get', (callback?: Function) => {
 			// valueUpdate is a ReplaySubject, so we can respond
 			// with the last cached value instantly
-			valueUpdate.pipe(first()).subscribe(value => {
-				this.sendZwaveValueToHomeKit(value, callback)
+			valueUpdate
+				.pipe(first())
+				.subscribe(value => {
+					this.sendZwaveValueToHomeKit(value, callback)
 
-				// Protect against the possibility this fires multiple times
-				callback = undefined
-			})
+					// Protect against the possibility this fires multiple times
+					callback = undefined
+				})
+				.unsubscribe()
 
 			// However, we still want to grab the fresh value from
 			// the device, so we’ll request a refresh and that will
@@ -109,7 +112,7 @@ export default class ValueCoordinator {
 		}
 	}
 
-	private sendHomeKitValueToZwave(homekitValue: ValueType, callback: Function) {
+	private sendHomeKitValueToZwave(homekitValue: ValueType, callback: (error?: Error) => void) {
 		if (this.readonly === true) {
 			return
 		}
@@ -120,11 +123,14 @@ export default class ValueCoordinator {
 			return
 		}
 
-		// NOTE: Constructor ensures homekitToZwave is available
-		this.valueStream.set(this.transformer.homekitToZwave!(homekitValue))
-
-		setTimeout(callback, 1000) // TODO
-		setTimeout(this.refreshZwaveValue.bind(this), 5000)
+		this.valueStream
+			// NOTE: Constructor ensures homekitToZwave is available
+			.set(this.transformer.homekitToZwave!(homekitValue))
+			.then(() => callback())
+			.catch(callback)
+			.finally(() => {
+				setTimeout(this.refreshZwaveValue.bind(this), 5000)
+			})
 	}
 
 	private refreshZwaveValue() {
