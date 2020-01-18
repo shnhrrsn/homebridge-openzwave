@@ -55,16 +55,13 @@ export class BoundValueStream {
 		if (this.isRefreshing) {
 			this.log.debug('Already refreshing')
 			return
-		} else if (Date.now() - this.valueSubject.value.publishedAt < 5000) {
-			this.log.debug('Throttling refresh')
-			return
 		}
 
 		this.valueStreams.zwave.refreshValue(this.valueId)
 		this.isRefreshing = true
 		this.log.debug('Refreshing')
 
-		takeFreshValue(this.valueStreams.valueRefreshed, 10000)
+		takeFreshValue(this.valueStreams.valueRefreshed, 10_000)
 			.then(() => this.log.debug('Refreshed'))
 			.catch(error => this.log.debug('Failed to refresh', error.message))
 			.finally(() => {
