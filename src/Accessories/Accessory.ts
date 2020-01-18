@@ -79,6 +79,8 @@ export class Accessory {
 				zwave: this.zwave,
 			})
 		}
+
+		this.log.info(`Node Available: ${this.platformAccessory.displayName}`)
 	}
 
 	getService(

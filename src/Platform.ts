@@ -64,7 +64,7 @@ export default class Platform implements Homebridge.Platform {
 	}
 
 	onScanComplete() {
-		this.log.debug('onScanComplete')
+		this.log.info('Finished Scanning')
 		this.accessoryManager.purge()
 	}
 

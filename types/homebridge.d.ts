@@ -48,6 +48,7 @@ export namespace Homebridge {
 
 	interface PlatformAccessory extends EventEmitter {
 		UUID: string
+		displayName: string
 		addService(service: HAPNodeJS.Service | HAPNodeJS.PredefinedService): HAPNodeJS.Service
 		removeService(service: HAPNodeJS.Service): void
 		getService(service: string | HAPNodeJS.PredefinedService): HAPNodeJS.Service | undefined
