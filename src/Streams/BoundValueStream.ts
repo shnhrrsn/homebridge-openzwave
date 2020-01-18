@@ -1,9 +1,10 @@
 import { ValueId, Value } from 'openzwave-shared'
 import { IValueStreams, IValueParams } from './IValueStreams'
 import { ValueType } from '../Values/ValueType'
-import { filter, skipWhile, first, map, distinctUntilChanged } from 'rxjs/operators'
+import { filter, map, distinctUntilChanged } from 'rxjs/operators'
 import { Observable, Subscription, BehaviorSubject } from 'rxjs'
 import { Homebridge } from '../../types/homebridge'
+import takeFreshValue from '../Support/takeFreshValue'
 
 interface PublishValue {
 	value: ValueType
@@ -63,7 +64,7 @@ export class BoundValueStream {
 		this.isRefreshing = true
 		this.log.debug('Refreshing')
 
-		this.takeFreshValue(this.valueStreams.valueRefreshed, 5000)
+		takeFreshValue(this.valueStreams.valueRefreshed, 10000)
 			.then(() => this.log.debug('Refreshed'))
 			.catch(error => this.log.debug('Failed to refresh', error.message))
 			.finally(() => {
@@ -78,7 +79,7 @@ export class BoundValueStream {
 			return Promise.reject(error)
 		}
 
-		return this.takeFreshValue(this.valueStreams.valueChanged, 5000).then(() => undefined)
+		return takeFreshValue(this.valueStreams.valueChanged, 5000).then(() => undefined)
 	}
 
 	private onValueRefreshed(params: IValueParams) {
@@ -93,37 +94,6 @@ export class BoundValueStream {
 		this.valueSubject.next({
 			value: value.value,
 			publishedAt: Date.now(),
-		})
-	}
-
-	private takeFreshValue<T>(observable: Observable<T>, timeoutInterval = 2000): Promise<T> {
-		return new Promise((resolve, reject) => {
-			let shouldSkip = true
-
-			// Skip initial value since this is a replay subject
-			let subscriber: Subscription | undefined = undefined
-			const timeout = setTimeout(() => {
-				if (!subscriber) {
-					return
-				}
-
-				subscriber?.unsubscribe()
-				reject(new Error('Timeout'))
-			}, timeoutInterval)
-
-			subscriber = observable
-				.pipe(
-					skipWhile(() => shouldSkip),
-					first(),
-				)
-				.subscribe(value => {
-					resolve(value)
-					clearTimeout(timeout)
-					subscriber?.unsubscribe()
-					subscriber = undefined
-				})
-
-			shouldSkip = false
 		})
 	}
 }
