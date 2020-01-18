@@ -1,4 +1,4 @@
-import Zwave from '../Zwave/Zwave'
+import { IZwave } from '../Zwave/IZwave'
 import NodeScopedValueStreams from '../Streams/NodeScopedValueStreams'
 import MappedValues from '../Values/MappedValues'
 
@@ -17,7 +17,7 @@ export class Accessory {
 	platformAccessory: Homebridge.PlatformAccessory
 	api: Homebridge.Api
 	log: Homebridge.Logger
-	zwave: Zwave
+	zwave: IZwave
 	commands: AccessoryCommands
 	valueStreams: IValueStreams
 	driverRegistry: IDriverRegistry
@@ -26,7 +26,7 @@ export class Accessory {
 	constructor(
 		log: Homebridge.Logger,
 		api: Homebridge.Api,
-		zwave: Zwave,
+		zwave: IZwave,
 		nodeId: number,
 		platformAccessory: Homebridge.PlatformAccessory,
 		driverRegistry: IDriverRegistry,

@@ -1,4 +1,4 @@
-import Zwave from '../Zwave/Zwave'
+import { IZwave } from '../Zwave/IZwave'
 import { Observable } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import { INodeStreams } from './INodeStreams'
@@ -30,7 +30,7 @@ export default class NodeScopedValueStreams implements IValueStreams {
 		// TODO
 	}
 
-	get zwave(): Zwave {
+	get zwave(): IZwave {
 		return this.nodeStreams.zwave
 	}
 }

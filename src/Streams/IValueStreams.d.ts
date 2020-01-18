@@ -1,6 +1,6 @@
 import { Value, ValueId } from 'openzwave-shared'
 import { Observable } from 'rxjs'
-import Zwave from '../Zwave/Zwave'
+import { IZwave } from '../Zwave/IZwave'
 
 export interface IValueParams {
 	nodeId: number
@@ -29,5 +29,5 @@ export interface IValueStreams {
 	readonly valueRemoved: Observable<IValueRemovedParams>
 
 	// Access to the underlying zwave instance
-	readonly zwave: Zwave
+	readonly zwave: IZwave
 }

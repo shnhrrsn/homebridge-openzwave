@@ -15,8 +15,9 @@ import {
 } from '../Streams/INodeStreams'
 import { IValueParams, IValueRemovedParams } from '../Streams/IValueStreams'
 import { ValueType } from '../Values/ValueType'
+import { IZwave } from './IZwave'
 
-export default class Zwave implements INodeStreams {
+export default class Zwave implements INodeStreams, IZwave {
 	readonly nodeRemoved = new Subject<INodeIdParams>()
 	readonly nodeAdded = new Subject<INodeIdParams>()
 	readonly nodeReset = new Subject<INodeIdParams>()
@@ -106,7 +107,19 @@ export default class Zwave implements INodeStreams {
 		return this.ozw.getControllerNodeId()
 	}
 
-	get zwave(): Zwave {
+	addNode(isSecure: boolean): boolean {
+		return this.ozw.addNode(isSecure)
+	}
+
+	removeNode(): boolean {
+		return this.ozw.removeNode()
+	}
+
+	cancelControllerCommand() {
+		return this.ozw.cancelControllerCommand()
+	}
+
+	get zwave(): IZwave {
 		return this
 	}
 }
