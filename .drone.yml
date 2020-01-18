@@ -26,6 +26,11 @@ steps:
     environment:
       DEVICE_PATH: ./ttyVACM0
 
+  - name: build
+    image: *image
+    commands: [yarn build]
+    depends_on: [test]
+
 ---
 kind: signature
 hmac: aba187ab778b7d5fed83c1aa0892fce3fd163f0b42fa93f7e49aa63f5c7db73c
