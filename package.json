@@ -7,7 +7,8 @@
   "main": "lib/registerPlatform.js",
   "scripts": {
     "code:typecheck": "tsc --noEmit",
-    "code:format": "prettier --write src/**/*.ts types/**/*.ts *.json *.yaml .babelrc *.markdown",
+    "code:format": "prettier --write **/*.ts *.json *.yaml .babelrc *.markdown",
+    "code:lint": "prettier --check **/*.ts *.json *.yaml .babelrc *.markdown",
     "util": "node utils/util.js",
     "test": "ava --verbose",
     "testharness": "node utils/testharness.js",

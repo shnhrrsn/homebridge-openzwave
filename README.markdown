@@ -2,6 +2,7 @@
 
 [![Latest Version](https://img.shields.io/npm/v/homebridge-openzwave.svg)](https://www.npmjs.com/package/homebridge-openzwave)
 [![Total Downloads](https://img.shields.io/npm/dt/homebridge-openzwave.svg)](https://www.npmjs.com/package/homebridge-openzwave)
+[![Build Status](https://cloud.drone.io/api/badges/shnhrrsn/homebridge-openzwave/status.svg)](https://cloud.drone.io/shnhrrsn/homebridge-openzwave)
 [![License](https://img.shields.io/npm/l/homebridge-openzwave.svg)](https://www.npmjs.com/package/homebridge-openzwave)
 
 OpenZWave platform for Homebridge. The main goal of this project is to map Z-Wave protocol command classes to HomeKit Accessories, Services, and Characteristics. Theoretically, it should make it support any Open Z-Wave device.
