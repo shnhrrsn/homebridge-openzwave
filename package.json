@@ -9,6 +9,7 @@
     "code:typecheck": "tsc --noEmit",
     "code:format": "prettier --write src/**/*.ts types/**/*.ts *.json *.yaml .babelrc *.markdown",
     "util": "node utils/util.js",
+    "test": "ava --verbose",
     "testharness": "node utils/testharness.js",
     "build": "tsc --noEmit && rm -fr lib && babel src --out-dir lib --extensions .ts --source-maps inline",
     "prepack": "npm run build"
@@ -46,6 +47,7 @@
     "@babel/register": "^7.7.7",
     "@types/node": "^13.1.6",
     "ascii-table": "^0.0.9",
+    "ava": "^2.4.0",
     "dotenv": "^8.2.0",
     "homebridge": "^0.4.50",
     "prettier": "1.19.1",
