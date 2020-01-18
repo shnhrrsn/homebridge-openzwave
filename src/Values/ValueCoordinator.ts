@@ -51,25 +51,17 @@ export default class ValueCoordinator {
 			valueUpdate = valueUpdate.pipe(filter(value => this.transformer.isZwaveValid!(value)))
 		}
 
-		// If we already have a value, send it to HomeKit
+		// Subscribe to all value updates and forward them to HomeKit
 		let hadInitialValue = false
-		valueUpdate
-			.pipe(first())
-			.subscribe(value => {
-				this.sendZwaveValueToHomeKit(value)
-				hadInitialValue = true
-			})
-			.unsubscribe()
+		this.valueUpdateObserver = valueUpdate.subscribe(value => {
+			this.sendZwaveValueToHomeKit(value)
+			hadInitialValue = true
+		})
 
-		// Otherwise, request a refresh
+		// If we didn’t immediately load a value, refresh
 		if (!hadInitialValue) {
 			this.valueStream.refresh()
 		}
-
-		// Subscribe to all value updates and forward them to HomeKit
-		this.valueUpdateObserver = valueUpdate.subscribe(value => {
-			this.sendZwaveValueToHomeKit(value)
-		})
 
 		// Handle explicit HomeKit value setting
 		if (this.readonly !== true) {
