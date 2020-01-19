@@ -6,7 +6,12 @@ import { INodeStreams } from '../Streams/INodeStreams'
 
 export interface IZwave extends INodeStreams {
 	getControllerNodeId(): number
+
+	// Throttles refreshes, see ValueRefresher for more
 	refreshValue(valueId: ValueId): void
+
+	// Pass through to ozw refreshValue
+	unsafeRefreshValue(valueId: ValueId): void
 
 	// No guarantees are made re: value set, see ValueSetter for more
 	setValue(valueId: ValueId, value: ValueType): Promise<ValueType>

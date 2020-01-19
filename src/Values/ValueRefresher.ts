@@ -25,7 +25,7 @@ export default class ValueRefresher {
 			return
 		}
 
-		this.valueStreams.zwave.refreshValue(this.valueId)
+		this.valueStreams.zwave.unsafeRefreshValue(this.valueId)
 		this.isRefreshing = true
 		this.log.debug('Refreshing')
 

@@ -4,7 +4,6 @@ import { ValueType } from '../Values/ValueType'
 import { filter, map, distinctUntilChanged } from 'rxjs/operators'
 import { Observable, Subscription, BehaviorSubject } from 'rxjs'
 import { Homebridge } from '../../types/homebridge'
-import takeFreshValue from '../Support/takeFreshValue'
 
 interface PublishValue {
 	value: ValueType
@@ -15,7 +14,6 @@ export default class BoundValueStream {
 	private valueSubject: BehaviorSubject<PublishValue>
 	private valueStreams: IValueStreams
 	private log: Homebridge.Logger
-	private isRefreshing = false
 	private valueChangedSubscriber: Subscription
 	private valueRefreshedSubscriber: Subscription
 	readonly valueId: ValueId
@@ -52,21 +50,7 @@ export default class BoundValueStream {
 	}
 
 	refresh() {
-		if (this.isRefreshing) {
-			this.log.debug('Already refreshing')
-			return
-		}
-
-		this.valueStreams.zwave.refreshValue(this.valueId)
-		this.isRefreshing = true
-		this.log.debug('Refreshing')
-
-		takeFreshValue(this.valueStreams.valueRefreshed, 10_000)
-			.then(() => this.log.debug('Refreshed'))
-			.catch(error => this.log.debug('Failed to refresh', error.message))
-			.finally(() => {
-				this.isRefreshing = false
-			})
+		return this.valueStreams.zwave.refreshValue(this.valueId)
 	}
 
 	set(newValue: ValueType): Promise<ValueType> {

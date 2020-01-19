@@ -1,4 +1,5 @@
 import ValueSetter from '../Values/ValueSetter'
+import ValueRefresher from '../Values/ValueRefresher'
 import stringifyValueId from '../Support/stringifyValueId'
 import makePrefixedLogger from '../Support/makePrefixedLogger'
 import OpenZwave, {
@@ -36,6 +37,8 @@ export default class Zwave implements INodeStreams, IZwave {
 	readonly ozw: OpenZwave
 	readonly log: Homebridge.Logger
 	private valueSetters = new Map<string, ValueSetter>()
+	private valueRefreshers = new Map<string, ValueRefresher>()
+	private valueLoggers = new Map<string, Homebridge.Logger>()
 
 	constructor(log: Homebridge.Logger, settings: Partial<OpenZwave.IConstructorParameters>) {
 		this.log = log
@@ -103,6 +106,18 @@ export default class Zwave implements INodeStreams, IZwave {
 	}
 
 	refreshValue(valueId: ValueId) {
+		const key = stringifyValueId(valueId)
+		let refresher = this.valueRefreshers.get(key)
+
+		if (!refresher) {
+			refresher = new ValueRefresher(this.getValueLogger(valueId), valueId, this)
+			this.valueRefreshers.set(key, refresher)
+		}
+
+		refresher.refresh()
+	}
+
+	unsafeRefreshValue(valueId: ValueId) {
 		this.ozw.refreshValue(valueId)
 	}
 
@@ -111,11 +126,7 @@ export default class Zwave implements INodeStreams, IZwave {
 		let setter = this.valueSetters.get(key)
 
 		if (!setter) {
-			setter = new ValueSetter(
-				makePrefixedLogger(this.log, String(valueId.node_id)),
-				valueId,
-				this,
-			)
+			setter = new ValueSetter(this.getValueLogger(valueId), valueId, this)
 			this.valueSetters.set(key, setter)
 		}
 
@@ -140,6 +151,18 @@ export default class Zwave implements INodeStreams, IZwave {
 
 	cancelControllerCommand() {
 		return this.ozw.cancelControllerCommand()
+	}
+
+	private getValueLogger(valueId: ValueId): Homebridge.Logger {
+		const key = stringifyValueId(valueId)
+		let log = this.valueLoggers.get(key)
+
+		if (!log) {
+			log = makePrefixedLogger(this.log, String(valueId.node_id))
+			this.valueLoggers.set(key, log)
+		}
+
+		return log
 	}
 
 	get zwave(): IZwave {

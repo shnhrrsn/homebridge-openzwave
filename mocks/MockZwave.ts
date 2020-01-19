@@ -12,6 +12,7 @@ import { ValueType } from '../src/Values/ValueType'
 import ValueSetter from '../src/Values/ValueSetter'
 import stringifyValueId from '../src/Support/stringifyValueId'
 import MockNoopLogger from './MockNoopLogger'
+import ValueRefresher from '../src/Values/ValueRefresher'
 
 export interface MockZwaveParams {
 	handleRefreshValue(valueId: ValueId): void
@@ -31,6 +32,7 @@ export default class MockZwave implements IZwave {
 	readonly notification = new Subject<INotificationParams>()
 	readonly controllerCommand = new Subject<IControllerCommandParams>()
 	private valueSetters = new Map<string, ValueSetter>()
+	private valueRefreshers = new Map<string, ValueRefresher>()
 	private params: MockZwaveParams
 
 	constructor(params: MockZwaveParams) {
@@ -42,6 +44,18 @@ export default class MockZwave implements IZwave {
 	}
 
 	refreshValue(valueId: ValueId): void {
+		const key = stringifyValueId(valueId)
+		let refresher = this.valueRefreshers.get(key)
+
+		if (!refresher) {
+			refresher = new ValueRefresher(new MockNoopLogger(), valueId, this)
+			this.valueRefreshers.set(key, refresher)
+		}
+
+		refresher.refresh()
+	}
+
+	unsafeRefreshValue(valueId: ValueId): void {
 		this.params.handleRefreshValue(valueId)
 	}
 
