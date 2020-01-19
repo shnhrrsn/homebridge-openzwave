@@ -11,6 +11,7 @@ import { ValueId } from 'openzwave-shared'
 import { ValueType } from '../src/Values/ValueType'
 import ValueSetter from '../src/Values/ValueSetter'
 import stringifyValueId from '../src/Support/stringifyValueId'
+import MockNoopLogger from './MockNoopLogger'
 
 export interface MockZwaveParams {
 	handleRefreshValue(valueId: ValueId): void
@@ -49,7 +50,7 @@ export default class MockZwave implements IZwave {
 		let setter = this.valueSetters.get(key)
 
 		if (!setter) {
-			setter = new ValueSetter(valueId, this)
+			setter = new ValueSetter(new MockNoopLogger(), valueId, this)
 			this.valueSetters.set(key, setter)
 		}
 

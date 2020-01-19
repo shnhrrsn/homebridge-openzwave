@@ -1,6 +1,7 @@
 import { ValueId } from 'openzwave-shared'
 import { IValueStreams } from '../Streams/IValueStreams'
 import { ValueType } from './ValueType'
+import { Homebridge } from '../../types/homebridge'
 import takeFreshValue from '../Support/takeFreshValue'
 
 interface PendingSetValue {
@@ -25,12 +26,14 @@ interface PendingSetValue {
  * the most recent and the second step is queued alongside the third step.
  */
 export default class ValueSetter {
-	valueId: ValueId
-	valueStreams: IValueStreams
 	private isSetting = false
 	private pendingSets: PendingSetValue[] = []
+	readonly valueId: ValueId
+	readonly valueStreams: IValueStreams
+	readonly log: Homebridge.Logger
 
-	constructor(valueId: ValueId, valueStreams: IValueStreams) {
+	constructor(log: Homebridge.Logger, valueId: ValueId, valueStreams: IValueStreams) {
+		this.log = log
 		this.valueId = valueId
 		this.valueStreams = valueStreams
 	}

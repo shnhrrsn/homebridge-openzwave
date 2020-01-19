@@ -16,7 +16,7 @@ export default class Platform implements Homebridge.Platform {
 		this.log = log
 		this.config = config
 		this.api = api
-		this.zwave = new Zwave({
+		this.zwave = new Zwave(this.log, {
 			ConsoleOutput: false,
 			Logging: false,
 			SaveConfiguration: false,

@@ -1,3 +1,6 @@
+import ValueSetter from '../Values/ValueSetter'
+import stringifyValueId from '../Support/stringifyValueId'
+import makePrefixedLogger from '../Support/makePrefixedLogger'
 import OpenZwave, {
 	NodeInfo,
 	Value,
@@ -5,7 +8,6 @@ import OpenZwave, {
 	ControllerState,
 	ValueId,
 } from 'openzwave-shared'
-import { Subject, ReplaySubject } from 'rxjs'
 import {
 	INodeStreams,
 	INotificationParams,
@@ -16,8 +18,8 @@ import {
 import { IValueParams, IValueRemovedParams } from '../Streams/IValueStreams'
 import { ValueType } from '../Values/ValueType'
 import { IZwave } from './IZwave'
-import ValueSetter from '../Values/ValueSetter'
-import stringifyValueId from '../Support/stringifyValueId'
+import { Homebridge } from '../../types/homebridge'
+import { Subject, ReplaySubject } from 'rxjs'
 
 export default class Zwave implements INodeStreams, IZwave {
 	readonly nodeRemoved = new Subject<INodeIdParams>()
@@ -32,9 +34,11 @@ export default class Zwave implements INodeStreams, IZwave {
 	readonly notification = new ReplaySubject<INotificationParams>()
 	readonly controllerCommand = new ReplaySubject<IControllerCommandParams>()
 	readonly ozw: OpenZwave
+	readonly log: Homebridge.Logger
 	private valueSetters = new Map<string, ValueSetter>()
 
-	constructor(settings: Partial<OpenZwave.IConstructorParameters>) {
+	constructor(log: Homebridge.Logger, settings: Partial<OpenZwave.IConstructorParameters>) {
+		this.log = log
 		this.ozw = new OpenZwave(settings)
 
 		this.ozw.on('node removed', (nodeId: number) => {
@@ -107,7 +111,11 @@ export default class Zwave implements INodeStreams, IZwave {
 		let setter = this.valueSetters.get(key)
 
 		if (!setter) {
-			setter = new ValueSetter(valueId, this)
+			setter = new ValueSetter(
+				makePrefixedLogger(this.log, String(valueId.node_id)),
+				valueId,
+				this,
+			)
 			this.valueSetters.set(key, setter)
 		}
 

@@ -2,23 +2,24 @@ import test from 'ava'
 import MockValue from '../mocks/MockValue'
 import ValueSetter from '../src/Values/ValueSetter'
 import makeZwaveSet from './helpers/makeZwaveSet'
+import MockNoopLogger from '../mocks/MockNoopLogger'
 
 test('single set', async t => {
 	const zwave = makeZwaveSet(10)
-	const valueSetter = new ValueSetter(new MockValue(63), zwave)
+	const valueSetter = new ValueSetter(new MockNoopLogger(), new MockValue(63), zwave)
 	t.is(87, await valueSetter.set(87))
 })
 
 test('double set', async t => {
 	const zwave = makeZwaveSet(10)
-	const valueSetter = new ValueSetter(new MockValue(63), zwave)
+	const valueSetter = new ValueSetter(new MockNoopLogger(), new MockValue(63), zwave)
 	t.is(87, await valueSetter.set(87))
 	t.is(63, await valueSetter.set(63))
 })
 
 test('multi set', async t => {
 	const zwave = makeZwaveSet(50)
-	const valueSetter = new ValueSetter(new MockValue(63), zwave)
+	const valueSetter = new ValueSetter(new MockNoopLogger(), new MockValue(63), zwave)
 
 	// This will trigger immediately
 	const set87 = valueSetter.set(87)
