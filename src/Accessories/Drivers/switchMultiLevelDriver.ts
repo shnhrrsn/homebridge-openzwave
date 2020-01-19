@@ -4,7 +4,7 @@ import { IDriverParams } from './Driver'
 import multiLevelBinaryTransformer from '../../Values/Transformers/multiLevelBinaryTransformer'
 import multiLevelTransformer from '../../Values/Transformers/multiLevelTransformer'
 import fanMultiLevelDriver from './fanMultiLevelDriver'
-import { BoundValueStream } from '../../Streams/BoundValueStream'
+import BoundValueStream from '../../Streams/BoundValueStream'
 
 export default function switchMultiLevelDriver(params: IDriverParams) {
 	if (params.hints.has('fan')) {

@@ -3,7 +3,7 @@ import registerCharacteristic from './Support/registerCharacteristic'
 import { IDriverParams } from './Driver'
 import multiLevelBinaryTransformer from '../../Values/Transformers/multiLevelBinaryTransformer'
 import multiLevelTransformer from '../../Values/Transformers/multiLevelTransformer'
-import { BoundValueStream } from '../../Streams/BoundValueStream'
+import BoundValueStream from '../../Streams/BoundValueStream'
 
 export default function fanMultiLevelDriver(params: IDriverParams) {
 	const value = params.values.get(0)

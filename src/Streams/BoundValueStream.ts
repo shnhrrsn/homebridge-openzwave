@@ -11,7 +11,7 @@ interface PublishValue {
 	publishedAt: number
 }
 
-export class BoundValueStream {
+export default class BoundValueStream {
 	private valueSubject: BehaviorSubject<PublishValue>
 	private valueStreams: IValueStreams
 	private log: Homebridge.Logger

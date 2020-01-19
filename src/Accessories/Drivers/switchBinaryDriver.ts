@@ -1,6 +1,6 @@
 import { IDriverParams } from './Driver'
 import registerCharacteristic from './Support/registerCharacteristic'
-import { BoundValueStream } from '../../Streams/BoundValueStream'
+import BoundValueStream from '../../Streams/BoundValueStream'
 
 export default function switchBinaryDriver(params: IDriverParams) {
 	const value = params.values.get(0)

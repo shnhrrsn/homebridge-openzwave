@@ -1,7 +1,7 @@
 import ValueCoordinator, { CoordinateValuesParams } from '../../../Values/ValueCoordinator'
-import { BoundValueStream } from '../../../Streams/BoundValueStream'
-import { Homebridge } from '../../../../types/homebridge'
+import BoundValueStream from '../../../Streams/BoundValueStream'
 import makePrefixedLogger from '../../../Support/makePrefixedLogger'
+import { Homebridge } from '../../../../types/homebridge'
 
 export type RegisterCharacteristicParams = {
 	service: HAPNodeJS.Service

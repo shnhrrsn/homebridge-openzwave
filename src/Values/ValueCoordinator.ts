@@ -1,11 +1,11 @@
-import { BoundValueStream } from '../Streams/BoundValueStream'
+import BoundValueStream from '../Streams/BoundValueStream'
+import exactlyOnce from '../Support/exactlyOnce'
+import noopValueTransformer from './Transformers/noopValueTransformer'
 import { first, filter } from 'rxjs/operators'
 import { Homebridge } from '../../types/homebridge'
 import { IValueTransformer } from './Transformers/IValueTransformer'
 import { Subscription } from 'rxjs'
 import { ValueType } from './ValueType'
-import exactlyOnce from '../Support/exactlyOnce'
-import noopValueTransformer from './Transformers/noopValueTransformer'
 
 export type CoordinateValuesParams = {
 	log: Homebridge.Logger
