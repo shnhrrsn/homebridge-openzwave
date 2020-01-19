@@ -3,8 +3,9 @@ import MockZwave from '../mocks/MockZwave'
 import MockNoopLogger from '../mocks/MockNoopLogger'
 import MockValue from '../mocks/MockValue'
 import BoundValueStream from '../src/Streams/BoundValueStream'
-import { ValueType } from '../src/Values/ValueType'
 import takeImmediateValue from '../src/Support/takeImmediateValue'
+import makeZwaveSet from './helpers/makeZwaveSet'
+import makeZwaveRefresh from './helpers/makeZwaveRefresh'
 
 test('initial value', t => {
 	const zwave = new MockZwave({
@@ -17,37 +18,21 @@ test('initial value', t => {
 })
 
 test('refresh value', t => {
-	const initialValue = new MockValue(63)
-	const zwave = new MockZwave({
-		handleSetValue() {},
-		handleRefreshValue() {
-			zwave.valueRefreshed.next({
-				nodeId: initialValue.node_id,
-				comClass: initialValue.class_id,
-				value: new MockValue(87),
-			})
-		},
-	})
-
-	const boundValueStream = new BoundValueStream(initialValue, zwave, new MockNoopLogger())
+	const boundValueStream = new BoundValueStream(
+		new MockValue(63),
+		makeZwaveRefresh(87),
+		new MockNoopLogger(),
+	)
 	boundValueStream.refresh()
 	t.is(87, takeImmediateValue(boundValueStream.valueObservable))
 })
 
 test('set value', t => {
-	const initialValue = new MockValue(63)
-	const zwave = new MockZwave({
-		handleSetValue(valueId, value) {
-			zwave.valueChanged.next({
-				nodeId: valueId.node_id,
-				comClass: valueId.class_id,
-				value: new MockValue(value),
-			})
-		},
-		handleRefreshValue() {},
-	})
-
-	const boundValueStream = new BoundValueStream(initialValue, zwave, new MockNoopLogger())
+	const boundValueStream = new BoundValueStream(
+		new MockValue(63),
+		makeZwaveSet(),
+		new MockNoopLogger(),
+	)
 	t.is(63, takeImmediateValue(boundValueStream.valueObservable))
 
 	boundValueStream.set(87)
@@ -55,21 +40,11 @@ test('set value', t => {
 })
 
 test('slow set value', async t => {
-	const initialValue = new MockValue(63)
-	const zwave = new MockZwave({
-		handleSetValue(valueId, value) {
-			setTimeout(() => {
-				zwave.valueChanged.next({
-					nodeId: valueId.node_id,
-					comClass: valueId.class_id,
-					value: new MockValue(value),
-				})
-			}, 100)
-		},
-		handleRefreshValue() {},
-	})
-
-	const boundValueStream = new BoundValueStream(initialValue, zwave, new MockNoopLogger())
+	const boundValueStream = new BoundValueStream(
+		new MockValue(63),
+		makeZwaveSet(100),
+		new MockNoopLogger(),
+	)
 	t.is(63, takeImmediateValue(boundValueStream.valueObservable))
 
 	let promise = boundValueStream.set(87)
@@ -80,21 +55,11 @@ test('slow set value', async t => {
 })
 
 test('slow multi set value', async t => {
-	const initialValue = new MockValue(63)
-	const zwave = new MockZwave({
-		handleSetValue(valueId, value) {
-			setTimeout(() => {
-				zwave.valueChanged.next({
-					nodeId: valueId.node_id,
-					comClass: valueId.class_id,
-					value: new MockValue(value),
-				})
-			}, 100)
-		},
-		handleRefreshValue() {},
-	})
-
-	const boundValueStream = new BoundValueStream(initialValue, zwave, new MockNoopLogger())
+	const boundValueStream = new BoundValueStream(
+		new MockValue(63),
+		makeZwaveSet(100),
+		new MockNoopLogger(),
+	)
 	t.is(63, takeImmediateValue(boundValueStream.valueObservable))
 
 	boundValueStream.set(6)
