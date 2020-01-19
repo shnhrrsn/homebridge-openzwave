@@ -13,6 +13,11 @@ export interface INodeInfoParams {
 	nodeInfo: NodeInfo
 }
 
+export interface INodeEventParams {
+	nodeId: number
+	data: any
+}
+
 export interface INotificationParams {
 	nodeId: number
 	notification: Notification
@@ -36,6 +41,9 @@ export interface INodeStreams extends IValueStreams {
 
 	// Basic node information has been received, such as whether the node is a listening device, a routing device and its baud rate and basic, generic and specific types.
 	readonly nodeReady: Observable<INodeInfoParams>
+
+	// A node has triggered an event. This is commonly caused when a node sends a Basic_Set command to the controller. The event value is stored in the notification.
+	readonly nodeEvent: Observable<INodeEventParams>
 
 	// A node has been removed from OpenZWave's list. This may be due to a device being removed from the Z-Wave network, or because the application is closing.
 	readonly nodeRemoved: Observable<INodeIdParams>

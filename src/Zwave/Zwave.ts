@@ -15,6 +15,7 @@ import {
 	INodeIdParams,
 	INodeInfoParams,
 	IControllerCommandParams,
+	INodeEventParams,
 } from '../Streams/INodeStreams'
 import { IValueParams, IValueRemovedParams } from '../Streams/IValueStreams'
 import { ValueType } from '../Values/ValueType'
@@ -28,6 +29,7 @@ export default class Zwave implements INodeStreams, IZwave {
 	readonly nodeReset = new Subject<INodeIdParams>()
 	readonly nodeReady = new Subject<INodeInfoParams>()
 	readonly nodeAvailable = new Subject<INodeInfoParams>()
+	readonly nodeEvent = new Subject<INodeEventParams>()
 	readonly valueAdded = new Subject<IValueParams>()
 	readonly valueChanged = new ReplaySubject<IValueParams>()
 	readonly valueRefreshed = new ReplaySubject<IValueParams>()
@@ -60,6 +62,13 @@ export default class Zwave implements INodeStreams, IZwave {
 
 		this.ozw.on('node available', (nodeId: number, nodeInfo: NodeInfo) => {
 			this.nodeAvailable.next({ nodeId, nodeInfo })
+		})
+
+		this.ozw.on('node event', (nodeId: number, data: any) => {
+			this.nodeEvent.next({
+				nodeId,
+				data,
+			})
 		})
 
 		this.ozw.on('value added', (nodeId: number, comClass: number, value: Value) => {
