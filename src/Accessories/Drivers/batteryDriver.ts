@@ -24,6 +24,7 @@ export default function batteryDriver(params: IDriverParams) {
 		log: params.log,
 		characteristic: Characteristic.BatteryLevel,
 		options: {
+			readonly: true,
 			transformer: {
 				zwaveToHomeKit(value) {
 					return Math.round(Number(value))
