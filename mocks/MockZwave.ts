@@ -9,6 +9,8 @@ import {
 } from '../src/Streams/INodeStreams'
 import { ValueId } from 'openzwave-shared'
 import { ValueType } from '../src/Values/ValueType'
+import ValueSetter from '../src/Values/ValueSetter'
+import stringifyValueId from '../src/Support/stringifyValueId'
 
 export interface MockZwaveParams {
 	handleRefreshValue(valueId: ValueId): void
@@ -27,6 +29,7 @@ export default class MockZwave implements IZwave {
 	readonly nodeReset = new Subject<INodeIdParams>()
 	readonly notification = new Subject<INotificationParams>()
 	readonly controllerCommand = new Subject<IControllerCommandParams>()
+	private valueSetters = new Map<string, ValueSetter>()
 	private params: MockZwaveParams
 
 	constructor(params: MockZwaveParams) {
@@ -41,7 +44,19 @@ export default class MockZwave implements IZwave {
 		this.params.handleRefreshValue(valueId)
 	}
 
-	setValue(valueId: ValueId, value: ValueType): void {
+	setValue(valueId: ValueId, value: ValueType): Promise<ValueType> {
+		const key = stringifyValueId(valueId)
+		let setter = this.valueSetters.get(key)
+
+		if (!setter) {
+			setter = new ValueSetter(valueId, this)
+			this.valueSetters.set(key, setter)
+		}
+
+		return setter.set(value)
+	}
+
+	unsafeSetValue(valueId: ValueId, value: ValueType) {
 		this.params.handleSetValue(valueId, value)
 	}
 

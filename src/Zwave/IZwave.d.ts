@@ -5,9 +5,14 @@ import { INodeStreams } from '../Streams/INodeStreams'
 // TODO: Rename to something less specific?
 
 export interface IZwave extends INodeStreams {
-	refreshValue(valueId: ValueId): void
-	setValue(valueId: ValueId, value: ValueType): void
 	getControllerNodeId(): number
+	refreshValue(valueId: ValueId): void
+
+	// No guarantees are made re: value set, see ValueSetter for more
+	setValue(valueId: ValueId, value: ValueType): Promise<ValueType>
+
+	// Pass through to ozw setValue
+	unsafeSetValue(valueId: ValueId, value: ValueType): void
 
 	addNode?(isSecure?: boolean): boolean
 	removeNode?(): boolean

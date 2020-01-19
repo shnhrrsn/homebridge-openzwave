@@ -69,14 +69,8 @@ export default class BoundValueStream {
 			})
 	}
 
-	set(newValue: ValueType): Promise<void> {
-		try {
-			this.valueStreams.zwave.setValue(this.valueId, newValue)
-		} catch (error) {
-			return Promise.reject(error)
-		}
-
-		return takeFreshValue(this.valueStreams.valueChanged, 5000).then(() => undefined)
+	set(newValue: ValueType): Promise<ValueType> {
+		return this.valueStreams.zwave.setValue(this.valueId, newValue)
 	}
 
 	private onValueRefreshed(params: IValueParams) {

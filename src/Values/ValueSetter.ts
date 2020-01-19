@@ -56,7 +56,7 @@ export default class ValueSetter {
 		}
 
 		const { value: lastValue } = sets[sets.length - 1]
-		this.valueStreams.zwave.setValue(this.valueId, lastValue)
+		this.valueStreams.zwave.unsafeSetValue(this.valueId, lastValue)
 		this.isSetting = true
 
 		takeFreshValue(this.valueStreams.valueChanged)

@@ -16,6 +16,8 @@ import {
 import { IValueParams, IValueRemovedParams } from '../Streams/IValueStreams'
 import { ValueType } from '../Values/ValueType'
 import { IZwave } from './IZwave'
+import ValueSetter from '../Values/ValueSetter'
+import stringifyValueId from '../Support/stringifyValueId'
 
 export default class Zwave implements INodeStreams, IZwave {
 	readonly nodeRemoved = new Subject<INodeIdParams>()
@@ -30,6 +32,7 @@ export default class Zwave implements INodeStreams, IZwave {
 	readonly notification = new ReplaySubject<INotificationParams>()
 	readonly controllerCommand = new ReplaySubject<IControllerCommandParams>()
 	readonly ozw: OpenZwave
+	private valueSetters = new Map<string, ValueSetter>()
 
 	constructor(settings: Partial<OpenZwave.IConstructorParameters>) {
 		this.ozw = new OpenZwave(settings)
@@ -99,7 +102,19 @@ export default class Zwave implements INodeStreams, IZwave {
 		this.ozw.refreshValue(valueId)
 	}
 
-	setValue(valueId: ValueId, value: ValueType) {
+	setValue(valueId: ValueId, value: ValueType): Promise<ValueType> {
+		const key = stringifyValueId(valueId)
+		let setter = this.valueSetters.get(key)
+
+		if (!setter) {
+			setter = new ValueSetter(valueId, this)
+			this.valueSetters.set(key, setter)
+		}
+
+		return setter.set(value)
+	}
+
+	unsafeSetValue(valueId: ValueId, value: ValueType) {
 		this.ozw.setValue(valueId, value)
 	}
 
