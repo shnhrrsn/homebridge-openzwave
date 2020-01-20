@@ -1,34 +1,32 @@
-import registerCharacteristic from './Support/registerCharacteristic'
-
-import Driver, { IDriverParams } from './Driver'
+import { IDriverParams } from './Driver'
 import multiLevelBinaryTransformer from '../../Values/Transformers/multiLevelBinaryTransformer'
 import multiLevelTransformer from '../../Values/Transformers/multiLevelTransformer'
 import BoundValueStream from '../../Streams/BoundValueStream'
+import ManagedDriver from './ManagedDriver'
 
-export default class SwitchMultiLevelDriver extends Driver {
+export default class SwitchMultiLevelDriver extends ManagedDriver {
 	constructor(params: IDriverParams) {
 		super(params)
 
-		const value = params.values.get(0)
+		const value = this.values.get(0)
 
 		if (!value) {
 			return
 		}
 
-		const { Service, Characteristic } = params.hap
-		const service = params.accessory.getService(Service.Lightbulb)
+		const { Service, Characteristic } = this.hap
+		const service = this.accessory.getService(Service.Lightbulb)
 
 		if (!service) {
 			return
 		}
 
-		const valueStream = new BoundValueStream(value, params.valueStreams, params.log)
+		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 
 		// On/Off
-		registerCharacteristic({
+		this.registerCharacteristic({
 			service,
 			valueStream,
-			log: params.log,
 			characteristic: Characteristic.On,
 			options: {
 				transformer: multiLevelBinaryTransformer(),
@@ -36,22 +34,13 @@ export default class SwitchMultiLevelDriver extends Driver {
 		})
 
 		// Brightness
-		registerCharacteristic({
+		this.registerCharacteristic({
 			service,
 			valueStream,
-			log: params.log,
 			characteristic: Characteristic.Brightness,
 			options: {
 				transformer: multiLevelTransformer(),
 			},
 		})
-	}
-
-	ready(): void {
-		// TODO
-	}
-
-	destroy(): void {
-		// TODO
 	}
 }

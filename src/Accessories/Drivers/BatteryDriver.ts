@@ -1,30 +1,29 @@
-import Driver, { IDriverParams } from './Driver'
-import registerCharacteristic from './Support/registerCharacteristic'
+import { IDriverParams } from './Driver'
 import BoundValueStream from '../../Streams/BoundValueStream'
+import ManagedDriver from './ManagedDriver'
 
-export default class BatteryDriver extends Driver {
+export default class BatteryDriver extends ManagedDriver {
 	constructor(params: IDriverParams) {
 		super(params)
 
-		const value = params.values.get(0)
+		const value = this.values.get(0)
 
 		if (!value) {
 			return
 		}
 
-		const { Service, Characteristic } = params.hap
-		const service = params.accessory.getService(Service.BatteryService)
+		const { Service, Characteristic } = this.hap
+		const service = this.accessory.getService(Service.BatteryService)
 
 		if (!service) {
 			return
 		}
 
-		const valueStream = new BoundValueStream(value, params.valueStreams, params.log)
+		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 
-		registerCharacteristic({
+		this.registerCharacteristic({
 			service,
 			valueStream,
-			log: params.log,
 			characteristic: Characteristic.BatteryLevel,
 			options: {
 				readonly: true,
@@ -36,10 +35,9 @@ export default class BatteryDriver extends Driver {
 			},
 		})
 
-		registerCharacteristic({
+		this.registerCharacteristic({
 			service,
 			valueStream,
-			log: params.log,
 			characteristic: Characteristic.StatusLowBattery,
 			options: {
 				readonly: true,
@@ -53,13 +51,5 @@ export default class BatteryDriver extends Driver {
 				},
 			},
 		})
-	}
-
-	ready(): void {
-		// TODO
-	}
-
-	destroy(): void {
-		// TODO
 	}
 }

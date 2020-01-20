@@ -1,105 +1,94 @@
-import registerCharacteristic from './Support/registerCharacteristic'
-
-import Driver, { IDriverParams } from './Driver'
+import { IDriverParams } from './Driver'
 import BoundValueStream from '../../Streams/BoundValueStream'
 import fahrenheitToCelsiusTransformer from '../../Values/Transformers/fahrenheitToCelsiusTransformer'
+import ManagedDriver from './ManagedDriver'
 
-export default class SensorMultiLevelDriver extends Driver {
+export default class SensorMultiLevelDriver extends ManagedDriver {
 	constructor(params: IDriverParams) {
 		super(params)
-		registerTemperature(params)
-		registerLuminance(params)
-		registerHumidity(params)
+
+		this.registerTemperature()
+		this.registerLuminance()
+		this.registerHumidity()
 	}
 
-	ready(): void {
-		// TODO
+	registerTemperature() {
+		const value = this.values.get(1)
+
+		if (value === undefined) {
+			return
+		}
+
+		const { Service, Characteristic } = this.hap
+		const service = this.accessory.getService(Service.TemperatureSensor)
+		if (!service) {
+			return
+		}
+
+		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
+		const unit = this.values.get(256)
+
+		this.registerCharacteristic({
+			service,
+			valueStream,
+			characteristic: Characteristic.CurrentTemperature,
+			options: {
+				readonly: true,
+				transformer:
+					(unit ?? 'celsius').toString().toLowerCase() !== 'celius'
+						? fahrenheitToCelsiusTransformer()
+						: undefined,
+			},
+		})
 	}
 
-	destroy(): void {
-		// TODO
-	}
-}
+	registerLuminance() {
+		const value = this.values.get(3)
 
-function registerTemperature(params: IDriverParams) {
-	const value = params.values.get(1)
+		if (value === undefined) {
+			return
+		}
 
-	if (value === undefined) {
-		return
-	}
+		const { Service, Characteristic } = this.hap
+		const service = this.accessory.getService(Service.LightSensor)
+		if (!service) {
+			return
+		}
 
-	const { Service, Characteristic } = params.hap
-	const service = params.accessory.getService(Service.TemperatureSensor)
-	if (!service) {
-		return
-	}
+		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 
-	const valueStream = new BoundValueStream(value, params.valueStreams, params.log)
-	const unit = params.values.get(256)
-
-	registerCharacteristic({
-		service,
-		valueStream,
-		log: params.log,
-		characteristic: Characteristic.CurrentTemperature,
-		options: {
-			readonly: true,
-			transformer:
-				(unit ?? 'celsius').toString().toLowerCase() !== 'celius'
-					? fahrenheitToCelsiusTransformer()
-					: undefined,
-		},
-	})
-}
-
-function registerLuminance(params: IDriverParams) {
-	const value = params.values.get(3)
-
-	if (value === undefined) {
-		return
+		this.registerCharacteristic({
+			service,
+			valueStream,
+			characteristic: Characteristic.CurrentAmbientLightLevel,
+			options: {
+				readonly: true,
+			},
+		})
 	}
 
-	const { Service, Characteristic } = params.hap
-	const service = params.accessory.getService(Service.LightSensor)
-	if (!service) {
-		return
+	registerHumidity() {
+		const value = this.values.get(5)
+
+		if (value === undefined) {
+			return
+		}
+
+		const { Service, Characteristic } = this.hap
+		const service = this.accessory.getService(Service.HumiditySensor)
+		if (!service) {
+			return
+		}
+
+		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
+
+		this.registerCharacteristic({
+			service,
+			valueStream,
+			characteristic: Characteristic.CurrentRelativeHumidity,
+			options: {
+				readonly: true,
+			},
+		})
 	}
-
-	const valueStream = new BoundValueStream(value, params.valueStreams, params.log)
-
-	registerCharacteristic({
-		service,
-		valueStream,
-		log: params.log,
-		characteristic: Characteristic.CurrentAmbientLightLevel,
-		options: {
-			readonly: true,
-		},
-	})
-}
-
-function registerHumidity(params: IDriverParams) {
-	const value = params.values.get(5)
-
-	if (value === undefined) {
-		return
-	}
-
-	const { Service, Characteristic } = params.hap
-	const service = params.accessory.getService(Service.HumiditySensor)
-	if (!service) {
-		return
-	}
-
-	const valueStream = new BoundValueStream(value, params.valueStreams, params.log)
-
-	registerCharacteristic({
-		service,
-		valueStream,
-		log: params.log,
-		characteristic: Characteristic.CurrentRelativeHumidity,
-		options: {
-			readonly: true,
-		},
-	})
 }

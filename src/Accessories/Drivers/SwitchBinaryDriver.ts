@@ -1,38 +1,30 @@
-import Driver, { IDriverParams } from './Driver'
-import registerCharacteristic from './Support/registerCharacteristic'
+import { IDriverParams } from './Driver'
 import BoundValueStream from '../../Streams/BoundValueStream'
+import ManagedDriver from './ManagedDriver'
 
-export default class SwitchBinaryDriver extends Driver {
+export default class SwitchBinaryDriver extends ManagedDriver {
 	constructor(params: IDriverParams) {
 		super(params)
-		const value = params.values.get(0)
+
+		const value = this.values.get(0)
 
 		if (!value) {
 			return
 		}
 
-		const { Service, Characteristic } = params.hap
-		const service = params.accessory.getService(Service.Switch)
+		const { Service, Characteristic } = this.hap
+		const service = this.accessory.getService(Service.Switch)
 
 		if (!service) {
 			return
 		}
 
-		const valueStream = new BoundValueStream(value, params.valueStreams, params.log)
+		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 
-		registerCharacteristic({
+		this.registerCharacteristic({
 			service,
 			valueStream,
-			log: params.log,
 			characteristic: Characteristic.On,
 		})
-	}
-
-	ready(): void {
-		// TODO
-	}
-
-	destroy(): void {
-		// TODO
 	}
 }
