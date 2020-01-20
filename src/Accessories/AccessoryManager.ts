@@ -3,6 +3,7 @@ import Platform from '../Platform'
 import StandardDriverRegistry from './Registries/StandardDriverRegistry'
 import loadDeviceConfig from '../Devices/loadDeviceConfig'
 import mergeDeviceConfig from '../Devices/mergeDeviceConfig'
+import Database from '../Support/Database'
 
 import { Accessory, AccessoryCommands } from './Accessory'
 import { IConfig } from '../IConfig'
@@ -12,6 +13,7 @@ import { NodeInfo } from 'openzwave-shared'
 import { INodeInfoParams, INodeIdParams } from '../Streams/INodeStreams'
 import { platformName, pluginName } from '../settings'
 import { CommandClass } from '../Zwave/CommandClass'
+import { IValueParams } from '../Streams/IValueStreams'
 
 export default class AccessoryManager {
 	log: Homebridge.Logger
@@ -21,8 +23,9 @@ export default class AccessoryManager {
 	registry: Map<string, Accessory>
 	nodeIdToCommandsMap: Map<number, AccessoryCommands>
 	restorableAccessories: Map<string, Homebridge.PlatformAccessory>
+	database: Database
 
-	constructor(platform: Platform) {
+	constructor(platform: Platform, database: Database) {
 		if (!platform.zwave) {
 			throw new Error('Platform must have zwave before creating Accessories')
 		}
@@ -32,6 +35,7 @@ export default class AccessoryManager {
 		this.api = platform.api
 		this.zwave = platform.zwave
 		this.registry = new Map()
+		this.database = database
 		this.nodeIdToCommandsMap = new Map()
 		this.restorableAccessories = new Map()
 
@@ -39,21 +43,7 @@ export default class AccessoryManager {
 		this.zwave.nodeRemoved.subscribe(this.onNodeRemoved.bind(this))
 		this.zwave.nodeAvailable.subscribe(this.onNodeAvailable.bind(this))
 		this.zwave.nodeReady.subscribe(this.onNodeReady.bind(this))
-		this.zwave.valueAdded.subscribe(({ nodeId, comClass, value }) => {
-			let nodeIdToCommands = this.nodeIdToCommandsMap.get(nodeId)
-			if (!nodeIdToCommands) {
-				nodeIdToCommands = new Map()
-				this.nodeIdToCommandsMap.set(nodeId, nodeIdToCommands)
-			}
-
-			let commands = nodeIdToCommands.get(comClass)
-			if (!commands) {
-				commands = new Map()
-				nodeIdToCommands.set(comClass, commands)
-			}
-
-			commands.set(value.index, value)
-		})
+		this.zwave.valueAdded.subscribe(this.onValueAdded.bind(this))
 	}
 
 	purge() {
@@ -94,10 +84,13 @@ export default class AccessoryManager {
 			this.getInitialNodeName(nodeId, nodeInfo),
 			`${nodeInfo.manufacturerid}/${nodeInfo.productid}`,
 		)
+
+		this.database.storeNode(nodeId, { nodeInfo })
 	}
 
 	onNodeReady({ nodeId, nodeInfo }: INodeInfoParams) {
 		const nodeName = this.getInitialNodeName(nodeId, nodeInfo)
+		this.database.storeNode(nodeId, { nodeInfo })
 		this.log.debug('onNodeReady', nodeName)
 
 		const config = this.config?.accessories?.[String(nodeId)]
@@ -134,6 +127,23 @@ export default class AccessoryManager {
 		this.removeAccessory(this.nodeIdToAccessoryId(nodeId))
 	}
 
+	onValueAdded({ nodeId, comClass, value }: IValueParams) {
+		let nodeIdToCommands = this.nodeIdToCommandsMap.get(nodeId)
+		if (!nodeIdToCommands) {
+			nodeIdToCommands = new Map()
+			this.nodeIdToCommandsMap.set(nodeId, nodeIdToCommands)
+		}
+
+		let commands = nodeIdToCommands.get(comClass)
+		if (!commands) {
+			commands = new Map()
+			nodeIdToCommands.set(comClass, commands)
+		}
+
+		commands.set(value.index, value)
+		this.database.storeNode(nodeId, { commands: nodeIdToCommands })
+	}
+
 	nodeIdToAccessoryId(nodeId: number): string {
 		const uuidPrefix = this.config?.uuidPrefix ?? `${platformName}/`
 		return this.api.hap.uuid.generate(uuidPrefix + String(nodeId))
@@ -165,6 +175,9 @@ export default class AccessoryManager {
 			this.restorableAccessories.get(accessoryId) ||
 			new this.api.platformAccessory(this.getInitialNodeName(nodeId, nodeInfo), accessoryId)
 
+		const commands = this.getNodeCommands(nodeId)
+		this.database.storeNode(nodeId, { nodeInfo, commands })
+
 		accessory = new Accessory(
 			this.log,
 			this.api,
@@ -172,7 +185,7 @@ export default class AccessoryManager {
 			nodeId,
 			platformAccessory,
 			StandardDriverRegistry,
-			this.getNodeCommands(nodeId),
+			commands,
 			config,
 		)
 

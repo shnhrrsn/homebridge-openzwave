@@ -49,6 +49,7 @@ In order to use this plugin, you’ll need to add the following JSON object to y
 | `zwave`            | This contains the settings that will be passed to OpenZWave.                                                                                            | Y        |
 | `zwave.devicePath` | The device path to your gateway.<br>See [Finding Your Device](#finding-your-device) for more information.]                                              | Y        |
 | `uuidPrefix`       | Override the default prefix used when generating UUIDs for each node.<br>_NOTE: Most setups will not need to change this value._                        | N        |
+| `databasePath`     | Override with an an absolute path for where the database should be stored..<br>_NOTE: Most setups will not need to change this value._                  | N        |
 | `accessories`      | Customize how your Z-Wave accessories behave in HomeKit, or exclude them entirely.<br>See the [Accessories](#accessories) section for more information. | N        |
 
 ### Finding Your Device

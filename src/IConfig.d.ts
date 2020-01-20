@@ -8,4 +8,5 @@ export type IConfig = {
 		[x in string]: IAccessoryConfig | false
 	}
 	uuidPrefix?: string
+	databasePath?: string
 }

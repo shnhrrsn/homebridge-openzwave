@@ -6,6 +6,7 @@ export namespace Homebridge {
 		hap: Hap
 		serverVersion: string
 		platformAccessory: new (name: string, id: string) => PlatformAccessory
+		user: User
 
 		registerPlatform(
 			pluginName: string,
@@ -44,6 +45,11 @@ export namespace Homebridge {
 		info(msg: string, ...args: any[]): void
 		warn(msg: string, ...args: any[]): void
 		error(msg: string, ...args: any[]): void
+	}
+
+	interface User {
+		storagePath(): string
+		persistPath(): string
 	}
 
 	interface PlatformAccessory extends EventEmitter {
