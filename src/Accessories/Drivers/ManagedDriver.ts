@@ -5,7 +5,7 @@ import makePrefixedLogger from '../../Support/makePrefixedLogger'
 import { Value } from 'openzwave-shared'
 
 export interface RegisterCharacteristicParams {
-	service: HAPNodeJS.Service
+	service?: HAPNodeJS.Service
 	characteristic: Function
 	valueStream: BoundValueStream
 	options?: Partial<CoordinateValuesParams>
@@ -36,7 +36,11 @@ export default abstract class ManagedDriver extends Driver {
 		valueStream,
 		options,
 	}: RegisterCharacteristicParams) {
-		const characteristicInstance = service?.getCharacteristic(characteristic)
+		if (!service) {
+			return
+		}
+
+		const characteristicInstance = service.getCharacteristic(characteristic)
 
 		if (!characteristicInstance) {
 			return

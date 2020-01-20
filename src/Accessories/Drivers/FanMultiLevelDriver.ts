@@ -12,11 +12,6 @@ export default class FanMultiLevelDriver extends ManagedDriver {
 
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.Fanv2)
-
-		if (!service) {
-			return
-		}
-
 		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 
 		// On/Off

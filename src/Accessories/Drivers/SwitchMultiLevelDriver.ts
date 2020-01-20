@@ -12,11 +12,6 @@ export default class SwitchMultiLevelDriver extends ManagedDriver {
 
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.Lightbulb)
-
-		if (!service) {
-			return
-		}
-
 		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 
 		// On/Off

@@ -10,11 +10,6 @@ export default class BatteryDriver extends ManagedDriver {
 
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.BatteryService)
-
-		if (!service) {
-			return
-		}
-
 		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 
 		this.registerCharacteristic({

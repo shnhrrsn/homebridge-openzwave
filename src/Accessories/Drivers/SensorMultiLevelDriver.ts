@@ -21,10 +21,6 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 	registerTemperature(value: Value) {
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.TemperatureSensor)
-		if (!service) {
-			return
-		}
-
 		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 		const unit = this.getValue(256)
 
@@ -45,10 +41,6 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 	registerLuminance(value: Value) {
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.LightSensor)
-		if (!service) {
-			return
-		}
-
 		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 
 		this.registerCharacteristic({
@@ -64,10 +56,6 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 	registerHumidity(value: Value) {
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.HumiditySensor)
-		if (!service) {
-			return
-		}
-
 		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 
 		this.registerCharacteristic({
