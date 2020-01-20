@@ -19,7 +19,6 @@ export default abstract class Driver {
 	log: Homebridge.Logger
 	accessory: Accessory
 	valueStreams: IValueStreams
-	values: Map<number, Value<string | number | boolean>>
 	hints: Set<string>
 	zwave: IZwave
 
@@ -28,7 +27,6 @@ export default abstract class Driver {
 		this.log = params.log
 		this.accessory = params.accessory
 		this.valueStreams = params.valueStreams
-		this.values = params.values
 		this.hints = params.hints
 		this.zwave = params.zwave
 	}

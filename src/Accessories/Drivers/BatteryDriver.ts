@@ -6,7 +6,7 @@ export default class BatteryDriver extends ManagedDriver {
 	constructor(params: IDriverParams) {
 		super(params)
 
-		const value = this.values.get(0)
+		const value = this.getValue(0)
 
 		if (!value) {
 			return

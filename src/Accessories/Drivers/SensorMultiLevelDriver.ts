@@ -13,7 +13,7 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 	}
 
 	registerTemperature() {
-		const value = this.values.get(1)
+		const value = this.getValue(1)
 
 		if (value === undefined) {
 			return
@@ -26,7 +26,7 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 		}
 
 		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
-		const unit = this.values.get(256)
+		const unit = this.getValue(256)
 
 		this.registerCharacteristic({
 			service,
@@ -43,7 +43,7 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 	}
 
 	registerLuminance() {
-		const value = this.values.get(3)
+		const value = this.getValue(3)
 
 		if (value === undefined) {
 			return
@@ -68,7 +68,7 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 	}
 
 	registerHumidity() {
-		const value = this.values.get(5)
+		const value = this.getValue(5)
 
 		if (value === undefined) {
 			return
