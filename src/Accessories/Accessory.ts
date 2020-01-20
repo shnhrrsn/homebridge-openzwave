@@ -1,6 +1,5 @@
 import { IZwave } from '../Zwave/IZwave'
 import NodeScopedValueStreams from '../Streams/NodeScopedValueStreams'
-import MappedValues from '../Values/MappedValues'
 
 import { IAccessoryConfig } from '../IAccessoryConfig'
 import { CommandClass } from '../Zwave/CommandClass'
@@ -9,6 +8,8 @@ import { Homebridge } from '../../types/homebridge'
 import { NodeInfo, Value } from 'openzwave-shared'
 import { IValueStreams } from '../Streams/IValueStreams'
 import makePrefixedLogger from '../Support/makePrefixedLogger'
+import MappedValueIndexes from '../Values/Indexes/MappedValueIndexes'
+import NoopValueIndexes from '../Values/Indexes/NoopValueIndexes'
 
 export type AccessoryCommands = Map<CommandClass, Map<number, Value>>
 
@@ -72,7 +73,8 @@ export class Accessory {
 			driver({
 				log,
 				commandClass,
-				values: indexes ? new MappedValues(indexes, values) : values,
+				indexes: indexes ? new MappedValueIndexes(indexes) : new NoopValueIndexes(),
+				values: Array.from(values.values()),
 				hap: this.api.hap,
 				accessory: this,
 				valueStreams: this.valueStreams,

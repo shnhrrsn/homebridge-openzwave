@@ -4,6 +4,7 @@ import { IValueStreams } from '../../Streams/IValueStreams'
 import { IZwave } from '../../Zwave/IZwave'
 import { Value } from 'openzwave-shared'
 import { CommandClass } from '../../Zwave/CommandClass'
+import { IValueIndexes } from '../../Values/Indexes/IValueIndexes'
 
 export interface IDriverParams {
 	hap: Homebridge.Hap
@@ -11,7 +12,8 @@ export interface IDriverParams {
 	commandClass: CommandClass
 	accessory: Accessory
 	valueStreams: IValueStreams
-	values: Map<number, Value>
+	values?: Value[]
+	indexes: IValueIndexes
 	hints: Set<string>
 	zwave: IZwave
 }
@@ -22,6 +24,7 @@ export default abstract class Driver {
 	commandClass: CommandClass
 	accessory: Accessory
 	valueStreams: IValueStreams
+	indexes: IValueIndexes
 	hints: Set<string>
 	zwave: IZwave
 
@@ -31,6 +34,7 @@ export default abstract class Driver {
 		this.commandClass = params.commandClass
 		this.accessory = params.accessory
 		this.valueStreams = params.valueStreams
+		this.indexes = params.indexes
 		this.hints = params.hints
 		this.zwave = params.zwave
 	}

@@ -12,14 +12,14 @@ export interface RegisterCharacteristicParams {
 }
 
 export default abstract class ManagedDriver extends Driver {
-	private values: Map<number, Value>
+	private values = new Map<number, Value>()
 
 	constructor(params: IDriverParams) {
 		super(params)
 
-		this.values = params.values
-
-		for (const [index, value] of this.values.entries()) {
+		for (const value of params.values ?? []) {
+			const index = this.indexes.get(value.index)
+			this.values.set(index, value)
 			this.addValue(index, value)
 		}
 	}
