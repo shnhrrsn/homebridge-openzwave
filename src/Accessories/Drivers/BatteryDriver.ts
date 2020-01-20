@@ -12,7 +12,7 @@ export default class BatteryDriver extends ManagedDriver {
 		const service = this.accessory.getService(Service.BatteryService)
 		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 
-		this.registerCharacteristic({
+		this.registerCharacteristic(index, {
 			service,
 			valueStream,
 			characteristic: Characteristic.BatteryLevel,
@@ -26,7 +26,7 @@ export default class BatteryDriver extends ManagedDriver {
 			},
 		})
 
-		this.registerCharacteristic({
+		this.registerCharacteristic(index, {
 			service,
 			valueStream,
 			characteristic: Characteristic.StatusLowBattery,

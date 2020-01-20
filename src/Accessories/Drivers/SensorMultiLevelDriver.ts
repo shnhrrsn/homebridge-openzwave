@@ -7,24 +7,24 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 	addValue(index: number, value: Value) {
 		switch (index) {
 			case 1:
-				this.registerTemperature(value)
+				this.registerTemperature(index, value)
 				break
 			case 3:
-				this.registerLuminance(value)
+				this.registerLuminance(index, value)
 				break
 			case 5:
-				this.registerHumidity(value)
+				this.registerHumidity(index, value)
 				break
 		}
 	}
 
-	registerTemperature(value: Value) {
+	registerTemperature(index: number, value: Value) {
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.TemperatureSensor)
 		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 		const unit = this.getValue(256)
 
-		this.registerCharacteristic({
+		this.registerCharacteristic(index, {
 			service,
 			valueStream,
 			characteristic: Characteristic.CurrentTemperature,
@@ -38,12 +38,12 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 		})
 	}
 
-	registerLuminance(value: Value) {
+	registerLuminance(index: number, value: Value) {
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.LightSensor)
 		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 
-		this.registerCharacteristic({
+		this.registerCharacteristic(index, {
 			service,
 			valueStream,
 			characteristic: Characteristic.CurrentAmbientLightLevel,
@@ -53,12 +53,12 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 		})
 	}
 
-	registerHumidity(value: Value) {
+	registerHumidity(index: number, value: Value) {
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.HumiditySensor)
 		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
 
-		this.registerCharacteristic({
+		this.registerCharacteristic(index, {
 			service,
 			valueStream,
 			characteristic: Characteristic.CurrentRelativeHumidity,

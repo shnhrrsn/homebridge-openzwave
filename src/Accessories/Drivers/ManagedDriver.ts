@@ -30,12 +30,10 @@ export default abstract class ManagedDriver extends Driver {
 		return this.values.get(index)
 	}
 
-	registerCharacteristic({
-		service,
-		characteristic,
-		valueStream,
-		options,
-	}: RegisterCharacteristicParams) {
+	registerCharacteristic(
+		index: number,
+		{ service, characteristic, valueStream, options }: RegisterCharacteristicParams,
+	) {
 		if (!service) {
 			return
 		}
