@@ -71,6 +71,7 @@ export class Accessory {
 
 			driver({
 				log,
+				commandClass,
 				values: indexes ? new MappedValues(indexes, values) : values,
 				hap: this.api.hap,
 				accessory: this,
