@@ -19,14 +19,14 @@ export interface IDriverParams {
 }
 
 export default abstract class Driver {
-	hap: Homebridge.Hap
-	log: Homebridge.Logger
-	commandClass: CommandClass
-	accessory: Accessory
-	valueStreams: IValueStreams
-	indexes: IValueIndexes
-	hints: Set<string>
-	zwave: IZwave
+	readonly hap: Homebridge.Hap
+	readonly log: Homebridge.Logger
+	readonly commandClass: CommandClass
+	readonly accessory: Accessory
+	readonly valueStreams: IValueStreams
+	readonly indexes: IValueIndexes
+	readonly hints: Set<string>
+	readonly zwave: IZwave
 
 	constructor(params: IDriverParams) {
 		this.hap = params.hap
