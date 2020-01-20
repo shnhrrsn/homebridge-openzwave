@@ -1,26 +1,28 @@
-import batteryDriver from '../Drivers/batteryDriver'
-import switchBinaryDriver from '../Drivers/switchBinaryDriver'
-import switchMultiLevelDriver from '../Drivers/switchMultiLevelDriver'
-import platformDriver from '../Drivers/platformDriver'
-
+import BatteryDriver from '../Drivers/BatteryDriver'
 import { CommandClass } from '../../Zwave/CommandClass'
 import { IDriverRegistry } from './IDriverRegistry'
-import fanMultiLevelDriver from '../Drivers/fanMultiLevelDriver'
-import sensorMultiLevelDriver from '../Drivers/sensorMultiLevelDriver'
+import FanMultiLevelDriver from '../Drivers/FanMultiLevelDriver'
+import PlatformDriver from '../Drivers/PlatformDriver'
+import SensorMultiLevelDriver from '../Drivers/SensorMultiLevelDriver'
+import SwitchBinaryDriver from '../Drivers/SwitchBinaryDriver'
+import SwitchMultiLevelDriver from '../Drivers/SwitchMultiLevelDriver'
 
 const StandardDriverRegistry: IDriverRegistry = new Map()
 export default StandardDriverRegistry
 
-StandardDriverRegistry.set(CommandClass.VIRTUAL_PLATFORM, platformDriver)
-StandardDriverRegistry.set(CommandClass.VIRTUAL_FAN_MULTILEVEL, fanMultiLevelDriver)
+StandardDriverRegistry.set(CommandClass.VIRTUAL_PLATFORM, params => {
+	return new PlatformDriver(params)
+})
+	.set(CommandClass.VIRTUAL_FAN_MULTILEVEL, params => new FanMultiLevelDriver(params))
+	.set(CommandClass.BATTERY, params => new BatteryDriver(params))
+	.set(CommandClass.SWITCH_BINARY, params => new SwitchBinaryDriver(params))
+	.set(CommandClass.SENSOR_MULTILEVEL, params => new SensorMultiLevelDriver(params))
+	.set(CommandClass.SWITCH_MULTILEVEL, params => {
+		if (params.hints.has('fan')) {
+			new FanMultiLevelDriver(params)
+		}
 
-StandardDriverRegistry.set(CommandClass.BATTERY, batteryDriver)
-StandardDriverRegistry.set(CommandClass.SWITCH_BINARY, switchBinaryDriver)
-
-StandardDriverRegistry.set(CommandClass.SWITCH_MULTILEVEL, switchMultiLevelDriver)
-StandardDriverRegistry.set(CommandClass.SWITCH_MULTILEVEL_V2, switchMultiLevelDriver)
-
-StandardDriverRegistry.set(CommandClass.SENSOR_MULTILEVEL, sensorMultiLevelDriver)
-StandardDriverRegistry.set(CommandClass.SENSOR_MULTILEVEL_V2, sensorMultiLevelDriver)
+		return new SwitchMultiLevelDriver(params)
+	})
 
 Object.seal(StandardDriverRegistry)

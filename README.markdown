@@ -11,10 +11,10 @@ This project was initially forked from [velocityzen/homebridge-platform-zwave](h
 
 ## Supported Z-Wave Command Classes
 
-- [SWITCH_BINARY](src/Accessories/Drivers/switchBinaryDriver.ts) (37)
-- [SWITCH_MULTILEVEL](src/Accessories/Drivers/switchMultiLevelDriver.ts) (38)
-- [SENSOR_MULTILEVEL](src/Accessories/Drivers/sensorMultiLevelDriver.ts) (49)
-- [BATTERY](src/Accessories/Drivers/batteryDriver.ts) (128)
+- [SWITCH_BINARY](src/Accessories/Drivers/SwitchBinaryDriver.ts) (37)
+- [SWITCH_MULTILEVEL](src/Accessories/Drivers/SwitchMultiLevelDriver.ts) (38)
+- [SENSOR_MULTILEVEL](src/Accessories/Drivers/SensorMultiLevelDriver.ts) (49)
+- [BATTERY](src/Accessories/Drivers/BatteryDriver.ts) (128)
 
 ## Requirements
 

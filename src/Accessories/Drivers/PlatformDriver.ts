@@ -1,25 +1,37 @@
 import ControllerCommandStreams from '../../Streams/ControllerCommandStreams'
 
-import { IDriverParams } from './Driver'
+import Driver, { IDriverParams } from './Driver'
 import { ValueType } from '../../Values/ValueType'
 import { first } from 'rxjs/operators'
 
 // Platform specific driver to create switches within HomeKit
 // to allow users to add/remove nodes
-export default function platformDriver(params: IDriverParams) {
-	const stream = new ControllerCommandStreams(params.zwave)
+export default class PlatformDriver extends Driver {
+	constructor(params: IDriverParams) {
+		super(params)
 
-	createPlatformSwitch(params, stream, 'Add Node', () => {
-		params.zwave.addNode?.()
-	})
+		const stream = new ControllerCommandStreams(params.zwave)
 
-	createPlatformSwitch(params, stream, 'Add Secure Node', () => {
-		params.zwave.addNode?.(true)
-	})
+		createPlatformSwitch(params, stream, 'Add Node', () => {
+			params.zwave.addNode?.()
+		})
 
-	createPlatformSwitch(params, stream, 'Remove Node', () => {
-		params.zwave.removeNode?.()
-	})
+		createPlatformSwitch(params, stream, 'Add Secure Node', () => {
+			params.zwave.addNode?.(true)
+		})
+
+		createPlatformSwitch(params, stream, 'Remove Node', () => {
+			params.zwave.removeNode?.()
+		})
+	}
+
+	ready(): void {
+		// TODO
+	}
+
+	destroy(): void {
+		// TODO
+	}
 }
 
 function createPlatformSwitch(

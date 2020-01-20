@@ -77,7 +77,7 @@ export class Accessory {
 				valueStreams: this.valueStreams,
 				hints: new Set(this.config.hints ?? []),
 				zwave: this.zwave,
-			})
+			}).ready()
 		}
 
 		this.log.info(`Node Available: ${this.platformAccessory.displayName}`)

@@ -1,4 +1,4 @@
 import { CommandClass } from '../../Zwave/CommandClass'
-import { Driver } from '../Drivers/Driver'
+import Driver, { IDriverParams } from '../Drivers/Driver'
 
-export type IDriverRegistry = Map<CommandClass, Driver>
+export type IDriverRegistry = Map<CommandClass, (params: IDriverParams) => Driver>

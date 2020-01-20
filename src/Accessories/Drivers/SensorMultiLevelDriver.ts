@@ -1,13 +1,24 @@
 import registerCharacteristic from './Support/registerCharacteristic'
 
-import { IDriverParams } from './Driver'
+import Driver, { IDriverParams } from './Driver'
 import BoundValueStream from '../../Streams/BoundValueStream'
 import fahrenheitToCelsiusTransformer from '../../Values/Transformers/fahrenheitToCelsiusTransformer'
 
-export default function sensorMultiLevelDriver(params: IDriverParams) {
-	registerTemperature(params)
-	registerLuminance(params)
-	registerHumidity(params)
+export default class SensorMultiLevelDriver extends Driver {
+	constructor(params: IDriverParams) {
+		super(params)
+		registerTemperature(params)
+		registerLuminance(params)
+		registerHumidity(params)
+	}
+
+	ready(): void {
+		// TODO
+	}
+
+	destroy(): void {
+		// TODO
+	}
 }
 
 function registerTemperature(params: IDriverParams) {
