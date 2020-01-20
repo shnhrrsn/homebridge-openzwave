@@ -1,16 +1,12 @@
-import { IDriverParams } from './Driver'
 import multiLevelBinaryTransformer from '../../Values/Transformers/multiLevelBinaryTransformer'
 import multiLevelTransformer from '../../Values/Transformers/multiLevelTransformer'
 import BoundValueStream from '../../Streams/BoundValueStream'
 import ManagedDriver from './ManagedDriver'
+import { Value } from 'openzwave-shared'
 
 export default class FanMultiLevelDriver extends ManagedDriver {
-	constructor(params: IDriverParams) {
-		super(params)
-
-		const value = this.getValue(0)
-
-		if (!value) {
+	addValue(index: number, value: Value) {
+		if (index !== 0) {
 			return
 		}
 

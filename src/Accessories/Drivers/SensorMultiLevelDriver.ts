@@ -1,24 +1,24 @@
-import { IDriverParams } from './Driver'
 import BoundValueStream from '../../Streams/BoundValueStream'
 import fahrenheitToCelsiusTransformer from '../../Values/Transformers/fahrenheitToCelsiusTransformer'
 import ManagedDriver from './ManagedDriver'
+import { Value } from 'openzwave-shared'
 
 export default class SensorMultiLevelDriver extends ManagedDriver {
-	constructor(params: IDriverParams) {
-		super(params)
-
-		this.registerTemperature()
-		this.registerLuminance()
-		this.registerHumidity()
+	addValue(index: number, value: Value) {
+		switch (index) {
+			case 1:
+				this.registerTemperature(value)
+				break
+			case 3:
+				this.registerLuminance(value)
+				break
+			case 5:
+				this.registerHumidity(value)
+				break
+		}
 	}
 
-	registerTemperature() {
-		const value = this.getValue(1)
-
-		if (value === undefined) {
-			return
-		}
-
+	registerTemperature(value: Value) {
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.TemperatureSensor)
 		if (!service) {
@@ -42,13 +42,7 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 		})
 	}
 
-	registerLuminance() {
-		const value = this.getValue(3)
-
-		if (value === undefined) {
-			return
-		}
-
+	registerLuminance(value: Value) {
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.LightSensor)
 		if (!service) {
@@ -67,13 +61,7 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 		})
 	}
 
-	registerHumidity() {
-		const value = this.getValue(5)
-
-		if (value === undefined) {
-			return
-		}
-
+	registerHumidity(value: Value) {
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.HumiditySensor)
 		if (!service) {

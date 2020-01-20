@@ -11,14 +11,20 @@ export interface RegisterCharacteristicParams {
 	options?: Partial<CoordinateValuesParams>
 }
 
-export default class ManagedDriver extends Driver {
+export default abstract class ManagedDriver extends Driver {
 	private values: Map<number, Value>
 
 	constructor(params: IDriverParams) {
 		super(params)
 
 		this.values = params.values
+
+		for (const [index, value] of this.values.entries()) {
+			this.addValue(index, value)
+		}
 	}
+
+	abstract addValue(index: number, value: Value): void
 
 	getValue(index: number): Value | undefined {
 		return this.values.get(index)

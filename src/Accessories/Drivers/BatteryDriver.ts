@@ -1,14 +1,10 @@
-import { IDriverParams } from './Driver'
 import BoundValueStream from '../../Streams/BoundValueStream'
 import ManagedDriver from './ManagedDriver'
+import { Value } from 'openzwave-shared'
 
 export default class BatteryDriver extends ManagedDriver {
-	constructor(params: IDriverParams) {
-		super(params)
-
-		const value = this.getValue(0)
-
-		if (!value) {
+	addValue(index: number, value: Value) {
+		if (index !== 0) {
 			return
 		}
 
