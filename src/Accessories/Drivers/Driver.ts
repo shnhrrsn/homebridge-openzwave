@@ -12,7 +12,7 @@ export interface IDriverParams {
 	commandClass: CommandClass
 	accessory: Accessory
 	valueStreams: IValueStreams
-	values?: Value[]
+	prefetchedValues?: Value[]
 	indexes: IValueIndexes
 	hints: Set<string>
 	zwave: IZwave

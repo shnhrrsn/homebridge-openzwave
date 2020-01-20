@@ -74,7 +74,7 @@ export class Accessory {
 				log,
 				commandClass,
 				indexes: indexes ? new MappedValueIndexes(indexes) : new NoopValueIndexes(),
-				values: Array.from(values.values()),
+				prefetchedValues: Array.from(values.values()),
 				hap: this.api.hap,
 				accessory: this,
 				valueStreams: this.valueStreams,

@@ -17,7 +17,7 @@ export default abstract class ManagedDriver extends Driver {
 	constructor(params: IDriverParams) {
 		super(params)
 
-		for (const value of params.values ?? []) {
+		for (const value of params.prefetchedValues ?? []) {
 			const index = this.indexes.get(value.index)
 			this.values.set(index, value)
 			this.addValue(index, value)
