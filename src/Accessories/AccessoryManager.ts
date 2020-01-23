@@ -75,6 +75,7 @@ export default class AccessoryManager {
 			return
 		}
 
+		this.registry.get(accessoryId)?.prepareForRemoval()
 		this.api.unregisterPlatformAccessories(pluginName, platformName, [accessory])
 		this.restorableAccessories.delete(accessoryId)
 		this.registry.delete(accessoryId)

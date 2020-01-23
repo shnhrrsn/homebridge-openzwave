@@ -87,6 +87,10 @@ export class Accessory {
 		this.log.info(`Node Available: ${this.platformAccessory.displayName}`)
 	}
 
+	prepareForRemoval() {
+		//
+	}
+
 	getService(
 		serviceType: HAPNodeJS.PredefinedService | string,
 		createAutomatically = true,
