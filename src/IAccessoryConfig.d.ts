@@ -1,6 +1,6 @@
 import { CommandClass } from './Zwave/CommandClass'
 
-export type AccessoryHintType = 'fan' | 'light'
+export type AccessoryHintType = 'fan' | 'light' | 'presence'
 
 export interface IAccessoryConfig {
 	name?: string

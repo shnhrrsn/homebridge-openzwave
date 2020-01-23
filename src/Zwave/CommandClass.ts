@@ -105,4 +105,5 @@ export enum CommandClass {
 	// Virtual Platform Commands
 	VIRTUAL_PLATFORM = 999_000,
 	VIRTUAL_FAN_MULTILEVEL = 999_001,
+	VIRTUAL_PRESENCE_BINARY = 999_002,
 }
