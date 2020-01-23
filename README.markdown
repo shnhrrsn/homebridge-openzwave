@@ -13,6 +13,7 @@ This project was initially forked from [velocityzen/homebridge-platform-zwave](h
 
 - [SWITCH_BINARY](src/Accessories/Drivers/SwitchBinaryDriver.ts) (37)
 - [SWITCH_MULTILEVEL](src/Accessories/Drivers/SwitchMultiLevelDriver.ts) (38)
+- [SENSOR_BINARY](src/Accessories/Drivers/SensorBinaryDriver.ts) (48)
 - [SENSOR_MULTILEVEL](src/Accessories/Drivers/SensorMultiLevelDriver.ts) (49)
 - [BATTERY](src/Accessories/Drivers/BatteryDriver.ts) (128)
 

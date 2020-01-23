@@ -8,11 +8,13 @@ import BatteryDriver from '../Drivers/BatteryDriver'
 import SwitchBinaryDriver from '../Drivers/SwitchBinaryDriver'
 import SensorMultiLevelDriver from '../Drivers/SensorMultiLevelDriver'
 import SwitchMultiLevelDriver from '../Drivers/SwitchMultiLevelDriver'
+import SensorBinaryDriver from '../Drivers/SensorBinaryDriver'
 
 export function populateDriverRegistry(registry: IRegisterableDriverRegistry): IDriverRegistry {
 	// Standard drivers
 	registry.register(CommandClass.BATTERY, BatteryDriver)
 	registry.register(CommandClass.SENSOR_MULTILEVEL, SensorMultiLevelDriver)
+	registry.register(CommandClass.SENSOR_BINARY, SensorBinaryDriver)
 	registry.register(CommandClass.SWITCH_BINARY, SwitchBinaryDriver)
 	registry.register(CommandClass.SWITCH_MULTILEVEL, SwitchMultiLevelDriver)
 	registry.register(CommandClass.VIRTUAL_FAN_MULTILEVEL, FanMultiLevelDriver)
