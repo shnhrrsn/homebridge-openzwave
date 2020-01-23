@@ -6,6 +6,9 @@ import { IConfig } from './IConfig'
 import { Notification } from 'openzwave-shared'
 import Database from './Support/Database'
 import path from 'path'
+import { IDriverRegistry } from './Accessories/Registries/IDriverRegistry'
+import SimpleDriverRegistry from './Accessories/Registries/SimpleDriverRegistry'
+import { populateDriverRegistry } from './Accessories/Registries/populateDriverRegistry'
 
 export default class Platform implements Homebridge.Platform {
 	log: Homebridge.Logger
@@ -14,11 +17,13 @@ export default class Platform implements Homebridge.Platform {
 	zwave: Zwave
 	accessoryManager: AccessoryManager
 	database: Database
+	readonly driverRegistry: IDriverRegistry
 
 	constructor(log: Homebridge.Logger, config: IConfig | undefined, api: Homebridge.Api) {
 		this.log = log
 		this.config = config
 		this.api = api
+		this.driverRegistry = populateDriverRegistry(new SimpleDriverRegistry())
 		this.zwave = new Zwave(this.log, {
 			ConsoleOutput: false,
 			Logging: false,

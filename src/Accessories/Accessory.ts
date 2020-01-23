@@ -61,8 +61,9 @@ export class Accessory {
 				continue
 			}
 
+			const hints = new Set(this.config.hints ?? [])
 			const rewrite = this.config.commands?.rewrite?.find(({ from }) => from === commandClass)
-			const driver = this.driverRegistry.get(rewrite?.to ?? commandClass)
+			const driver = this.driverRegistry.get(rewrite?.to ?? commandClass, hints)
 
 			if (!driver) {
 				continue
@@ -73,12 +74,12 @@ export class Accessory {
 			driver({
 				log,
 				commandClass,
+				hints,
 				indexes: indexes ? new MappedValueIndexes(indexes) : new NoopValueIndexes(),
 				prefetchedValues: Array.from(values.values()),
 				hap: this.api.hap,
 				accessory: this,
 				valueStreams: this.valueStreams,
-				hints: new Set(this.config.hints ?? []),
 				zwave: this.zwave,
 			}).ready()
 		}

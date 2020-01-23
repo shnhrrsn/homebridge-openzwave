@@ -1,6 +1,5 @@
 import Zwave from '../Zwave/Zwave'
 import Platform from '../Platform'
-import StandardDriverRegistry from './Registries/StandardDriverRegistry'
 import loadDeviceConfig from '../Devices/loadDeviceConfig'
 import mergeDeviceConfig from '../Devices/mergeDeviceConfig'
 import Database from '../Support/Database'
@@ -14,6 +13,7 @@ import { INodeInfoParams, INodeIdParams } from '../Streams/INodeStreams'
 import { platformName, pluginName } from '../settings'
 import { CommandClass } from '../Zwave/CommandClass'
 import { IValueParams } from '../Streams/IValueStreams'
+import { IDriverRegistry } from './Registries/IDriverRegistry'
 
 export default class AccessoryManager {
 	log: Homebridge.Logger
@@ -24,6 +24,7 @@ export default class AccessoryManager {
 	nodeIdToCommandsMap: Map<number, AccessoryCommands>
 	restorableAccessories: Map<string, Homebridge.PlatformAccessory>
 	database: Database
+	driverRegistry: IDriverRegistry
 
 	constructor(platform: Platform, database: Database) {
 		if (!platform.zwave) {
@@ -38,6 +39,7 @@ export default class AccessoryManager {
 		this.database = database
 		this.nodeIdToCommandsMap = new Map()
 		this.restorableAccessories = new Map()
+		this.driverRegistry = platform.driverRegistry
 
 		this.zwave.nodeAdded.subscribe(this.onNodeAdded.bind(this))
 		this.zwave.nodeRemoved.subscribe(this.onNodeRemoved.bind(this))
@@ -184,7 +186,7 @@ export default class AccessoryManager {
 			this.zwave,
 			nodeId,
 			platformAccessory,
-			StandardDriverRegistry,
+			this.driverRegistry,
 			commands,
 			config,
 		)

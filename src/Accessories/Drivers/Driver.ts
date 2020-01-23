@@ -5,6 +5,7 @@ import { IZwave } from '../../Zwave/IZwave'
 import { Value } from 'openzwave-shared'
 import { CommandClass } from '../../Zwave/CommandClass'
 import { IValueIndexes } from '../../Values/Indexes/IValueIndexes'
+import { AccessoryHintType } from '../../IAccessoryConfig'
 
 export interface IDriverParams {
 	hap: Homebridge.Hap
@@ -14,7 +15,7 @@ export interface IDriverParams {
 	valueStreams: IValueStreams
 	prefetchedValues?: Value[]
 	indexes: IValueIndexes
-	hints: Set<string>
+	hints: Set<AccessoryHintType>
 	zwave: IZwave
 }
 
