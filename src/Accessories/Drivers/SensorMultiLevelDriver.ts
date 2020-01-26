@@ -22,7 +22,10 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 		const { Service, Characteristic } = this.hap
 		const service = this.accessory.getService(Service.TemperatureSensor)
 		const valueStream = new BoundValueStream(value, this.valueStreams, this.log)
-		const unit = this.getValue(256)
+		const unit = (value.units || 'celsius')
+			.toString()
+			.toUpperCase()
+			.substring(0, 1)
 
 		this.registerCharacteristic(index, {
 			service,
@@ -30,10 +33,8 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 			characteristic: Characteristic.CurrentTemperature,
 			options: {
 				readonly: true,
-				transformer:
-					(unit ?? 'celsius').toString().toLowerCase() !== 'celius'
-						? fahrenheitToCelsiusTransformer()
-						: undefined,
+				// Assumes only units are C/F… No ones reporting Kelvin, right??
+				transformer: unit !== 'C' ? fahrenheitToCelsiusTransformer() : undefined,
 			},
 		})
 	}
