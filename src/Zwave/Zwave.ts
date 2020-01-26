@@ -31,11 +31,11 @@ export default class Zwave implements INodeStreams, IZwave {
 	readonly nodeAvailable = new Subject<INodeInfoParams>()
 	readonly nodeEvent = new Subject<INodeEventParams>()
 	readonly valueAdded = new Subject<IValueParams>()
-	readonly valueChanged = new ReplaySubject<IValueParams>()
-	readonly valueRefreshed = new ReplaySubject<IValueParams>()
+	readonly valueChanged = new ReplaySubject<IValueParams>(1)
+	readonly valueRefreshed = new ReplaySubject<IValueParams>(1)
 	readonly valueRemoved = new Subject<IValueRemovedParams>()
-	readonly notification = new ReplaySubject<INotificationParams>()
-	readonly controllerCommand = new ReplaySubject<IControllerCommandParams>()
+	readonly notification = new ReplaySubject<INotificationParams>(1)
+	readonly controllerCommand = new ReplaySubject<IControllerCommandParams>(1)
 	readonly ozw: OpenZwave
 	readonly log: Homebridge.Logger
 	private valueSetters = new Map<string, ValueSetter>()
