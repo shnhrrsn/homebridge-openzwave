@@ -71,22 +71,22 @@ export default class Zwave implements INodeStreams, IZwave {
 			})
 		})
 
-		this.ozw.on('value added', (nodeId: number, comClass: number, value: Value) => {
-			this.valueAdded.next({ nodeId, comClass, value })
+		this.ozw.on('value added', (nodeId: number, classId: number, value: Value) => {
+			this.valueAdded.next({ nodeId, classId, value })
 		})
 
-		this.ozw.on('value changed', (nodeId: number, comClass: number, value: Value) => {
-			this.valueChanged.next({ nodeId, comClass, value })
+		this.ozw.on('value changed', (nodeId: number, classId: number, value: Value) => {
+			this.valueChanged.next({ nodeId, classId, value })
 		})
 
-		this.ozw.on('value refreshed', (nodeId: number, comClass: number, value: Value) => {
-			this.valueRefreshed.next({ nodeId, comClass, value })
+		this.ozw.on('value refreshed', (nodeId: number, classId: number, value: Value) => {
+			this.valueRefreshed.next({ nodeId, classId, value })
 		})
 
 		this.ozw.on(
 			'value removed',
-			(nodeId: number, comClass: number, instance: number, index: number) => {
-				this.valueRemoved.next({ nodeId, comClass, instance, index })
+			(nodeId: number, classId: number, instance: number, index: number) => {
+				this.valueRemoved.next({ nodeId, classId, instance, index })
 			},
 		)
 

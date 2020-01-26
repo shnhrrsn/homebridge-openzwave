@@ -18,7 +18,7 @@ export default function makeZwaveRefresh(
 
 				zwave.valueRefreshed.next({
 					nodeId: valueId.node_id,
-					comClass: valueId.class_id,
+					classId: valueId.class_id,
 					value: new MockValue(refreshValue),
 				})
 			}

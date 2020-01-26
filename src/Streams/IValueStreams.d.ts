@@ -4,13 +4,13 @@ import { IZwave } from '../Zwave/IZwave'
 
 export interface IValueParams {
 	nodeId: number
-	comClass: number
+	classId: number
 	value: Value
 }
 
 export interface IValueRemovedParams {
 	nodeId: number
-	comClass: number
+	classId: number
 	instance: number
 	index: number
 }

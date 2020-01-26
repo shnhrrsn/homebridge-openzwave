@@ -130,17 +130,17 @@ export default class AccessoryManager {
 		this.removeAccessory(this.nodeIdToAccessoryId(nodeId))
 	}
 
-	onValueAdded({ nodeId, comClass, value }: IValueParams) {
+	onValueAdded({ nodeId, classId, value }: IValueParams) {
 		let nodeIdToCommands = this.nodeIdToCommandsMap.get(nodeId)
 		if (!nodeIdToCommands) {
 			nodeIdToCommands = new Map()
 			this.nodeIdToCommandsMap.set(nodeId, nodeIdToCommands)
 		}
 
-		let commands = nodeIdToCommands.get(comClass)
+		let commands = nodeIdToCommands.get(classId)
 		if (!commands) {
 			commands = new Map()
-			nodeIdToCommands.set(comClass, commands)
+			nodeIdToCommands.set(classId, commands)
 		}
 
 		commands.set(value.index, value)

@@ -8,7 +8,7 @@ export default function makeZwaveSet(setTimeoutInterval?: number): IZwave {
 			const set = () => {
 				zwave.valueChanged.next({
 					nodeId: valueId.node_id,
-					comClass: valueId.class_id,
+					classId: valueId.class_id,
 					value: new MockValue(value),
 				})
 			}
