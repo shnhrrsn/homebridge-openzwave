@@ -1,15 +1,15 @@
 import { IZwave } from '../Zwave/IZwave'
-import NodeScopedValueStreams from '../Streams/NodeScopedValueStreams'
 
 import { IAccessoryConfig } from '../IAccessoryConfig'
 import { CommandClass } from '../Zwave/CommandClass'
 import { IDriverRegistry } from './Registries/IDriverRegistry'
 import { Homebridge } from '../../types/homebridge'
 import { NodeInfo, Value } from 'openzwave-shared'
-import { IValueStreams } from '../Streams/IValueStreams'
+import { IValueObservables } from '../Values/IValueObservables'
 import makePrefixedLogger from '../Support/makePrefixedLogger'
 import MappedValueIndexes from '../Values/Indexes/MappedValueIndexes'
 import NoopValueIndexes from '../Values/Indexes/NoopValueIndexes'
+import ValueSubjects from '../Values/ValueSubjects'
 
 export type AccessoryCommands = Map<CommandClass, Map<number, Value>>
 
@@ -20,7 +20,7 @@ export class Accessory {
 	log: Homebridge.Logger
 	zwave: IZwave
 	commands: AccessoryCommands
-	valueStreams: IValueStreams
+	valueObservables: IValueObservables
 	driverRegistry: IDriverRegistry
 	config: IAccessoryConfig
 
@@ -40,7 +40,7 @@ export class Accessory {
 		this.nodeId = nodeId
 		this.platformAccessory = platformAccessory
 		this.driverRegistry = driverRegistry
-		this.valueStreams = new NodeScopedValueStreams(nodeId, zwave)
+		this.valueObservables = new ValueSubjects(zwave).filter(value => value.node_id === nodeId)
 		this.commands = new Map(commands)
 		this.config = config ?? {}
 	}
@@ -79,7 +79,7 @@ export class Accessory {
 				prefetchedValues: Array.from(values.values()),
 				hap: this.api.hap,
 				accessory: this,
-				valueStreams: this.valueStreams,
+				valueObservables: this.valueObservables,
 				zwave: this.zwave,
 			}).ready()
 		}

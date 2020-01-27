@@ -1,9 +1,9 @@
 import { ValueId, Value } from 'openzwave-shared'
-import { IValueStreams, IValueParams } from './IValueStreams'
 import { ValueType } from '../Values/ValueType'
 import { filter, map, distinctUntilChanged } from 'rxjs/operators'
 import { Observable, Subscription, BehaviorSubject } from 'rxjs'
 import { Homebridge } from '../../types/homebridge'
+import { IValueObservables } from '../Values/IValueObservables'
 
 interface PublishValue {
 	value: ValueType
@@ -12,16 +12,16 @@ interface PublishValue {
 
 export default class BoundValueStream {
 	private valueSubject: BehaviorSubject<PublishValue>
-	private valueStreams: IValueStreams
+	private valueObservables: IValueObservables
 	private log: Homebridge.Logger
 	private valueChangedSubscriber: Subscription
 	private valueRefreshedSubscriber: Subscription
 	readonly valueId: ValueId
 	readonly valueObservable: Observable<ValueType>
 
-	constructor(value: Value, valueStreams: IValueStreams, log: Homebridge.Logger) {
+	constructor(value: Value, valueObservables: IValueObservables, log: Homebridge.Logger) {
 		this.valueId = value
-		this.valueStreams = valueStreams
+		this.valueObservables = valueObservables
 		this.log = log
 		this.valueSubject = new BehaviorSubject<PublishValue>({
 			value: value.value,
@@ -40,29 +40,21 @@ export default class BoundValueStream {
 			map(({ value }) => value),
 		)
 
-		this.valueChangedSubscriber = this.valueStreams.valueChanged
-			.pipe(filter(params => matchesValueId(params.value, value)))
-			.subscribe(this.onValueChanged.bind(this))
+		this.valueChangedSubscriber = this.valueObservables.changes
+			.pipe(filter(valueId => matchesValueId(valueId, value)))
+			.subscribe(this.next.bind(this))
 
-		this.valueRefreshedSubscriber = this.valueStreams.valueRefreshed
-			.pipe(filter(params => matchesValueId(params.value, value)))
-			.subscribe(this.onValueRefreshed.bind(this))
+		this.valueRefreshedSubscriber = this.valueObservables.refreshes
+			.pipe(filter(valueId => matchesValueId(valueId, value)))
+			.subscribe(this.next.bind(this))
 	}
 
 	refresh() {
-		return this.valueStreams.zwave.refreshValue(this.valueId)
+		return this.valueObservables.zwave.refreshValue(this.valueId)
 	}
 
 	set(newValue: ValueType): Promise<ValueType> {
-		return this.valueStreams.zwave.setValue(this.valueId, newValue)
-	}
-
-	private onValueRefreshed(params: IValueParams) {
-		this.next(params.value)
-	}
-
-	private onValueChanged(params: IValueParams) {
-		this.next(params.value)
+		return this.valueObservables.zwave.setValue(this.valueId, newValue)
 	}
 
 	private next(value: Value) {
