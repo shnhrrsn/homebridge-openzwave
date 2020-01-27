@@ -1,6 +1,5 @@
 import Zwave from '../Zwave/Zwave'
 import Platform from '../Platform'
-import Database from '../Support/Database'
 import ValueSubjects from '../Values/ValueSubjects'
 import ControllerAccessory from './ControllerAccessory'
 import loadDeviceConfig from '../Devices/loadDeviceConfig'
@@ -23,11 +22,10 @@ export default class AccessoryManager {
 	private readonly zwave: Zwave
 	private readonly registry = new Map<string, Accessory>()
 	private readonly restorableAccessories = new Map<string, Homebridge.PlatformAccessory>()
-	private readonly database: Database
 	private readonly driverRegistry: IDriverRegistry
 	private readonly valueSubjects: ValueSubjects
 
-	constructor(platform: Platform, database: Database) {
+	constructor(platform: Platform) {
 		if (!platform.zwave) {
 			throw new Error('Platform must have zwave before creating Accessories')
 		}
@@ -36,7 +34,6 @@ export default class AccessoryManager {
 		this.config = platform.config
 		this.api = platform.api
 		this.zwave = platform.zwave
-		this.database = database
 		this.driverRegistry = platform.driverRegistry
 		this.valueSubjects = new ValueSubjects(platform.zwave)
 
@@ -86,13 +83,10 @@ export default class AccessoryManager {
 			this.getInitialNodeName(nodeId, nodeInfo),
 			`${nodeInfo.manufacturerid}/${nodeInfo.productid}`,
 		)
-
-		this.database.storeNode(nodeId, { nodeInfo })
 	}
 
 	onNodeReady({ nodeId, nodeInfo }: INodeInfoParams) {
 		const nodeName = this.getInitialNodeName(nodeId, nodeInfo)
-		this.database.storeNode(nodeId, { nodeInfo })
 		this.log.debug('onNodeReady', nodeName)
 
 		const config = this.config?.accessories?.[String(nodeId)]
@@ -163,8 +157,6 @@ export default class AccessoryManager {
 		const platformAccessory =
 			this.restorableAccessories.get(accessoryId) ||
 			new this.api.platformAccessory(this.getInitialNodeName(nodeId, nodeInfo), accessoryId)
-
-		this.database.storeNode(nodeId, { nodeInfo })
 
 		const params: IAccessoryParams = {
 			config,

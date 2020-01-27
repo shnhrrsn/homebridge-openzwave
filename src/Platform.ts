@@ -1,13 +1,11 @@
 import AccessoryManager from './Accessories/AccessoryManager'
+import SimpleDriverRegistry from './Accessories/Registries/SimpleDriverRegistry'
 import Zwave from './Zwave/Zwave'
 
 import { Homebridge } from '../types/homebridge'
 import { IConfig } from './IConfig'
 import { Notification } from 'openzwave-shared'
-import Database from './Support/Database'
-import path from 'path'
 import { IDriverRegistry } from './Accessories/Registries/IDriverRegistry'
-import SimpleDriverRegistry from './Accessories/Registries/SimpleDriverRegistry'
 import { populateDriverRegistry } from './Accessories/Registries/populateDriverRegistry'
 
 export default class Platform implements Homebridge.Platform {
@@ -16,7 +14,6 @@ export default class Platform implements Homebridge.Platform {
 	api: Homebridge.Api
 	zwave: Zwave
 	accessoryManager: AccessoryManager
-	database: Database
 	readonly driverRegistry: IDriverRegistry
 
 	constructor(log: Homebridge.Logger, config: IConfig | undefined, api: Homebridge.Api) {
@@ -29,11 +26,7 @@ export default class Platform implements Homebridge.Platform {
 			Logging: false,
 			SaveConfiguration: false,
 		})
-		this.database = new Database(
-			this.log,
-			config?.databasePath ?? path.join(api.user.persistPath(), 'openzwave.db.json'),
-		)
-		this.accessoryManager = new AccessoryManager(this, this.database)
+		this.accessoryManager = new AccessoryManager(this)
 
 		if (!config) {
 			this.log.warn('A config.json entry is required. Aborting.')
@@ -55,15 +48,7 @@ export default class Platform implements Homebridge.Platform {
 		this.zwave.ozw.on('driver failed', this.onDriverFailed.bind(this))
 		this.zwave.ozw.on('scan complete', this.onScanComplete.bind(this))
 		this.zwave.ozw.on('notification', this.onNotification.bind(this))
-
-		this.database
-			.load()
-			.then(() => {
-				this.zwave.ozw.connect(devicePath)
-			})
-			.catch(error => {
-				this.log.error('Unable to start platform.', error)
-			})
+		this.zwave.ozw.connect(devicePath)
 	}
 
 	configureAccessory(accessory: Homebridge.PlatformAccessory): void {

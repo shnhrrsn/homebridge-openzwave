@@ -1,10 +1,13 @@
 import { ValueId } from 'openzwave-shared'
 import { ValueType } from '../Values/ValueType'
 import { INodeStreams } from '../Streams/INodeStreams'
+import ZwaveCache from './ZwaveCache'
 
 // TODO: Rename to something less specific?
 
 export interface IZwave extends INodeStreams {
+	cache: ZwaveCache
+
 	getControllerNodeId(): number
 
 	// Throttles refreshes, see ValueRefresher for more

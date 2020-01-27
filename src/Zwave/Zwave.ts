@@ -22,6 +22,7 @@ import { ValueType } from '../Values/ValueType'
 import { IZwave } from './IZwave'
 import { Homebridge } from '../../types/homebridge'
 import { Subject, ReplaySubject } from 'rxjs'
+import ZwaveCache from './ZwaveCache'
 
 export default class Zwave implements INodeStreams, IZwave {
 	readonly nodeRemoved = new Subject<INodeIdParams>()
@@ -36,6 +37,7 @@ export default class Zwave implements INodeStreams, IZwave {
 	readonly valueRemoved = new Subject<IValueRemovedParams>()
 	readonly notification = new ReplaySubject<INotificationParams>(1)
 	readonly controllerCommand = new ReplaySubject<IControllerCommandParams>(1)
+	readonly cache = new ZwaveCache()
 	readonly ozw: OpenZwave
 	readonly log: Homebridge.Logger
 	private valueSetters = new Map<string, ValueSetter>()
@@ -45,6 +47,8 @@ export default class Zwave implements INodeStreams, IZwave {
 	constructor(log: Homebridge.Logger, settings: Partial<OpenZwave.IConstructorParameters>) {
 		this.log = log
 		this.ozw = new OpenZwave(settings)
+
+		this.ozw.on('driver ready', homeId => this.cache.load(homeId))
 
 		this.ozw.on('node removed', (nodeId: number) => {
 			this.nodeRemoved.next({ nodeId })
