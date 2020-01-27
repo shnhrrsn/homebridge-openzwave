@@ -1,17 +1,27 @@
 import { IZwave } from '../Zwave/IZwave'
-
-import { IAccessoryConfig } from '../IAccessoryConfig'
+import { IAccessoryConfig, AccessoryHintType } from '../IAccessoryConfig'
 import { CommandClass } from '../Zwave/CommandClass'
 import { IDriverRegistry } from './Registries/IDriverRegistry'
 import { Homebridge } from '../../types/homebridge'
 import { NodeInfo, Value } from 'openzwave-shared'
 import { IValueObservables } from '../Values/IValueObservables'
+import { distinct } from 'rxjs/operators'
+
 import makePrefixedLogger from '../Support/makePrefixedLogger'
 import MappedValueIndexes from '../Values/Indexes/MappedValueIndexes'
 import NoopValueIndexes from '../Values/Indexes/NoopValueIndexes'
-import ValueSubjects from '../Values/ValueSubjects'
 
 export type AccessoryCommands = Map<CommandClass, Map<number, Value>>
+export interface IAccessoryParams {
+	log: Homebridge.Logger
+	api: Homebridge.Api
+	zwave: IZwave
+	nodeId: number
+	platformAccessory: Homebridge.PlatformAccessory
+	driverRegistry: IDriverRegistry
+	valueObservables: IValueObservables
+	config?: IAccessoryConfig
+}
 
 export class Accessory {
 	nodeId: number
@@ -19,30 +29,25 @@ export class Accessory {
 	api: Homebridge.Api
 	log: Homebridge.Logger
 	zwave: IZwave
-	commands: AccessoryCommands
 	valueObservables: IValueObservables
 	driverRegistry: IDriverRegistry
 	config: IAccessoryConfig
+	ignoredCommands: Set<CommandClass>
+	prefixedLog: Homebridge.Logger
+	hints: Set<AccessoryHintType>
 
-	constructor(
-		log: Homebridge.Logger,
-		api: Homebridge.Api,
-		zwave: IZwave,
-		nodeId: number,
-		platformAccessory: Homebridge.PlatformAccessory,
-		driverRegistry: IDriverRegistry,
-		commands: AccessoryCommands,
-		config?: IAccessoryConfig,
-	) {
-		this.log = log
-		this.api = api
-		this.zwave = zwave
-		this.nodeId = nodeId
-		this.platformAccessory = platformAccessory
-		this.driverRegistry = driverRegistry
-		this.valueObservables = new ValueSubjects(zwave).filter(value => value.node_id === nodeId)
-		this.commands = new Map(commands)
-		this.config = config ?? {}
+	constructor(params: IAccessoryParams) {
+		this.log = params.log
+		this.api = params.api
+		this.zwave = params.zwave
+		this.nodeId = params.nodeId
+		this.platformAccessory = params.platformAccessory
+		this.driverRegistry = params.driverRegistry
+		this.valueObservables = params.valueObservables
+		this.config = params.config ?? {}
+		this.ignoredCommands = new Set(this.config.commands?.ignored ?? [])
+		this.prefixedLog = makePrefixedLogger(this.log, `node ${this.nodeId}`)
+		this.hints = new Set(this.config.hints ?? [])
 	}
 
 	configure(nodeInfo: NodeInfo) {
@@ -53,38 +58,41 @@ export class Accessory {
 			this.configureInfoService(infoService, nodeInfo)
 		}
 
-		const ignoredCommands = new Set(this.config.commands?.ignored ?? [])
-		const log = makePrefixedLogger(this.log, `node ${this.nodeId}`)
-
-		for (const [commandClass, values] of this.commands.entries()) {
-			if (ignoredCommands.has(commandClass)) {
-				continue
-			}
-
-			const hints = new Set(this.config.hints ?? [])
-			const rewrite = this.config.commands?.rewrite?.find(({ from }) => from === commandClass)
-			const driver = this.driverRegistry.get(rewrite?.to ?? commandClass, hints)
-
-			if (!driver) {
-				continue
-			}
-
-			const indexes = rewrite?.indexes
-
-			driver({
-				log,
-				commandClass,
-				hints,
-				indexes: indexes ? new MappedValueIndexes(indexes) : new NoopValueIndexes(),
-				prefetchedValues: Array.from(values.values()),
-				hap: this.api.hap,
-				accessory: this,
-				valueObservables: this.valueObservables,
-				zwave: this.zwave,
-			}).ready()
-		}
+		this.valueObservables.additions
+			.pipe(distinct(value => value.class_id))
+			.subscribe(({ class_id: commandClass }) => {
+				this.registerCommandClass(commandClass)
+			})
 
 		this.log.info(`Node Available: ${this.platformAccessory.displayName}`)
+	}
+
+	registerCommandClass(commandClass: CommandClass) {
+		if (this.ignoredCommands.has(commandClass)) {
+			return
+		}
+
+		const rewrite = this.config.commands?.rewrite?.find(({ from }) => from === commandClass)
+		const driver = this.driverRegistry.get(rewrite?.to ?? commandClass, this.hints)
+
+		if (!driver) {
+			return
+		}
+
+		const indexes = rewrite?.indexes
+
+		driver({
+			commandClass,
+			hints: this.hints,
+			log: this.prefixedLog,
+			indexes: indexes ? new MappedValueIndexes(indexes) : new NoopValueIndexes(),
+			hap: this.api.hap,
+			accessory: this,
+			valueObservables: this.valueObservables.filter(
+				value => value.class_id === commandClass,
+			),
+			zwave: this.zwave,
+		}).ready()
 	}
 
 	prepareForRemoval() {

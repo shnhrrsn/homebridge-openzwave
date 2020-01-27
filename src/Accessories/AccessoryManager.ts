@@ -1,30 +1,31 @@
 import Zwave from '../Zwave/Zwave'
 import Platform from '../Platform'
+import Database from '../Support/Database'
+import ValueSubjects from '../Values/ValueSubjects'
+import ControllerAccessory from './ControllerAccessory'
 import loadDeviceConfig from '../Devices/loadDeviceConfig'
 import mergeDeviceConfig from '../Devices/mergeDeviceConfig'
-import Database from '../Support/Database'
 
-import { Accessory, AccessoryCommands } from './Accessory'
+import { Accessory, IAccessoryParams } from './Accessory'
 import { IConfig } from '../IConfig'
 import { IAccessoryConfig } from '../IAccessoryConfig'
 import { Homebridge } from '../../types/homebridge'
 import { NodeInfo } from 'openzwave-shared'
 import { INodeInfoParams, INodeIdParams } from '../Streams/INodeStreams'
 import { platformName, pluginName } from '../settings'
-import { CommandClass } from '../Zwave/CommandClass'
 import { IValueParams } from '../Streams/IValueStreams'
 import { IDriverRegistry } from './Registries/IDriverRegistry'
 
 export default class AccessoryManager {
-	log: Homebridge.Logger
-	config?: IConfig
-	api: Homebridge.Api
-	zwave: Zwave
-	registry: Map<string, Accessory>
-	nodeIdToCommandsMap: Map<number, AccessoryCommands>
-	restorableAccessories: Map<string, Homebridge.PlatformAccessory>
-	database: Database
-	driverRegistry: IDriverRegistry
+	private readonly log: Homebridge.Logger
+	private readonly config?: IConfig
+	private readonly api: Homebridge.Api
+	private readonly zwave: Zwave
+	private readonly registry = new Map<string, Accessory>()
+	private readonly restorableAccessories = new Map<string, Homebridge.PlatformAccessory>()
+	private readonly database: Database
+	private readonly driverRegistry: IDriverRegistry
+	private readonly valueSubjects: ValueSubjects
 
 	constructor(platform: Platform, database: Database) {
 		if (!platform.zwave) {
@@ -35,11 +36,9 @@ export default class AccessoryManager {
 		this.config = platform.config
 		this.api = platform.api
 		this.zwave = platform.zwave
-		this.registry = new Map()
 		this.database = database
-		this.nodeIdToCommandsMap = new Map()
-		this.restorableAccessories = new Map()
 		this.driverRegistry = platform.driverRegistry
+		this.valueSubjects = new ValueSubjects(platform.zwave)
 
 		this.zwave.nodeAdded.subscribe(this.onNodeAdded.bind(this))
 		this.zwave.nodeRemoved.subscribe(this.onNodeRemoved.bind(this))
@@ -131,20 +130,7 @@ export default class AccessoryManager {
 	}
 
 	onValueAdded({ nodeId, classId, value }: IValueParams) {
-		let nodeIdToCommands = this.nodeIdToCommandsMap.get(nodeId)
-		if (!nodeIdToCommands) {
-			nodeIdToCommands = new Map()
-			this.nodeIdToCommandsMap.set(nodeId, nodeIdToCommands)
-		}
-
-		let commands = nodeIdToCommands.get(classId)
-		if (!commands) {
-			commands = new Map()
-			nodeIdToCommands.set(classId, commands)
-		}
-
-		commands.set(value.index, value)
-		this.database.storeNode(nodeId, { commands: nodeIdToCommands })
+		// Noop
 	}
 
 	nodeIdToAccessoryId(nodeId: number): string {
@@ -178,35 +164,30 @@ export default class AccessoryManager {
 			this.restorableAccessories.get(accessoryId) ||
 			new this.api.platformAccessory(this.getInitialNodeName(nodeId, nodeInfo), accessoryId)
 
-		const commands = this.getNodeCommands(nodeId)
-		this.database.storeNode(nodeId, { nodeInfo, commands })
+		this.database.storeNode(nodeId, { nodeInfo })
 
-		accessory = new Accessory(
-			this.log,
-			this.api,
-			this.zwave,
+		const params: IAccessoryParams = {
+			config,
 			nodeId,
 			platformAccessory,
-			this.driverRegistry,
-			commands,
-			config,
-		)
+			log: this.log,
+			api: this.api,
+			zwave: this.zwave,
+			driverRegistry: this.driverRegistry,
+			valueObservables: this.valueSubjects.filter(value => value.node_id === nodeId),
+		}
+
+		if (nodeId === this.zwave.getControllerNodeId()) {
+			accessory = new ControllerAccessory(params)
+		} else {
+			accessory = new Accessory(params)
+		}
 
 		if (this.restorableAccessories.delete(accessoryId)) {
 			this.registry.set(accessoryId, accessory)
 		}
 
 		return accessory
-	}
-
-	private getNodeCommands(nodeId: number): AccessoryCommands {
-		if (nodeId === this.zwave.getControllerNodeId()) {
-			const commands: AccessoryCommands = new Map()
-			commands.set(CommandClass.VIRTUAL_PLATFORM, new Map())
-			return commands
-		}
-
-		return this.nodeIdToCommandsMap.get(nodeId) ?? new Map()
 	}
 
 	private getInitialNodeName(nodeId: number, nodeInfo?: NodeInfo) {

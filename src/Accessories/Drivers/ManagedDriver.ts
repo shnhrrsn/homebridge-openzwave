@@ -17,11 +17,11 @@ export default abstract class ManagedDriver extends Driver {
 	constructor(params: IDriverParams) {
 		super(params)
 
-		for (const value of params.prefetchedValues ?? []) {
+		params.valueObservables.additions.subscribe(value => {
 			const index = this.indexes.get(value.index)
 			this.values.set(index, value)
 			this.addValue(index, value)
-		}
+		})
 	}
 
 	abstract addValue(index: number, value: Value): void
