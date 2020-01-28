@@ -97,11 +97,13 @@ export default class ValueCoordinator {
 		const homekitValue = this.transformer.zwaveToHomeKit(value)
 		this.log.debug('sendZwaveValueToHomeKit', homekitValue)
 
-		if (callback) {
-			callback(null, homekitValue)
-		} else {
-			this.characteristic.updateValue(homekitValue)
-		}
+		setImmediate(() => {
+			if (callback) {
+				callback(null, homekitValue)
+			} else {
+				this.characteristic.updateValue(homekitValue)
+			}
+		})
 	}
 
 	private sendHomeKitValueToZwave(homekitValue: ValueType, callback: (error?: Error) => void) {
