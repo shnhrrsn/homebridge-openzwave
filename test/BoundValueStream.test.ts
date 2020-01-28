@@ -6,6 +6,7 @@ import BoundValueStream from '../src/Streams/BoundValueStream'
 import takeImmediateValue from '../src/Support/takeImmediateValue'
 import makeZwaveSet from './helpers/makeZwaveSet'
 import makeZwaveRefresh from './helpers/makeZwaveRefresh'
+import { MockValueObservables } from '../mocks/MockValueObservables'
 
 test('initial value', t => {
 	const zwave = new MockZwave({
@@ -13,14 +14,18 @@ test('initial value', t => {
 		handleRefreshValue() {},
 	})
 	const initialValue = new MockValue(63)
-	const boundValueStream = new BoundValueStream(initialValue, zwave, new MockNoopLogger())
+	const boundValueStream = new BoundValueStream(
+		initialValue,
+		new MockValueObservables(zwave),
+		new MockNoopLogger(),
+	)
 	t.is(63, takeImmediateValue(boundValueStream.valueObservable))
 })
 
 test('refresh value', t => {
 	const boundValueStream = new BoundValueStream(
 		new MockValue(63),
-		makeZwaveRefresh(87),
+		new MockValueObservables(makeZwaveRefresh(87)),
 		new MockNoopLogger(),
 	)
 	boundValueStream.refresh()
@@ -30,7 +35,7 @@ test('refresh value', t => {
 test('set value', t => {
 	const boundValueStream = new BoundValueStream(
 		new MockValue(63),
-		makeZwaveSet(),
+		new MockValueObservables(makeZwaveSet()),
 		new MockNoopLogger(),
 	)
 	t.is(63, takeImmediateValue(boundValueStream.valueObservable))
@@ -42,7 +47,7 @@ test('set value', t => {
 test('slow set value', async t => {
 	const boundValueStream = new BoundValueStream(
 		new MockValue(63),
-		makeZwaveSet(100),
+		new MockValueObservables(makeZwaveSet(100)),
 		new MockNoopLogger(),
 	)
 	t.is(63, takeImmediateValue(boundValueStream.valueObservable))
@@ -57,7 +62,7 @@ test('slow set value', async t => {
 test('slow multi set value', async t => {
 	const boundValueStream = new BoundValueStream(
 		new MockValue(63),
-		makeZwaveSet(100),
+		new MockValueObservables(makeZwaveSet(100)),
 		new MockNoopLogger(),
 	)
 	t.is(63, takeImmediateValue(boundValueStream.valueObservable))

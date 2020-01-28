@@ -6,6 +6,7 @@ import {
 	INodeIdParams,
 	INotificationParams,
 	IControllerCommandParams,
+	INodeEventParams,
 } from '../src/Streams/INodeStreams'
 import { ValueId } from 'openzwave-shared'
 import { ValueType } from '../src/Values/ValueType'
@@ -13,6 +14,7 @@ import ValueSetter from '../src/Values/ValueSetter'
 import stringifyValueId from '../src/Support/stringifyValueId'
 import MockNoopLogger from './MockNoopLogger'
 import ValueRefresher from '../src/Values/ValueRefresher'
+import ZwaveCache from '../src/Zwave/ZwaveCache'
 
 export interface MockZwaveParams {
 	handleRefreshValue(valueId: ValueId): void
@@ -30,7 +32,9 @@ export default class MockZwave implements IZwave {
 	readonly nodeRemoved = new Subject<INodeIdParams>()
 	readonly nodeReset = new Subject<INodeIdParams>()
 	readonly notification = new Subject<INotificationParams>()
+	readonly nodeEvent = new Subject<INodeEventParams>()
 	readonly controllerCommand = new Subject<IControllerCommandParams>()
+	readonly cache = new ZwaveCache()
 	private valueSetters = new Map<string, ValueSetter>()
 	private valueRefreshers = new Map<string, ValueRefresher>()
 	private params: MockZwaveParams
@@ -77,5 +81,9 @@ export default class MockZwave implements IZwave {
 
 	getControllerNodeId(): number {
 		return 1
+	}
+
+	isNodeListeningDevice(nodeId: number): boolean {
+		return true
 	}
 }
