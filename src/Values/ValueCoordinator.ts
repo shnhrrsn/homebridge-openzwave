@@ -15,7 +15,7 @@ export type CoordinateValuesParams = {
 	transformer?: IValueTransformer
 }
 
-type HomeKitCallback = (error?: Error, ...args: any) => void
+type HomeKitCallback = (error: Error | null, value?: ValueType) => void
 
 // Coordinates value streams from both Zwave and HomeKit for a single Characteristic
 export default class ValueCoordinator {
@@ -98,7 +98,7 @@ export default class ValueCoordinator {
 		this.log.debug('sendZwaveValueToHomeKit', homekitValue)
 
 		if (callback) {
-			callback(undefined, homekitValue)
+			callback(null, homekitValue)
 		} else {
 			this.characteristic.updateValue(homekitValue)
 		}
