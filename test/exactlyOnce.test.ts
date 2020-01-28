@@ -37,3 +37,11 @@ test('exactly once', t => {
 	wrappedCallback(undefined)
 	t.is(count, 1)
 })
+
+test('params', t => {
+	const wrappedCallback = exactlyOnce((a, b, c) => {
+		return { a, b, c }
+	})
+
+	t.deepEqual({ a: 'a', b: 'b', c: 'c' }, wrappedCallback('a', 'b', 'c'))
+})
