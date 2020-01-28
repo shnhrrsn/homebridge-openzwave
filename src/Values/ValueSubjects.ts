@@ -26,8 +26,8 @@ export default class ValueSubjects implements IValueObservables {
 	}
 
 	constructor(valueStreams: IValueStreams) {
-		valueStreams.valueAdded.subscribe(this.onValue.bind(this))
-		valueStreams.valueChanged.subscribe(this.onValue.bind(this))
+		valueStreams.valueAdded.pipe(map(({ value }) => value)).subscribe(this.onValue.bind(this))
+		valueStreams.valueChanged.pipe(map(({ value }) => value)).subscribe(this.onValue.bind(this))
 		valueStreams.valueRemoved.subscribe(this.onValueRemoved.bind(this))
 
 		this.zwave = valueStreams.zwave
@@ -43,13 +43,13 @@ export default class ValueSubjects implements IValueObservables {
 		)
 	}
 
-	private onValue(params: IValueParams) {
-		const valueId = stringifyValueId(params.value)
+	private onValue(value: Value) {
+		const valueId = stringifyValueId(value)
 		if (!this.registry.has(valueId)) {
-			this.subject.next(params.value)
+			this.subject.next(value)
 		}
 
-		this.registry.set(valueId, params.value)
+		this.registry.set(valueId, value)
 	}
 
 	private onValueRemoved(params: IValueRemovedParams) {
@@ -69,6 +69,12 @@ export default class ValueSubjects implements IValueObservables {
 
 	filter(predicate: (valueId: ValueId) => boolean): IValueObservables {
 		return filteredValueObservables(this, predicate)
+	}
+
+	seed(values: Value[]) {
+		for (const value of values) {
+			this.onValue(value)
+		}
 	}
 }
 
