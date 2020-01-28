@@ -15,7 +15,7 @@ export default class FanMultiLevelDriver extends ManagedDriver {
 		const valueStream = new BoundValueStream(value, this.valueObservables, this.log)
 
 		// On/Off
-		this.registerCharacteristic(index, {
+		this.registerCharacteristic(index, value, {
 			service,
 			valueStream,
 			characteristic: Characteristic.Active,
@@ -28,7 +28,7 @@ export default class FanMultiLevelDriver extends ManagedDriver {
 		})
 
 		// Speed
-		this.registerCharacteristic(index, {
+		this.registerCharacteristic(index, value, {
 			service,
 			valueStream,
 			characteristic: Characteristic.RotationSpeed,

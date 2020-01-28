@@ -12,12 +12,11 @@ export default class BatteryDriver extends ManagedDriver {
 		const service = this.accessory.getService(Service.BatteryService)
 		const valueStream = new BoundValueStream(value, this.valueObservables, this.log)
 
-		this.registerCharacteristic(index, {
+		this.registerCharacteristic(index, value, {
 			service,
 			valueStream,
 			characteristic: Characteristic.BatteryLevel,
 			options: {
-				readonly: true,
 				transformer: {
 					zwaveToHomeKit(value) {
 						return Math.round(Number(value))
@@ -26,12 +25,11 @@ export default class BatteryDriver extends ManagedDriver {
 			},
 		})
 
-		this.registerCharacteristic(index, {
+		this.registerCharacteristic(index, value, {
 			service,
 			valueStream,
 			characteristic: Characteristic.StatusLowBattery,
 			options: {
-				readonly: true,
 				transformer: {
 					zwaveToHomeKit(value) {
 						return Number(value) < 20

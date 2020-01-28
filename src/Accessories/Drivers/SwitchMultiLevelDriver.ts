@@ -15,7 +15,7 @@ export default class SwitchMultiLevelDriver extends ManagedDriver {
 		const valueStream = new BoundValueStream(value, this.valueObservables, this.log)
 
 		// On/Off
-		this.registerCharacteristic(index, {
+		this.registerCharacteristic(index, value, {
 			service,
 			valueStream,
 			characteristic: Characteristic.On,
@@ -25,7 +25,7 @@ export default class SwitchMultiLevelDriver extends ManagedDriver {
 		})
 
 		// Brightness
-		this.registerCharacteristic(index, {
+		this.registerCharacteristic(index, value, {
 			service,
 			valueStream,
 			characteristic: Characteristic.Brightness,

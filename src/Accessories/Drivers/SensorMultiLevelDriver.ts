@@ -27,12 +27,11 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 			.toUpperCase()
 			.substring(0, 1)
 
-		this.registerCharacteristic(index, {
+		this.registerCharacteristic(index, value, {
 			service,
 			valueStream,
 			characteristic: Characteristic.CurrentTemperature,
 			options: {
-				readonly: true,
 				// Assumes only units are C/F… No ones reporting Kelvin, right??
 				transformer: unit !== 'C' ? fahrenheitToCelsiusTransformer() : undefined,
 			},
@@ -44,13 +43,10 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 		const service = this.accessory.getService(Service.LightSensor)
 		const valueStream = new BoundValueStream(value, this.valueObservables, this.log)
 
-		this.registerCharacteristic(index, {
+		this.registerCharacteristic(index, value, {
 			service,
 			valueStream,
 			characteristic: Characteristic.CurrentAmbientLightLevel,
-			options: {
-				readonly: true,
-			},
 		})
 	}
 
@@ -59,13 +55,10 @@ export default class SensorMultiLevelDriver extends ManagedDriver {
 		const service = this.accessory.getService(Service.HumiditySensor)
 		const valueStream = new BoundValueStream(value, this.valueObservables, this.log)
 
-		this.registerCharacteristic(index, {
+		this.registerCharacteristic(index, value, {
 			service,
 			valueStream,
 			characteristic: Characteristic.CurrentRelativeHumidity,
-			options: {
-				readonly: true,
-			},
 		})
 	}
 }

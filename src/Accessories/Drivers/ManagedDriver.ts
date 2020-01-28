@@ -32,6 +32,7 @@ export default abstract class ManagedDriver extends Driver {
 
 	registerCharacteristic(
 		index: number,
+		value: Value,
 		{ service, characteristic, valueStream, options }: RegisterCharacteristicParams,
 	) {
 		if (!service) {
@@ -48,6 +49,7 @@ export default abstract class ManagedDriver extends Driver {
 			log: makePrefixedLogger(this.log, (characteristicInstance as any).displayName),
 			valueStream,
 			characteristic: characteristicInstance,
+			readonly: value.read_only,
 			...options,
 		}).start()
 	}

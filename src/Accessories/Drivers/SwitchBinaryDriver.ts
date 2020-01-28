@@ -12,7 +12,7 @@ export default class SwitchBinaryDriver extends ManagedDriver {
 		const service = this.accessory.getService(Service.Switch)
 		const valueStream = new BoundValueStream(value, this.valueObservables, this.log)
 
-		this.registerCharacteristic(index, {
+		this.registerCharacteristic(index, value, {
 			service,
 			valueStream,
 			characteristic: Characteristic.On,

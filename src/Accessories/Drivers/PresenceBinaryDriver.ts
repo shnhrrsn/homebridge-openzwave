@@ -12,7 +12,7 @@ export default class PresenceBinaryDriver extends ManagedDriver {
 		const service = this.accessory.getService(Service.OccupancySensor)
 		const valueStream = new BoundValueStream(value, this.valueObservables, this.log)
 
-		this.registerCharacteristic(index, {
+		this.registerCharacteristic(index, value, {
 			service,
 			valueStream,
 			characteristic: Characteristic.OccupancyDetected,
