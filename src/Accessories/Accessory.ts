@@ -35,6 +35,7 @@ export class Accessory {
 	ignoredCommands: Set<CommandClass>
 	prefixedLog: Homebridge.Logger
 	hints: Set<AccessoryHintType>
+	isListeningDevice: boolean
 
 	constructor(params: IAccessoryParams) {
 		this.log = params.log
@@ -48,6 +49,7 @@ export class Accessory {
 		this.ignoredCommands = new Set(this.config.commands?.ignored ?? [])
 		this.prefixedLog = makePrefixedLogger(this.log, `node ${this.nodeId}`)
 		this.hints = new Set(this.config.hints ?? [])
+		this.isListeningDevice = this.zwave.isNodeListeningDevice(this.nodeId)
 	}
 
 	configure(nodeInfo: NodeInfo) {

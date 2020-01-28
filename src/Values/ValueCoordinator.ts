@@ -12,6 +12,7 @@ export type CoordinateValuesParams = {
 	characteristic: HAPNodeJS.Characteristic
 	valueStream: BoundValueStream
 	readonly?: boolean
+	listening: boolean
 	transformer?: IValueTransformer
 }
 
@@ -24,6 +25,7 @@ export default class ValueCoordinator {
 	readonly valueStream: BoundValueStream
 	readonly transformer: IValueTransformer
 	readonly readonly: boolean
+	readonly listening: boolean
 	private valueUpdateObserver?: Subscription
 
 	constructor({
@@ -31,12 +33,14 @@ export default class ValueCoordinator {
 		characteristic,
 		valueStream,
 		readonly,
+		listening,
 		transformer,
 	}: CoordinateValuesParams) {
 		this.log = log
 		this.characteristic = characteristic
 		this.valueStream = valueStream
-		this.readonly = readonly ?? false
+		this.readonly = listening === false || (readonly ?? false)
+		this.listening = listening
 		this.transformer = transformer ?? noopValueTransformer()
 
 		if (!this.transformer.homekitToZwave && !this.readonly) {
@@ -72,19 +76,27 @@ export default class ValueCoordinator {
 
 		// Handle explicit HomeKit value requests
 		this.characteristic.on('get', (callback: HomeKitCallback) => {
+			let didReceiveValue = false
+			callback = exactlyOnce(callback, this.log)
+
 			// valueUpdate is a ReplaySubject, so we can respond
 			// with the last cached value instantly
 			valueUpdate
 				.pipe(first())
 				.subscribe(value => {
-					this.sendZwaveValueToHomeKit(value, exactlyOnce(callback, this.log))
+					didReceiveValue = true
+					this.sendZwaveValueToHomeKit(value, callback)
 				})
 				.unsubscribe()
 
-			// However, we still want to grab the fresh value from
-			// the device, so we’ll request a refresh and that will
-			// be sent to HomeKit once it’s resolved
-			this.refreshZwaveValue()
+			if (!this.listening && !didReceiveValue) {
+				callback(new Error('Unable to request value'))
+			} else {
+				// However, we still want to grab the fresh value from
+				// the device, so we’ll request a refresh and that will
+				// be sent to HomeKit once it’s resolved
+				this.refreshZwaveValue()
+			}
 		})
 	}
 
@@ -95,7 +107,10 @@ export default class ValueCoordinator {
 
 	private sendZwaveValueToHomeKit(value: ValueType, callback?: HomeKitCallback) {
 		const homekitValue = this.transformer.zwaveToHomeKit(value)
-		this.log.debug('sendZwaveValueToHomeKit', homekitValue)
+		this.log.debug(
+			`sendZwaveValueToHomeKit via ${callback ? 'callback' : 'updateValue'}`,
+			homekitValue,
+		)
 
 		setImmediate(() => {
 			if (callback) {
@@ -129,6 +144,11 @@ export default class ValueCoordinator {
 	}
 
 	private refreshZwaveValue() {
+		if (!this.listening) {
+			this.log.debug('Refusing to refresh value for non-listening device')
+			return
+		}
+
 		this.valueStream.refresh()
 	}
 }

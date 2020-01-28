@@ -50,6 +50,7 @@ export default abstract class ManagedDriver extends Driver {
 			valueStream,
 			characteristic: characteristicInstance,
 			readonly: value.read_only,
+			listening: this.accessory.isListeningDevice,
 			...options,
 		}).start()
 	}

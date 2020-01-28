@@ -154,6 +154,10 @@ export default class Zwave implements INodeStreams, IZwave {
 		return this.ozw.getControllerNodeId()
 	}
 
+	isNodeListeningDevice(nodeId: number): boolean {
+		return this.ozw.isNodeListeningDevice(nodeId)
+	}
+
 	addNode(isSecure: boolean): boolean {
 		return this.ozw.addNode(isSecure)
 	}

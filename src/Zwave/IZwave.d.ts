@@ -9,6 +9,7 @@ export interface IZwave extends INodeStreams {
 	cache: ZwaveCache
 
 	getControllerNodeId(): number
+	isNodeListeningDevice(nodeId: number): boolean
 
 	// Throttles refreshes, see ValueRefresher for more
 	refreshValue(valueId: ValueId): void
