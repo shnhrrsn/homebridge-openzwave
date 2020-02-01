@@ -47,7 +47,7 @@ export default class MockZwave implements IZwave {
 		return this
 	}
 
-	refreshValue(valueId: ValueId): void {
+	refreshValue(valueId: ValueId, reason: string): void {
 		const key = stringifyValueId(valueId)
 		let refresher = this.valueRefreshers.get(key)
 
@@ -56,7 +56,7 @@ export default class MockZwave implements IZwave {
 			this.valueRefreshers.set(key, refresher)
 		}
 
-		refresher.refresh()
+		refresher.refresh(reason)
 	}
 
 	unsafeRefreshValue(valueId: ValueId): void {

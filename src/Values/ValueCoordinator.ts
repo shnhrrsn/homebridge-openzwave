@@ -64,7 +64,7 @@ export default class ValueCoordinator {
 
 		// If we didn’t immediately load a value, refresh
 		if (!hadInitialValue) {
-			this.valueStream.refresh()
+			this.valueStream.refresh('No initial value on startup')
 		}
 
 		// Handle explicit HomeKit value setting
@@ -95,7 +95,7 @@ export default class ValueCoordinator {
 				// However, we still want to grab the fresh value from
 				// the device, so we’ll request a refresh and that will
 				// be sent to HomeKit once it’s resolved
-				this.refreshZwaveValue()
+				this.refreshZwaveValue('HomeKit requested')
 			}
 		})
 	}
@@ -139,16 +139,18 @@ export default class ValueCoordinator {
 			.then(() => callback())
 			.catch(callback)
 			.finally(() => {
-				setTimeout(this.refreshZwaveValue.bind(this), 5000)
+				setTimeout(() => {
+					this.refreshZwaveValue('Set confirmation')
+				}, 5000)
 			})
 	}
 
-	private refreshZwaveValue() {
+	private refreshZwaveValue(reason: String) {
 		if (!this.listening) {
 			this.log.debug('Refusing to refresh value for non-listening device')
 			return
 		}
 
-		this.valueStream.refresh()
+		this.valueStream.refresh(reason)
 	}
 }

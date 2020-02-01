@@ -12,7 +12,7 @@ export interface IZwave extends INodeStreams {
 	isNodeListeningDevice(nodeId: number): boolean
 
 	// Throttles refreshes, see ValueRefresher for more
-	refreshValue(valueId: ValueId): void
+	refreshValue(valueId: ValueId, reason: String): void
 
 	// Pass through to ozw refreshValue
 	unsafeRefreshValue(valueId: ValueId): void

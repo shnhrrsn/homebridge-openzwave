@@ -49,8 +49,8 @@ export default class BoundValueStream {
 			.subscribe(this.next.bind(this))
 	}
 
-	refresh() {
-		return this.valueObservables.zwave.refreshValue(this.valueId)
+	refresh(reason: String) {
+		return this.valueObservables.zwave.refreshValue(this.valueId, reason)
 	}
 
 	set(newValue: ValueType): Promise<ValueType> {

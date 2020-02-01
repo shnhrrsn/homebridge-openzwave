@@ -118,7 +118,7 @@ export default class Zwave implements INodeStreams, IZwave {
 		)
 	}
 
-	refreshValue(valueId: ValueId) {
+	refreshValue(valueId: ValueId, reason: String) {
 		const key = stringifyValueId(valueId)
 		let refresher = this.valueRefreshers.get(key)
 
@@ -127,7 +127,7 @@ export default class Zwave implements INodeStreams, IZwave {
 			this.valueRefreshers.set(key, refresher)
 		}
 
-		refresher.refresh()
+		refresher.refresh(reason)
 	}
 
 	unsafeRefreshValue(valueId: ValueId) {

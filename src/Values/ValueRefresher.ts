@@ -19,7 +19,7 @@ export default class ValueRefresher {
 		this.valueStreams = valueStreams
 	}
 
-	refresh() {
+	refresh(reason: String) {
 		if (this.isRefreshing) {
 			this.log.debug('Already refreshing')
 			return
@@ -27,7 +27,7 @@ export default class ValueRefresher {
 
 		this.valueStreams.zwave.unsafeRefreshValue(this.valueId)
 		this.isRefreshing = true
-		this.log.debug('Refreshing')
+		this.log.debug(`Refreshing: ${reason}`)
 
 		takeFreshValue(this.valueStreams.valueRefreshed, 10_000)
 			.then(() => this.log.debug('Refreshed'))

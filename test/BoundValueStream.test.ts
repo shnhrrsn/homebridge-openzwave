@@ -28,7 +28,7 @@ test('refresh value', t => {
 		new MockValueObservables(makeZwaveRefresh(87)),
 		new MockNoopLogger(),
 	)
-	boundValueStream.refresh()
+	boundValueStream.refresh('test')
 	t.is(87, takeImmediateValue(boundValueStream.valueObservable))
 })
 
