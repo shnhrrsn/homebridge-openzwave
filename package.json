@@ -11,7 +11,7 @@
     "code:lint": "prettier --check **/*.ts *.json *.yaml .babelrc *.markdown",
     "util": "node utils/util.js",
     "test": "ava --verbose",
-    "testharness": "node utils/testharness.js",
+    "testharness": "node utils/util.js testharness",
     "build": "tsc --noEmit && rm -fr lib && babel src --out-dir lib --extensions .ts --source-maps inline",
     "prepack": "npm run build"
   },
@@ -51,6 +51,8 @@
     "ava": "^2.4.0",
     "dotenv": "^8.2.0",
     "homebridge": "^0.4.50",
+    "is-port-reachable": "^3.0.0",
+    "nopt": "^4.0.1",
     "prettier": "1.19.1",
     "typescript": "^3.7.4"
   }

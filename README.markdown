@@ -132,6 +132,14 @@ A `.env` file is supported in the root of the project directory.
 - `yarn util ls` displays a list of devices currently in your Z-Wave network
 - `yarn util inspect :nodeid` query a specific node to display debug information including node info and command classes
 
+### Emulated Development
+
+You can run the testharness with a docker flag to launch an Z-Wave emulator with test devices.
+
+```bash
+yarn testharness --docker
+```
+
 ### Remote Development
 
 If your Z-Wave Controller is plugged into a different machine, you can access it remotely via `socat`.
@@ -147,10 +155,10 @@ alpine/socat -d -d tcp-l:32375,reuseaddr,fork file:/host/dev/ttyACM0,raw,nonbloc
 
 > NOTE: Remember to update your `/dev` path to match the path from [Finding Your Device](#finding-your-device).
 
-Next you’ll just need to configure your local machine to access it:
+Next, when launching the testharness on your local machine, pass through a `remote` flag:
 
 ```bash
-socat -d -d pty,link=./ttyVACM0,echo=0,raw,waitslave tcp:$IP_OF_REMOTE_MACHINE:32375
+yarn testharness --remote=$IP_OF_REMOTE_MACHINE:32375
 ```
 
-And you should be good to go, just setup your `.env` file to include `DEVICE_PATH=./ttyVACM0`.
+The testharness will handle launching socat on your local machine and configuring `DEVICE_PATH` for you.
