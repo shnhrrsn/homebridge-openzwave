@@ -1,12 +1,11 @@
-import AccessoryManager from './Accessories/AccessoryManager'
-import SimpleDriverRegistry from './Accessories/Registries/SimpleDriverRegistry'
-import Zwave from './Zwave/Zwave'
-
-import { Homebridge } from '../types/homebridge'
-import { IConfig } from './IConfig'
 import { Notification } from 'openzwave-shared'
+import { Homebridge } from '../types/homebridge'
+import AccessoryManager from './Accessories/AccessoryManager'
 import { IDriverRegistry } from './Accessories/Registries/IDriverRegistry'
 import { populateDriverRegistry } from './Accessories/Registries/populateDriverRegistry'
+import SimpleDriverRegistry from './Accessories/Registries/SimpleDriverRegistry'
+import { IConfig } from './IConfig'
+import Zwave from './Zwave/Zwave'
 
 export default class Platform implements Homebridge.Platform {
 	log: Homebridge.Logger
@@ -25,6 +24,7 @@ export default class Platform implements Homebridge.Platform {
 			ConsoleOutput: false,
 			Logging: false,
 			SaveConfiguration: false,
+			NotifyTransactions: true,
 		})
 		this.accessoryManager = new AccessoryManager(this)
 
