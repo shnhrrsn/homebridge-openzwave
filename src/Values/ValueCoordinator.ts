@@ -5,6 +5,7 @@ import { first, filter } from 'rxjs/operators'
 import { Homebridge } from '../../types/homebridge'
 import { IValueTransformer } from './Transformers/IValueTransformer'
 import { Subscription } from 'rxjs'
+import { shareReplay } from 'rxjs/operators'
 import { ValueType } from './ValueType'
 
 export type CoordinateValuesParams = {
@@ -48,7 +49,10 @@ export default class ValueCoordinator {
 		let valueUpdate = this.valueStream.valueObservable
 
 		if (this.transformer.isZwaveValid) {
-			valueUpdate = valueUpdate.pipe(filter(value => this.transformer.isZwaveValid!(value)))
+			valueUpdate = valueUpdate.pipe(
+				filter(value => this.transformer.isZwaveValid!(value)),
+				shareReplay(1),
+			)
 		}
 
 		// Subscribe to all value updates and forward them to HomeKit
