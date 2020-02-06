@@ -1,10 +1,10 @@
+import { Subscription } from 'rxjs'
+import { filter, first } from 'rxjs/operators'
+import { Homebridge } from '../../types/homebridge'
 import BoundValueStream from '../Streams/BoundValueStream'
 import exactlyOnce from '../Support/exactlyOnce'
-import noopValueTransformer from './Transformers/noopValueTransformer'
-import { first, filter } from 'rxjs/operators'
-import { Homebridge } from '../../types/homebridge'
 import { IValueTransformer } from './Transformers/IValueTransformer'
-import { Subscription } from 'rxjs'
+import noopValueTransformer from './Transformers/noopValueTransformer'
 import { ValueType } from './ValueType'
 
 export type CoordinateValuesParams = {
@@ -135,14 +135,9 @@ export default class ValueCoordinator {
 		this.log.debug('sendHomeKitValueToZwave', zwaveValue)
 
 		this.valueStream
-			.set(zwaveValue)
+			.setThenRefresh(zwaveValue, 5000)
 			.then(() => callback())
 			.catch(callback)
-			.finally(() => {
-				setTimeout(() => {
-					this.refreshZwaveValue('Set confirmation')
-				}, 5000)
-			})
 	}
 
 	private refreshZwaveValue(reason: String) {

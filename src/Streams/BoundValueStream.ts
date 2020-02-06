@@ -1,9 +1,10 @@
-import { ValueId, Value } from 'openzwave-shared'
-import { ValueType } from '../Values/ValueType'
-import { filter, map, distinctUntilChanged } from 'rxjs/operators'
-import { Observable, Subscription, BehaviorSubject } from 'rxjs'
+import { Value, ValueId } from 'openzwave-shared'
+import { BehaviorSubject, Observable, Subscription } from 'rxjs'
+import { distinctUntilChanged, filter, map } from 'rxjs/operators'
 import { Homebridge } from '../../types/homebridge'
 import { IValueObservables } from '../Values/IValueObservables'
+import { ValueType } from '../Values/ValueType'
+import { ChainOperation, RefreshOperation, SetOperation } from '../Zwave/Operation'
 
 interface PublishValue {
 	value: ValueType
@@ -50,11 +51,39 @@ export default class BoundValueStream {
 	}
 
 	refresh(reason: String) {
-		return this.valueObservables.zwave.refreshValue(this.valueId, reason)
+		return this.valueObservables.zwave.perform(new RefreshOperation(this.valueId, reason))
 	}
 
 	set(newValue: ValueType): Promise<ValueType> {
-		return this.valueObservables.zwave.setValue(this.valueId, newValue)
+		return new Promise((resolve, reject) => {
+			this.valueObservables.zwave.perform(this.makeSetOperation(newValue, resolve, reject))
+		})
+	}
+
+	setThenRefresh(newValue: ValueType, afterDelay?: number): Promise<ValueType> {
+		return new Promise((resolve, reject) => {
+			this.valueObservables.zwave.perform(
+				new ChainOperation(
+					this.makeSetOperation(newValue, resolve, reject),
+					new RefreshOperation(this.valueId, 'Set confirmation'),
+					afterDelay,
+				),
+			)
+		})
+	}
+
+	private makeSetOperation(
+		newValue: ValueType,
+		resolve: (value: ValueType) => void,
+		reject: (error: Error) => void,
+	): SetOperation {
+		return new SetOperation(this.valueId, newValue, result => {
+			if (result instanceof Error) {
+				reject(result)
+			} else {
+				resolve(result)
+			}
+		})
 	}
 
 	private next(value: Value) {
