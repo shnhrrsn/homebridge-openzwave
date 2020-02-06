@@ -1,6 +1,7 @@
 import { ValueId } from 'openzwave-shared'
-import { ValueType } from '../Values/ValueType'
 import { INodeStreams } from '../Streams/INodeStreams'
+import { ValueType } from '../Values/ValueType'
+import { Operation } from './Operation'
 import ZwaveCache from './ZwaveCache'
 
 // TODO: Rename to something less specific?
@@ -11,14 +12,11 @@ export interface IZwave extends INodeStreams {
 	getControllerNodeId(): number
 	isNodeListeningDevice(nodeId: number): boolean
 
-	// Throttles refreshes, see ValueRefresher for more
-	refreshValue(valueId: ValueId, reason: String): void
+	// Perform an operation
+	perform(operation: Operation): void
 
 	// Pass through to ozw refreshValue
 	unsafeRefreshValue(valueId: ValueId): void
-
-	// No guarantees are made re: value set, see ValueSetter for more
-	setValue(valueId: ValueId, value: ValueType): Promise<ValueType>
 
 	// Pass through to ozw setValue
 	unsafeSetValue(valueId: ValueId, value: ValueType): void

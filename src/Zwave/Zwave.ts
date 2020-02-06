@@ -1,30 +1,32 @@
-import ValueSetter from '../Values/ValueSetter'
-import ValueRefresher from '../Values/ValueRefresher'
-import stringifyValueId from '../Support/stringifyValueId'
-import makePrefixedLogger from '../Support/makePrefixedLogger'
 import OpenZwave, {
-	NodeInfo,
-	Value,
-	Notification,
 	ControllerState,
+	NodeInfo,
+	Notification,
+	Value,
 	ValueId,
 } from 'openzwave-shared'
+import { ReplaySubject, Subject } from 'rxjs'
+import { Homebridge } from '../../types/homebridge'
 import {
-	INodeStreams,
-	INotificationParams,
-	INodeIdParams,
-	INodeInfoParams,
 	IControllerCommandParams,
 	INodeEventParams,
+	INodeIdParams,
+	INodeInfoParams,
+	INodeStreams,
+	INotificationParams,
 } from '../Streams/INodeStreams'
 import { IValueParams, IValueRemovedParams } from '../Streams/IValueStreams'
+import makePrefixedLogger from '../Support/makePrefixedLogger'
+import stringifyValueId from '../Support/stringifyValueId'
+import ValueRefresher from '../Values/ValueRefresher'
+import ValueSetter from '../Values/ValueSetter'
 import { ValueType } from '../Values/ValueType'
 import { IZwave } from './IZwave'
-import { Homebridge } from '../../types/homebridge'
-import { Subject, ReplaySubject } from 'rxjs'
+import { Operation } from './Operation'
+import OperationPerformer, { IOperationPerformer } from './OperationPerformer'
 import ZwaveCache from './ZwaveCache'
 
-export default class Zwave implements INodeStreams, IZwave {
+export default class Zwave implements INodeStreams, IZwave, IOperationPerformer {
 	readonly nodeRemoved = new Subject<INodeIdParams>()
 	readonly nodeAdded = new Subject<INodeIdParams>()
 	readonly nodeReset = new Subject<INodeIdParams>()
@@ -43,10 +45,12 @@ export default class Zwave implements INodeStreams, IZwave {
 	private valueSetters = new Map<string, ValueSetter>()
 	private valueRefreshers = new Map<string, ValueRefresher>()
 	private valueLoggers = new Map<string, Homebridge.Logger>()
+	private performer: OperationPerformer
 
 	constructor(log: Homebridge.Logger, settings: Partial<OpenZwave.IConstructorParameters>) {
 		this.log = log
 		this.ozw = new OpenZwave(settings)
+		this.performer = new OperationPerformer(this.ozw)
 
 		this.ozw.on('driver ready', homeId => this.cache.load(homeId))
 
@@ -116,6 +120,10 @@ export default class Zwave implements INodeStreams, IZwave {
 				})
 			},
 		)
+	}
+
+	perform(operation: Operation) {
+		this.performer.perform(operation)
 	}
 
 	refreshValue(valueId: ValueId, reason: String) {
