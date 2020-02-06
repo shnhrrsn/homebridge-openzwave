@@ -1,7 +1,7 @@
 import { ValueId, Value } from 'openzwave-shared'
 import { IValueStreams, IValueParams } from './IValueStreams'
 import { ValueType } from '../Values/ValueType'
-import { filter, map, distinctUntilChanged } from 'rxjs/operators'
+import { filter, map, distinctUntilChanged, skipWhile } from 'rxjs/operators'
 import { Observable, Subscription, BehaviorSubject } from 'rxjs'
 import { Homebridge } from '../../types/homebridge'
 
@@ -40,13 +40,22 @@ export default class BoundValueStream {
 			map(({ value }) => value),
 		)
 
+		let shouldSkip = true
 		this.valueChangedSubscriber = this.valueStreams.valueChanged
-			.pipe(filter(params => matchesValueId(params.value, value)))
+			.pipe(
+				filter(params => matchesValueId(params.value, value)),
+				skipWhile(() => shouldSkip),
+			)
 			.subscribe(this.onValueChanged.bind(this))
 
 		this.valueRefreshedSubscriber = this.valueStreams.valueRefreshed
-			.pipe(filter(params => matchesValueId(params.value, value)))
+			.pipe(
+				filter(params => matchesValueId(params.value, value)),
+				skipWhile(() => shouldSkip),
+			)
 			.subscribe(this.onValueRefreshed.bind(this))
+
+		shouldSkip = false
 	}
 
 	refresh() {
