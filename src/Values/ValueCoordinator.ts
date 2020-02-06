@@ -76,19 +76,27 @@ export default class ValueCoordinator {
 
 		// Handle explicit HomeKit value requests
 		this.characteristic.on('get', (callback: HomeKitCallback) => {
+			let didReceiveValue = false
+			callback = exactlyOnce(callback, this.log)
+
 			// valueUpdate is a ReplaySubject, so we can respond
 			// with the last cached value instantly
 			valueUpdate
 				.pipe(first())
 				.subscribe(value => {
-					this.sendZwaveValueToHomeKit(value, exactlyOnce(callback, this.log))
+					didReceiveValue = true
+					this.sendZwaveValueToHomeKit(value, callback)
 				})
 				.unsubscribe()
 
-			// However, we still want to grab the fresh value from
-			// the device, so we’ll request a refresh and that will
-			// be sent to HomeKit once it’s resolved
-			this.refreshZwaveValue()
+			if (!didReceiveValue) {
+				// Fail the initial get
+				callback(new Error('Value not available'))
+
+				// Then since we didn’t have the value cached, request a
+				// refresh and that will be sent to HomeKit once it’s resolved
+				this.refreshZwaveValue()
+			}
 		})
 	}
 
