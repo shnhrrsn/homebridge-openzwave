@@ -56,16 +56,12 @@ export default class ValueCoordinator {
 		}
 
 		// Subscribe to all value updates and forward them to HomeKit
-		let hadInitialValue = false
 		this.valueUpdateObserver = valueUpdate.subscribe(value => {
 			this.sendZwaveValueToHomeKit(value)
-			hadInitialValue = true
 		})
 
-		// If we didn’t immediately load a value, refresh
-		if (!hadInitialValue) {
-			this.valueStream.refresh()
-		}
+		// Always do an initial refresh as OZW cache is often out of date
+		this.valueStream.refresh()
 
 		// Handle explicit HomeKit value setting
 		if (this.readonly !== true) {
