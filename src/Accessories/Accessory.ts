@@ -108,5 +108,6 @@ export class Accessory {
 		const { Characteristic } = this.api.hap
 		infoService.setCharacteristic(<any>Characteristic.Manufacturer, nodeInfo.manufacturer)
 		infoService.setCharacteristic(<any>Characteristic.Model, nodeInfo.product)
+		infoService.setCharacteristic(<any>Characteristic.SerialNumber, `NODE-${this.nodeId}`)
 	}
 }
