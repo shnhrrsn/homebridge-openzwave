@@ -3,7 +3,7 @@ import { IValueStreams, IValueParams } from './IValueStreams'
 import { ValueType } from '../Values/ValueType'
 import { filter, map, distinctUntilChanged, skipWhile } from 'rxjs/operators'
 import { Observable, Subscription, BehaviorSubject } from 'rxjs'
-import { Homebridge } from '../../types/homebridge'
+import { Logging } from 'homebridge'
 
 interface PublishValue {
 	value: ValueType
@@ -13,13 +13,13 @@ interface PublishValue {
 export default class BoundValueStream {
 	private valueSubject: BehaviorSubject<PublishValue>
 	private valueStreams: IValueStreams
-	private log: Homebridge.Logger
+	private log: Logging
 	private valueChangedSubscriber: Subscription
 	private valueRefreshedSubscriber: Subscription
 	readonly valueId: ValueId
 	readonly valueObservable: Observable<ValueType>
 
-	constructor(value: Value, valueStreams: IValueStreams, log: Homebridge.Logger) {
+	constructor(value: Value, valueStreams: IValueStreams, log: Logging) {
 		this.valueId = value
 		this.valueStreams = valueStreams
 		this.log = log

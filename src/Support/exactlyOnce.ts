@@ -1,4 +1,4 @@
-import { Homebridge } from '../../types/homebridge'
+import { Logging } from 'homebridge'
 
 /**
  * Wraps a callback and ensures it’s only called once.
@@ -6,7 +6,7 @@ import { Homebridge } from '../../types/homebridge'
  */
 export default function exactlyOnce<ParamType, ReturnType>(
 	callback: (param: ParamType, ...args: any) => ReturnType | undefined,
-	log?: Homebridge.Logger,
+	log?: Logging,
 ): (param: ParamType) => ReturnType | undefined {
 	let hasFired = false
 	return function(param: ParamType, ...args: any): ReturnType | undefined {

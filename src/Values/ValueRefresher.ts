@@ -1,7 +1,7 @@
 import { ValueId } from 'openzwave-shared'
 import { IValueStreams } from '../Streams/IValueStreams'
-import { Homebridge } from '../../types/homebridge'
 import takeFreshValue from '../Support/takeFreshValue'
+import { Logging } from 'homebridge'
 
 /**
  * Throttles refresh requests by ensuring only a single refresh
@@ -11,9 +11,9 @@ export default class ValueRefresher {
 	private isRefreshing = false
 	readonly valueId: ValueId
 	readonly valueStreams: IValueStreams
-	readonly log: Homebridge.Logger
+	readonly log: Logging
 
-	constructor(log: Homebridge.Logger, valueId: ValueId, valueStreams: IValueStreams) {
+	constructor(log: Logging, valueId: ValueId, valueStreams: IValueStreams) {
 		this.log = log
 		this.valueId = valueId
 		this.valueStreams = valueStreams

@@ -20,8 +20,8 @@ import {
 import { IValueParams, IValueRemovedParams } from '../Streams/IValueStreams'
 import { ValueType } from '../Values/ValueType'
 import { IZwave } from './IZwave'
-import { Homebridge } from '../../types/homebridge'
 import { Subject, ReplaySubject } from 'rxjs'
+import { Logging } from 'homebridge'
 
 export default class Zwave implements INodeStreams, IZwave {
 	readonly nodeRemoved = new Subject<INodeIdParams>()
@@ -37,12 +37,12 @@ export default class Zwave implements INodeStreams, IZwave {
 	readonly notification = new ReplaySubject<INotificationParams>(1)
 	readonly controllerCommand = new ReplaySubject<IControllerCommandParams>(1)
 	readonly ozw: OpenZwave
-	readonly log: Homebridge.Logger
+	readonly log: Logging
 	private valueSetters = new Map<string, ValueSetter>()
 	private valueRefreshers = new Map<string, ValueRefresher>()
-	private valueLoggers = new Map<string, Homebridge.Logger>()
+	private valueLoggers = new Map<string, Logging>()
 
-	constructor(log: Homebridge.Logger, settings: Partial<OpenZwave.IConstructorParameters>) {
+	constructor(log: Logging, settings: Partial<OpenZwave.IConstructorParameters>) {
 		this.log = log
 		this.ozw = new OpenZwave(settings)
 
@@ -143,6 +143,11 @@ export default class Zwave implements INodeStreams, IZwave {
 	}
 
 	unsafeSetValue(valueId: ValueId, value: ValueType) {
+		if (Array.isArray(value) || typeof value === 'object') {
+			this.log.error('Unsupported Z-Wave Value', value)
+			return
+		}
+
 		this.ozw.setValue(valueId, value)
 	}
 
@@ -162,7 +167,7 @@ export default class Zwave implements INodeStreams, IZwave {
 		return this.ozw.cancelControllerCommand()
 	}
 
-	private getValueLogger(valueId: ValueId): Homebridge.Logger {
+	private getValueLogger(valueId: ValueId): Logging {
 		const key = stringifyValueId(valueId)
 		let log = this.valueLoggers.get(key)
 

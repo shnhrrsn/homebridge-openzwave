@@ -2,15 +2,22 @@ import BoundValueStream from '../Streams/BoundValueStream'
 import exactlyOnce from '../Support/exactlyOnce'
 import noopValueTransformer from './Transformers/noopValueTransformer'
 import { first, filter } from 'rxjs/operators'
-import { Homebridge } from '../../types/homebridge'
 import { IValueTransformer } from './Transformers/IValueTransformer'
 import { Subscription } from 'rxjs'
 import { shareReplay } from 'rxjs/operators'
 import { ValueType } from './ValueType'
+import {
+	Characteristic,
+	Logging,
+	CharacteristicEventTypes,
+	CharacteristicValue,
+	CharacteristicSetCallback,
+	SessionIdentifier,
+} from 'homebridge'
 
 export type CoordinateValuesParams = {
-	log: Homebridge.Logger
-	characteristic: HAPNodeJS.Characteristic
+	log: Logging
+	characteristic: Characteristic
 	valueStream: BoundValueStream
 	readonly?: boolean
 	transformer?: IValueTransformer
@@ -20,8 +27,8 @@ type HomeKitCallback = (error?: Error, ...args: any) => void
 
 // Coordinates value streams from both Zwave and HomeKit for a single Characteristic
 export default class ValueCoordinator {
-	readonly log: Homebridge.Logger
-	readonly characteristic: HAPNodeJS.Characteristic
+	readonly log: Logging
+	readonly characteristic: Characteristic
 	readonly valueStream: BoundValueStream
 	readonly transformer: IValueTransformer
 	readonly readonly: boolean
@@ -65,13 +72,16 @@ export default class ValueCoordinator {
 
 		// Handle explicit HomeKit value setting
 		if (this.readonly !== true) {
-			this.characteristic.on('set', (newValue: ValueType, callback: HomeKitCallback) => {
-				this.sendHomeKitValueToZwave(newValue, exactlyOnce(callback, this.log))
-			})
+			this.characteristic.on(
+				CharacteristicEventTypes.SET,
+				(newValue: CharacteristicValue, callback: CharacteristicSetCallback) => {
+					this.sendHomeKitValueToZwave(newValue, exactlyOnce(callback, this.log))
+				},
+			)
 		}
 
 		// Handle explicit HomeKit value requests
-		this.characteristic.on('get', (callback: HomeKitCallback) => {
+		this.characteristic.on(CharacteristicEventTypes.GET, (callback: HomeKitCallback) => {
 			let didReceiveValue = false
 			callback = exactlyOnce(callback, this.log)
 

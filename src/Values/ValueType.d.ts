@@ -1,1 +1,3 @@
-export type ValueType = boolean | number | string
+import { CharacteristicValue } from 'homebridge'
+
+export type ValueType = CharacteristicValue

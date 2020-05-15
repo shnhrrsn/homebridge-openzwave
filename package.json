@@ -32,7 +32,7 @@
     "semver": "^7.1.1"
   },
   "engines": {
-    "homebridge": ">=0.4.50"
+    "homebridge": ">=1.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.7",
@@ -50,7 +50,7 @@
     "ascii-table": "^0.0.9",
     "ava": "^2.4.0",
     "dotenv": "^8.2.0",
-    "homebridge": "^0.4.50",
+    "homebridge": "^1.0.4",
     "is-port-reachable": "^3.0.0",
     "nopt": "^4.0.1",
     "prettier": "1.19.1",

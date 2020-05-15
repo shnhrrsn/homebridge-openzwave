@@ -3,6 +3,7 @@ import ControllerCommandStreams from '../../Streams/ControllerCommandStreams'
 import { IDriverParams } from './Driver'
 import { ValueType } from '../../Values/ValueType'
 import { first } from 'rxjs/operators'
+import { CharacteristicEventTypes } from 'homebridge'
 
 // Platform specific driver to create switches within HomeKit
 // to allow users to add/remove nodes
@@ -43,11 +44,11 @@ function createPlatformSwitch(
 
 	let isOn = false
 
-	characteristic.on('get', (callback: Function) => {
+	characteristic.on(CharacteristicEventTypes.GET, (callback: Function) => {
 		setTimeout(() => callback(isOn), 1000)
 	})
 
-	characteristic.on('set', (value: ValueType, callback?: Function) => {
+	characteristic.on(CharacteristicEventTypes.SET, (value: ValueType, callback?: Function) => {
 		if (value === isOn) {
 			return callback?.()
 		}

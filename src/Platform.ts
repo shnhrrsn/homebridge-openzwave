@@ -1,20 +1,20 @@
 import AccessoryManager from './Accessories/AccessoryManager'
 import Zwave from './Zwave/Zwave'
 
-import { Homebridge } from '../types/homebridge'
 import { IConfig } from './IConfig'
-import { Notification, ControllerState } from 'openzwave-shared'
+import { Notification } from 'openzwave-shared'
+import { Logging, API, DynamicPlatformPlugin, PlatformAccessory, PlatformConfig } from 'homebridge'
 
-export default class Platform implements Homebridge.Platform {
-	log: Homebridge.Logger
+export default class Platform implements DynamicPlatformPlugin {
+	log: Logging
 	config?: IConfig
-	api: Homebridge.Api
+	api: API
 	zwave: Zwave
 	accessoryManager: AccessoryManager
 
-	constructor(log: Homebridge.Logger, config: IConfig | undefined, api: Homebridge.Api) {
+	constructor(log: Logging, config: PlatformConfig, api: API) {
 		this.log = log
-		this.config = config
+		this.config = config as IConfig
 		this.api = api
 		this.zwave = new Zwave(this.log, {
 			ConsoleOutput: false,
@@ -45,7 +45,7 @@ export default class Platform implements Homebridge.Platform {
 		this.zwave.ozw.connect(this.config.zwave.devicePath)
 	}
 
-	configureAccessory(accessory: Homebridge.PlatformAccessory): void {
+	configureAccessory(accessory: PlatformAccessory): void {
 		this.accessoryManager.restoreAccessory(accessory)
 	}
 

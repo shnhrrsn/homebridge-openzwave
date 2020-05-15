@@ -1,12 +1,12 @@
-import { Homebridge } from '../../../types/homebridge'
 import { Accessory } from '../Accessory'
 import { Value } from 'openzwave-shared'
 import { IValueStreams } from '../../Streams/IValueStreams'
 import { IZwave } from '../../Zwave/IZwave'
+import { HAP, Logging } from 'homebridge'
 
 export interface IDriverParams {
-	hap: Homebridge.Hap
-	log: Homebridge.Logger
+	hap: HAP
+	log: Logging
 	accessory: Accessory
 	valueStreams: IValueStreams
 	values: Map<number, Value>

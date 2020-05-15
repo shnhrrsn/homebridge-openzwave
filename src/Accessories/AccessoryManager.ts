@@ -7,20 +7,20 @@ import mergeDeviceConfig from '../Devices/mergeDeviceConfig'
 import { Accessory, AccessoryCommands } from './Accessory'
 import { IConfig } from '../IConfig'
 import { IAccessoryConfig } from '../IAccessoryConfig'
-import { Homebridge } from '../../types/homebridge'
 import { NodeInfo } from 'openzwave-shared'
 import { INodeInfoParams, INodeIdParams } from '../Streams/INodeStreams'
 import { platformName, pluginName } from '../settings'
 import { CommandClass } from '../Zwave/CommandClass'
+import { Logging, PlatformAccessory, API } from 'homebridge'
 
 export default class AccessoryManager {
-	log: Homebridge.Logger
+	log: Logging
 	config?: IConfig
-	api: Homebridge.Api
+	api: API
 	zwave: Zwave
 	registry: Map<string, Accessory>
 	nodeIdToCommandsMap: Map<number, AccessoryCommands>
-	restorableAccessories: Map<string, Homebridge.PlatformAccessory>
+	restorableAccessories: Map<string, PlatformAccessory>
 
 	constructor(platform: Platform) {
 		if (!platform.zwave) {
@@ -70,7 +70,7 @@ export default class AccessoryManager {
 		}
 	}
 
-	restoreAccessory(accessory: Homebridge.PlatformAccessory) {
+	restoreAccessory(accessory: PlatformAccessory) {
 		this.restorableAccessories.set(accessory.UUID, accessory)
 	}
 

@@ -1,6 +1,8 @@
-import { Homebridge } from '../types/homebridge'
+import { Logging, LogLevel } from 'homebridge'
 
-export default class MockNoopLogger implements Homebridge.Logger {
+export default class MockNoopLogger implements Logging {
+	prefix: string
+	log(level: LogLevel, message: string, ...parameters: any[]): void {}
 	debug() {}
 	info() {}
 	warn() {}
