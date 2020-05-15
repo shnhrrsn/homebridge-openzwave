@@ -22,6 +22,20 @@ This project was initially forked from [velocityzen/homebridge-platform-zwave](h
   - [Aeotec Z-Stick Gen5](https://aeotec.com/z-wave-usb-stick)
 - [OpenZwave](https://github.com/OpenZWave/open-zwave)
 
+In addition to OpenZwave, be sure to install the ozw dev package:
+
+For Ubuntu/Debian:
+
+```bash
+sudo apt install libopenzwave1.5-dev
+```
+
+For Alpine:
+
+```bash
+sudo apk --no-cache add openzwave-dev
+```
+
 ## Installation
 
 1. [Homebridge](https://github.com/nfarina/homebridge)
