@@ -19,6 +19,12 @@ export default function exactlyOnce<ParamType, ReturnType>(
 			hasFired = true
 		}
 
-		return callback(param, ...args)
+		try {
+			return callback(param, ...args)
+		} catch (err) {
+			if (log) {
+				log.warn('Error invoking callback', err)
+			}
+		}
 	}
 }
