@@ -19,29 +19,72 @@ This project was initially forked from [velocityzen/homebridge-platform-zwave](h
 
 ## Requirements
 
-- Z-Wave Gateway
+- Z-Wave Controller
+- OpenZWave
+- [Homebridge](https://github.com/nfarina/homebridge)
+
+### Z-Wave Controller
+
+A Z-Wave Controller is any device that acts as a gateway hub for your Z-Wave network and manages your Z-Wave nodes (lights, sensors, locks, etc.). This device can be a USB device or a board <abbr title="Hardware Attached on Top">HAT</abbr>.
+
+The following controllers are known to work:
   - [Aeotec Z-Stick Gen5](https://aeotec.com/z-wave-usb-stick)
-- [OpenZwave](https://github.com/OpenZWave/open-zwave)
+  - [HomeSeer SmartStick+ G2 USB Z-Wave Stick](https://shop.homeseer.com/collections/z-wave-usb-sticks-network-controllers/products/z-wave-usb-stick)
 
-In addition to OpenZwave, be sure to install the ozw dev package:
+But others should work too.
 
+### OpenZWave
+
+[OpenZWave](https://github.com/OpenZWave/open-zwave) is a library for applications to control Z-Wave networks via the z-wave controller. This plugin uses OpenZWave to interact with many types of devices.
+
+#### Installation
+
+<details><summary>Package manager</summary>
+<p>
 For Ubuntu/Debian:
 
 ```bash
+sudo apt install libopenzwave1.5
 sudo apt install libopenzwave1.5-dev
 ```
 
 For Alpine:
 
 ```bash
+sudo apk --no-cache add openzwave
 sudo apk --no-cache add openzwave-dev
 ```
+  
+</p>
+</details>
+
+<details><summary>From source</summary>
+<p>  
+Note: on Raspberry Pi, replace `lib64` with `lib`
+
+```bash
+git clone https://github.com/OpenZWave/open-zwave.git
+cd openzwave
+make && sudo make install
+export LD_LIBRARY_PATH=/usr/local/lib64
+sudo sed -i '$a LD_LIBRARY_PATH=/usr/local/lib64' /etc/environment
+sudo ldconfig
+```
+</p>
+</details>
+
 
 ## Installation
 
-1. [Homebridge](https://github.com/nfarina/homebridge)
-2. `npm i -g homebridge-openzwave`
-3. Add platform to your config file
+### Add plugin
+
+#### [homebridge-config-ui-x](https://github.com/oznu/homebridge-config-ui-x)
+
+Search for `homebridge-openzwave` and install
+
+#### Manual
+
+`npm i -g homebridge-openzwave`
 
 ## Configuration
 
@@ -62,13 +105,13 @@ In order to use this plugin, you’ll need to add the following JSON object to y
 | `platform`         | Homebridge Platform name.<br>This value should always be openzwave.                                                                                     | Y        |
 | `name`             | The name of this platform within Homebridge.<br>This is mainly used for logs and can be any value you want.                                             | N        |
 | `zwave`            | This contains the settings that will be passed to OpenZWave.                                                                                            | Y        |
-| `zwave.devicePath` | The device path to your gateway.<br>See [Finding Your Device](#finding-your-device) for more information.]                                              | Y        |
+| `zwave.devicePath` | The device path to your controller.<br>See [Finding Your Device](#finding-your-device) for more information.                                             | Y        |
 | `uuidPrefix`       | Override the default prefix used when generating UUIDs for each node.<br>_NOTE: Most setups will not need to change this value._                        | N        |
 | `accessories`      | Customize how your Z-Wave accessories behave in HomeKit, or exclude them entirely.<br>See the [Accessories](#accessories) section for more information. | N        |
 
 ### Finding Your Device
 
-To locate your Z-Wave controller, try running `ls /dev/tty.*` or `ls /dev/cu.*` in terminal. Depending on your OS, you may also be able to run `ls -lah /dev/serial/by-id` to find additional context for which device in your Z-Wave gateway.
+To locate your Z-Wave controller, try running `ls /dev/tty.*` or `ls /dev/cu.*` in terminal. Depending on your OS, you may also be able to run `ls -lah /dev/serial/by-id` to find additional context for which device path is your Z-Wave controller.
 
 If you’re unable to figure out the correct device, try unplugging it and running the commands above, after that, plug it back in and look for the additional device that wasn’t there before.
 
@@ -86,9 +129,17 @@ The accessories config object allows you to customize how your devices appear an
   "accessories": {
     "3": {
       "name": "My Fan Control",
-      "classes": {
+      "commands": {
         "ignored": [128],
-        "rewrite": [{ "from": 38, "to": 999001, "indexes": { "5": 0 } }]
+        "rewrite": [
+          {
+            "from": 38,
+            "to": 999001,
+            "indexes": {
+              "5": 0
+            }
+          }
+        ]
       },
       "hints": ["fan"]
     }
@@ -109,7 +160,7 @@ The accessories config object allows you to customize how your devices appear an
 
 #### Excluding Accessories from HomeKit
 
-If you have Z-Wave nodes you’d wish to exclude from HomeKit, you can hide them by setting the accessory to false:
+If you have Z-Wave nodes you’d wish to exclude from HomeKit, you can hide them by setting the accessory to `false`:
 
 ```json
 {
@@ -126,7 +177,7 @@ If you have Z-Wave nodes you’d wish to exclude from HomeKit, you can hide them
 
 ## Device Handlers
 
-`homebridge-openzwave` supports global/shared device handlers to override default Z-Wave behavior. This can be useful for devices that use generic commands for more specific purposes, such as a fan control that only implements SWITCH_MULTILEVEL.
+`homebridge-openzwave` supports global/shared device handlers to override default Z-Wave behavior. This can be useful for devices that use generic commands for more specific purposes, such as a fan control that only implements `SWITCH_MULTILEVEL`.
 
 For more information on device handlers, see the [README](src/Devices/README.markdown).
 
