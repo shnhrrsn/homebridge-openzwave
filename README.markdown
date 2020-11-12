@@ -109,7 +109,7 @@ In order to use this plugin, you’ll need to add the following JSON object to y
 | `uuidPrefix`       | Override the default prefix used when generating UUIDs for each node.<br>_NOTE: Most setups will not need to change this value._                        | N        |
 | `accessories`      | Customize how your Z-Wave accessories behave in HomeKit, or exclude them entirely.<br>See the [Accessories](#accessories) section for more information. | N        |
 
-### Finding Your Device
+### Finding Your Controller
 
 To locate your Z-Wave controller, try running `ls /dev/tty.*` or `ls /dev/cu.*` in terminal. Depending on your OS, you may also be able to run `ls -lah /dev/serial/by-id` to find additional context for which device path is your Z-Wave controller.
 
@@ -174,6 +174,19 @@ If you have Z-Wave nodes you’d wish to exclude from HomeKit, you can hide them
   }
 }
 ```
+
+## Adding Devices
+
+Installing this plugin automatically adds a set of switches to HomeKit that allows you to add and remove Z-Wave nodes/devices. This allows you to include new Z-Wave devices to your Z-Wave network.
+
+To add a device:
+- Turn the 'Add Node' switch to on
+- Place your Z-Wave device into inclusion mode. Note: This step varies per device.
+- If the device paired successfully, you should see the 'Add Node' switch reset to off
+- Wait a few seconds to a few minutes for the Z-Wave device to configure and appear within HomeKit.
+- If needed, customize the device under the `accessories` key in the plugin config
+
+Note: one of the switches, 'Add Secure Node' allows you to add a device with additional security features. Due to current limitations in OpenZWave, this impacts device responsivenes as there are additional communication steps involved. This may be resolved in future OpenZWave releases. Most devices do not need to be added as secure nodes.
 
 ## Device Handlers
 
